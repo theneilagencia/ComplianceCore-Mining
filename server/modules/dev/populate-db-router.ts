@@ -58,15 +58,21 @@ router.post('/populate-db', async (req, res) => {
       audits: 0
     };
     
-    // 1. Criar tenant padrão
+    // 1. Verificar e criar tenant padrão se não existir
     const tenantId = 'default_tenant';
-    await db.insert(tenants).values({
-      id: tenantId,
-      name: 'QIVO Mining',
-      logoUrl: null,
-      s3Prefix: 'qivo-mining',
-      createdAt: new Date()
-    }).onConflictDoNothing();
+    const existingTenant = await db.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1);
+    
+    if (existingTenant.length === 0) {
+      console.log('[Populate DB] Creating default tenant...');
+      await db.insert(tenants).values({
+        id: tenantId,
+        name: 'QIVO Mining',
+        s3Prefix: 'qivo-mining'
+      });
+      console.log('[Populate DB] Tenant created successfully');
+    } else {
+      console.log('[Populate DB] Tenant already exists, skipping...');
+    }
     
     // 2. Criar usuários
     console.log('[Populate DB] Creating users...');
