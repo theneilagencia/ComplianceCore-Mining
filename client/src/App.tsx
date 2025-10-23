@@ -35,6 +35,10 @@ const AuditKRCI = lazy(() => import("./modules/technical-reports/pages/AuditKRCI
 const PreCertification = lazy(() => import("./modules/technical-reports/pages/PreCertification"));
 const ExportStandards = lazy(() => import("./modules/technical-reports/pages/ExportStandards"));
 const ReviewReport = lazy(() => import("./modules/technical-reports/pages/ReviewReport"));
+const ESGReporting = lazy(() => import("./modules/technical-reports/pages/ESGReporting"));
+const ValuationAutomatic = lazy(() => import("./modules/technical-reports/pages/ValuationAutomatic"));
+const RegulatoryRadar = lazy(() => import("./modules/technical-reports/pages/RegulatoryRadar"));
+const GovernanceSecurity = lazy(() => import("./modules/technical-reports/pages/GovernanceSecurity"));
 
 // Loading component
 const PageLoader = () => (
@@ -101,6 +105,18 @@ function Router() {
         </Route>
         <Route path="/reports/export">
           <PrivateRoute><ExportStandards /></PrivateRoute>
+        </Route>
+        <Route path="/reports/esg">
+          <PrivateRoute><ESGReporting /></PrivateRoute>
+        </Route>
+        <Route path="/reports/valuation">
+          <PrivateRoute><ValuationAutomatic /></PrivateRoute>
+        </Route>
+        <Route path="/reports/regulatory">
+          <PrivateRoute><RegulatoryRadar /></PrivateRoute>
+        </Route>
+        <Route path="/reports/governance">
+          <PrivateRoute><GovernanceSecurity /></PrivateRoute>
         </Route>
         <Route path="/reports/:reportId/review">
           {(params) => (
