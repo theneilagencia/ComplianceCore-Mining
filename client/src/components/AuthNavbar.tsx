@@ -34,11 +34,12 @@ export default function AuthNavbar() {
             </div>
 
             {/* Minha Conta Button */}
-            <Link href="/account">
-              <button className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors">
-                Minha Conta
-              </button>
-            </Link>
+            <button
+              onClick={() => window.location.href = '/account'}
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+            >
+              Minha Conta
+            </button>
 
             {/* Logout Button */}
             <button
