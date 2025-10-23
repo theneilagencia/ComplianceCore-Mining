@@ -289,8 +289,40 @@ class SDKServer {
       }
     }
     
-    // Fallback to cookie-based authentication (for OAuth)
+    // Try accessToken cookie (for email/password auth with cookies)
     const cookies = this.parseCookies(req.headers.cookie);
+    const accessTokenCookie = cookies.get('accessToken');
+    
+    if (accessTokenCookie) {
+      try {
+        const authService = await import('../modules/auth/service');
+        const decoded = authService.verifyToken(accessTokenCookie);
+        
+        const signedInAt = new Date();
+        let user = await db.getUser(decoded.userId);
+        
+        if (!user) {
+          throw ForbiddenError("User not found");
+        }
+        
+        // Update lastSignedIn
+        const dbInstance = await db.getDb();
+        if (dbInstance) {
+          const { users } = await import('../../drizzle/schema');
+          const { eq } = await import('drizzle-orm');
+          await dbInstance.update(users)
+            .set({ lastSignedIn: signedInAt })
+            .where(eq(users.id, user.id));
+        }
+        
+        return user;
+      } catch (error) {
+        console.error('[Auth] Cookie JWT verification failed:', error);
+        // Continue to OAuth fallback
+      }
+    }
+    
+    // Fallback to cookie-based authentication (for OAuth)
     const sessionCookie = cookies.get(COOKIE_NAME);
     const session = await this.verifySession(sessionCookie);
 
