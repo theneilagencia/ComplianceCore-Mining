@@ -8,6 +8,7 @@ import { registerOAuthRoutes } from "./oauth";
 import paymentRouter from "../modules/payment/router";
 import licenseRouter from "../modules/licenses/router";
 import authRouter from "../modules/auth/router";
+import adminRouter from "../modules/admin/router";
 import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
@@ -66,6 +67,9 @@ async function startServer() {
   // Payment and License routes
   app.use("/api/payment", paymentRouter);
   app.use("/api/license", licenseRouter);
+  
+  // Admin routes
+  app.use("/api/admin", adminRouter);
   // tRPC API
   app.use(
     "/api/trpc",

@@ -21,6 +21,7 @@ const Cancel = lazy(() => import("./pages/Cancel"));
 const Account = lazy(() => import("./pages/Account"));
 const Subscription = lazy(() => import("./pages/Subscription"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Admin = lazy(() => import("./pages/Admin"));
 
 // Technical Reports Module Pages (lazy loading)
 const GenerateReport = lazy(() => import("./modules/technical-reports/pages/GenerateReport"));
@@ -58,6 +59,7 @@ function Router() {
         <Route path={"/account"} component={Account} />
         <Route path={"/subscription"} component={Subscription} />
         <Route path={"/dashboard"} component={Dashboard} />
+        <Route path={"/admin"} component={Admin} />
         
         {/* Technical Reports Routes */}
         <Route path={"/reports/generate"} component={GenerateReport} />
