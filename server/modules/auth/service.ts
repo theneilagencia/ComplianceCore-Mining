@@ -11,6 +11,7 @@ import { users } from '../../../drizzle/schema';
 import type { User, InsertUser } from '../../../drizzle/schema';
 import { createId } from '@paralleldrive/cuid2';
 import * as licenseService from '../licenses/service';
+import { ensureDefaultPlan } from '../licenses/ensure-default-plan';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-production';
 const JWT_EXPIRES_IN = '15m'; // Access token expires in 15 minutes
@@ -181,6 +182,9 @@ export async function loginUser(credentials: LoginCredentials): Promise<AuthToke
     throw new Error('Invalid email or password');
   }
 
+  // Ensure user has a START plan (creates one if missing)
+  await ensureDefaultPlan(user.id, user.tenantId);
+
   // Generate tokens
   const accessToken = generateAccessToken(user.id, user.email!);
   const refreshToken = generateRefreshToken(user.id);
@@ -259,6 +263,9 @@ export async function loginWithGoogle(googleProfile: {
     await licenseService.createLicense(userId, tenantId, 'START');
 
     user = userData as any;
+  } else {
+    // Ensure existing user has a START plan (creates one if missing)
+    await ensureDefaultPlan(user.id, user.tenantId);
   }
 
   // Generate tokens
