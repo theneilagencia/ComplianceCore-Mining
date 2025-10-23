@@ -136,6 +136,75 @@ router.put('/:id', requireAuth, async (req: any, res) => {
   }
 });
 
+// POST /api/reports/save - Save new complete report
+router.post('/save', requireAuth, async (req: any, res) => {
+  try {
+    const db = await getDb();
+    const userId = req.user.id;
+    const data = req.body;
+
+    const newReport = await db
+      .insert(reports)
+      .values({
+        id: `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        userId,
+        title: data.title || 'Novo Relatório',
+        type: data.standard || 'JORC',
+        status: 'draft',
+        data: data,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    res.json({
+      success: true,
+      reportId: newReport[0].id,
+      message: 'Relatório salvo com sucesso',
+    });
+  } catch (error) {
+    console.error('[Reports] Save error:', error);
+    res.status(500).json({ error: 'Failed to save report' });
+  }
+});
+
+// POST /api/reports/:id/save - Update existing report
+router.post('/:id/save', requireAuth, async (req: any, res) => {
+  try {
+    const db = await getDb();
+    const userId = req.user.id;
+    const reportId = req.params.id;
+    const data = req.body;
+
+    const updated = await db
+      .update(reports)
+      .set({
+        title: data.title,
+        type: data.standard,
+        data: data,
+        updatedAt: new Date(),
+      })
+      .where(and(
+        eq(reports.id, reportId),
+        eq(reports.userId, userId)
+      ))
+      .returning();
+
+    if (!updated || updated.length === 0) {
+      return res.status(404).json({ error: 'Report not found' });
+    }
+
+    res.json({
+      success: true,
+      reportId: updated[0].id,
+      message: 'Relatório atualizado com sucesso',
+    });
+  } catch (error) {
+    console.error('[Reports] Update save error:', error);
+    res.status(500).json({ error: 'Failed to update report' });
+  }
+});
+
 // DELETE /api/reports/:id - Delete report
 router.delete('/:id', requireAuth, async (req: any, res) => {
   try {

@@ -19,7 +19,7 @@ export default function Reports() {
   const [reports, setReports] = useState<Report[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  const [creating, setCreating] = useState(false);
+
 
   useEffect(() => {
     fetchReports();
@@ -39,27 +39,8 @@ export default function Reports() {
     }
   };
 
-  const createNewReport = async () => {
-    try {
-      setCreating(true);
-      setError('');
-      const response = await apiFetch('/api/reports', {
-        method: 'POST',
-        body: JSON.stringify({
-          title: 'Novo Relatório JORC',
-          type: 'JORC',
-        }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        await fetchReports();
-      }
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar relatório. Tente novamente.');
-    } finally {
-      setCreating(false);
-    }
+  const createNewReport = () => {
+    setLocation('/reports/create');
   };
 
   const getStatusBadge = (status: string) => {
@@ -157,17 +138,9 @@ export default function Reports() {
           </div>
           <button
             onClick={createNewReport}
-            disabled={creating}
-            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:shadow-lg transition-all font-medium flex items-center gap-2"
           >
-            {creating ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                Criando...
-              </>
-            ) : (
-              <>+ Novo Relatório</>
-            )}
+            + Novo Relatório
           </button>
         </div>
 
@@ -183,10 +156,9 @@ export default function Reports() {
             <p className="text-gray-600 mb-6">Comece criando seu primeiro relatório técnico</p>
             <button
               onClick={createNewReport}
-              disabled={creating}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
-              {creating ? 'Criando...' : 'Criar Primeiro Relatório'}
+              Criar Primeiro Relatório
             </button>
           </div>
         ) : (
@@ -195,7 +167,7 @@ export default function Reports() {
               <div
                 key={report.id}
                 className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
-                onClick={() => alert(`Visualizar relatório: ${report.id}`)}
+                onClick={() => setLocation(`/reports/${report.id}/edit`)}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
