@@ -100,23 +100,21 @@ router.get('/users', requireAdmin, async (req, res) => {
     const search = req.query.search as string;
     const offset = (page - 1) * limit;
 
-    // Build query
-    let query = db
+    // Build query - fetch users and licenses separately to avoid nested object issues
+    const allUsers = await db
       .select({
         id: users.id,
         email: users.email,
         fullName: users.fullName,
         createdAt: users.createdAt,
         lastLoginAt: users.lastLoginAt,
-        license: {
-          id: licenses.id,
-          plan: licenses.plan,
-          status: licenses.status,
-          reportsUsed: licenses.reportsUsed,
-          reportsLimit: licenses.reportsLimit,
-          projectsActive: licenses.projectsActive,
-          projectsLimit: licenses.projectsLimit,
-        },
+        licenseId: licenses.id,
+        licensePlan: licenses.plan,
+        licenseStatus: licenses.status,
+        reportsUsed: licenses.reportsUsed,
+        reportsLimit: licenses.reportsLimit,
+        projectsActive: licenses.projectsActive,
+        projectsLimit: licenses.projectsLimit,
       })
       .from(users)
       .leftJoin(licenses, and(
@@ -127,12 +125,28 @@ router.get('/users', requireAdmin, async (req, res) => {
       .limit(limit)
       .offset(offset);
 
-    const allUsers = await query;
+    // Transform to expected format
+    const transformedUsers = allUsers.map(u => ({
+      id: u.id,
+      email: u.email,
+      fullName: u.fullName,
+      createdAt: u.createdAt,
+      lastLoginAt: u.lastLoginAt,
+      license: u.licenseId ? {
+        id: u.licenseId,
+        plan: u.licensePlan,
+        status: u.licenseStatus,
+        reportsUsed: u.reportsUsed,
+        reportsLimit: u.reportsLimit,
+        projectsActive: u.projectsActive,
+        projectsLimit: u.projectsLimit,
+      } : null,
+    }));
 
     // Filter by search if provided
-    let filteredUsers = allUsers;
+    let filteredUsers = transformedUsers;
     if (search) {
-      filteredUsers = allUsers.filter(u => 
+      filteredUsers = transformedUsers.filter(u => 
         u.email?.toLowerCase().includes(search.toLowerCase()) ||
         u.fullName?.toLowerCase().includes(search.toLowerCase())
       );
