@@ -21,6 +21,39 @@ class ErrorBoundary extends Component<Props, State> {
     return { hasError: true, error };
   }
 
+  componentDidCatch(error: Error, errorInfo: any) {
+    // Log error to console
+    console.error('ErrorBoundary caught an error:', error, errorInfo);
+
+    // Send error to backend logger
+    this.logErrorToBackend(error, errorInfo);
+  }
+
+  logErrorToBackend = async (error: Error, errorInfo: any) => {
+    try {
+      await fetch('/api/ux/log', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          level: 'error',
+          message: error.message,
+          context: {
+            name: error.name,
+            stack: error.stack,
+            componentStack: errorInfo?.componentStack,
+            pathname: window.location.pathname,
+            href: window.location.href
+          },
+          timestamp: new Date().toISOString()
+        })
+      });
+    } catch (logError) {
+      console.error('Failed to log error to backend:', logError);
+    }
+  };
+
   render() {
     if (this.state.hasError) {
       return (

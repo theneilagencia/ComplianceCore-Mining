@@ -18,6 +18,8 @@ import uxRouter from "../modules/ux/router";
 import systemRouter from "../modules/system/router";
 import supportRouter from "../modules/support/router";
 import radarRouter from "../modules/radar/router";
+import templatesRouter from "../modules/templates/router";
+import validateRouter from "../modules/validate/router";
 import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
@@ -120,6 +122,12 @@ async function startServer() {
   
   // Radar routes
   app.use("/api/radar", radarRouter);
+  
+  // Templates routes
+  app.use("/api/templates", templatesRouter);
+  
+  // Validation routes
+  app.use("/api/validate", validateRouter);
   // tRPC API
   app.use(
     "/api/trpc",
