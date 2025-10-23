@@ -17,6 +17,7 @@ import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
 import makeAdminRouter from "../modules/dev/make-admin-router";
 import createTablesRouter from "../modules/dev/create-tables-router";
+import populateDbRouter from "../modules/dev/populate-db-router";
 import stripeWebhookSetupRouter from "../modules/dev/setup-stripe-webhook";
 import { runDevSeeds } from "../modules/dev/seed";
 import { appRouter } from "../routers";
@@ -71,6 +72,9 @@ async function startServer() {
   
   // Create tables route (temporary, for setup)
   app.use("/api/dev", createTablesRouter);
+  
+  // Populate database route (temporary, for setup)
+  app.use("/api/dev", populateDbRouter);
   
   // Stripe webhook setup route (temporary, for setup)
   app.use("/api", stripeWebhookSetupRouter);
