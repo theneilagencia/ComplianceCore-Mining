@@ -18,7 +18,7 @@ router.post('/make-admin', async (req, res) => {
       return res.status(400).json({ error: 'Email is required' });
     }
 
-    const db = getDb();
+    const db = await getDb();
 
     // Find user
     const userResult = await db
