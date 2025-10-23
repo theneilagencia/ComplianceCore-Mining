@@ -356,3 +356,148 @@ router.get('/sources', async (req: Request, res: Response) => {
 
 export default router;
 
+
+
+// Mock regulatory changes data
+const MOCK_REGULATORY_CHANGES = [
+  {
+    id: 'reg-001',
+    country: 'Brazil',
+    date: '2025-10-15',
+    summary: 'Nova lei de licenciamento ambiental para mineração reduz prazo de análise de 180 para 90 dias',
+    fullText: 'O Congresso Nacional aprovou a Lei 14.XXX/2025 que estabelece novos prazos para análise de licenciamento ambiental de projetos de mineração. A medida visa acelerar a aprovação de projetos considerados estratégicos para o país, mantendo os requisitos de proteção ambiental. Os órgãos ambientais terão 90 dias para análise inicial, com possibilidade de prorrogação por mais 45 dias em casos excepcionais.',
+    source: 'Diário Oficial da União',
+    category: 'licensing',
+    impact: 'high',
+    url: 'https://www.in.gov.br/exemplo',
+  },
+  {
+    id: 'reg-002',
+    country: 'Chile',
+    date: '2025-10-10',
+    summary: 'Aumento de royalties sobre mineração de cobre de 3% para 5%',
+    fullText: 'O governo chileno anunciou o aumento da alíquota de royalties sobre a exploração de cobre, principal commodity do país. A medida entrará em vigor em janeiro de 2026 e afetará todas as operações com produção superior a 50.000 toneladas anuais. Os recursos adicionais serão destinados a programas de desenvolvimento regional e transição energética.',
+    source: 'Ministerio de Minería de Chile',
+    category: 'taxation',
+    impact: 'high',
+    url: 'https://www.mineria.gob.cl/ejemplo',
+  },
+  {
+    id: 'reg-003',
+    country: 'Australia',
+    date: '2025-10-08',
+    summary: 'Novas diretrizes de segurança para operações subterrâneas',
+    fullText: 'O Departamento de Recursos Minerais da Austrália publicou novas diretrizes de segurança para operações de mineração subterrânea. As mudanças incluem requisitos mais rigorosos para ventilação, monitoramento de gases e treinamento de equipes de emergência. As empresas têm 12 meses para adequação completa aos novos padrões.',
+    source: 'Australian Department of Resources',
+    category: 'safety',
+    impact: 'medium',
+    url: 'https://www.industry.gov.au/exemplo',
+  },
+  {
+    id: 'reg-004',
+    country: 'Peru',
+    date: '2025-10-05',
+    summary: 'Consulta prévia obrigatória a comunidades indígenas ampliada',
+    fullText: 'O Ministério de Energia e Minas do Peru ampliou o escopo da consulta prévia obrigatória a comunidades indígenas. Agora, além de novos projetos, operações em expansão que afetem territórios tradicionais também devem passar pelo processo de consulta. A medida visa garantir maior participação das comunidades nas decisões sobre projetos minerários.',
+    source: 'Ministerio de Energía y Minas del Perú',
+    category: 'licensing',
+    impact: 'high',
+    url: 'https://www.minem.gob.pe/ejemplo',
+  },
+  {
+    id: 'reg-005',
+    country: 'Indonesia',
+    date: '2025-10-01',
+    summary: 'Proibição de exportação de minério bruto de níquel mantida',
+    fullText: 'O governo indonésio confirmou a manutenção da proibição de exportação de minério bruto de níquel, forçando empresas a processar o mineral localmente. A medida visa agregar valor à cadeia produtiva nacional e atrair investimentos em refinarias. Empresas que não se adequarem até 2026 terão suas licenças de exportação canceladas.',
+    source: 'Ministry of Energy and Mineral Resources Indonesia',
+    category: 'other',
+    impact: 'high',
+    url: 'https://www.esdm.go.id/exemplo',
+  },
+  {
+    id: 'reg-006',
+    country: 'South Africa',
+    date: '2025-09-28',
+    summary: 'Novo código de mineração estabelece cotas de participação local',
+    fullText: 'O novo Mining Charter da África do Sul estabelece que empresas de mineração devem ter no mínimo 30% de participação de empresários negros sul-africanos até 2030. A medida faz parte da política de transformação econômica do país e afeta todas as novas licenças de mineração concedidas a partir de 2026.',
+    source: 'Department of Mineral Resources and Energy SA',
+    category: 'licensing',
+    impact: 'high',
+    url: 'https://www.dmre.gov.za/exemplo',
+  },
+  {
+    id: 'reg-007',
+    country: 'Canada',
+    date: '2025-09-25',
+    summary: 'Incentivos fiscais para mineração de minerais críticos',
+    fullText: 'O governo canadense anunciou um pacote de incentivos fiscais para empresas que exploram minerais críticos (lítio, cobalto, grafite, terras raras). As medidas incluem crédito tributário de 30% sobre investimentos em exploração e isenção de impostos sobre exportação por 5 anos. O objetivo é fortalecer a cadeia de suprimentos de baterias para veículos elétricos.',
+    source: 'Natural Resources Canada',
+    category: 'taxation',
+    impact: 'medium',
+    url: 'https://www.nrcan.gc.ca/exemplo',
+  },
+  {
+    id: 'reg-008',
+    country: 'DRC',
+    date: '2025-09-20',
+    summary: 'Revisão do código de mineração aumenta participação estatal',
+    fullText: 'A República Democrática do Congo revisou seu código de mineração, aumentando a participação estatal em projetos de mineração de 5% para 10%. A medida afeta principalmente operações de cobalto e cobre. Empresas já estabelecidas têm 24 meses para renegociar contratos e adequar estruturas societárias.',
+    source: 'Ministère des Mines RDC',
+    category: 'taxation',
+    impact: 'high',
+    url: 'https://www.mines-rdc.cd/exemplo',
+  },
+  {
+    id: 'reg-009',
+    country: 'Sweden',
+    date: '2025-09-15',
+    summary: 'Novas exigências ambientais para mineração no Ártico',
+    fullText: 'A Suécia implementou novas regulamentações ambientais para projetos de mineração em regiões árticas. As mudanças incluem estudos de impacto mais detalhados sobre ecossistemas sensíveis, monitoramento contínuo de biodiversidade e planos de recuperação ambiental mais rigorosos. Projetos em andamento têm 18 meses para adequação.',
+    source: 'Swedish Environmental Protection Agency',
+    category: 'environmental',
+    impact: 'medium',
+    url: 'https://www.naturvardsverket.se/exemplo',
+  },
+  {
+    id: 'reg-010',
+    country: 'India',
+    date: '2025-09-10',
+    summary: 'Simplificação de processos para mineração de carvão',
+    fullText: 'O Ministério do Carvão da Índia anunciou a simplificação de processos de licenciamento para mineração de carvão. O número de aprovações necessárias foi reduzido de 15 para 8, e o prazo total de licenciamento caiu de 3 anos para 18 meses. A medida visa aumentar a produção doméstica e reduzir importações.',
+    source: 'Ministry of Coal India',
+    category: 'licensing',
+    impact: 'medium',
+    url: 'https://www.coal.nic.in/exemplo',
+  },
+];
+
+/**
+ * GET /api/radar/regulatory-changes
+ * Returns regulatory changes affecting mining operations globally
+ */
+router.get('/regulatory-changes', async (req: Request, res: Response) => {
+  try {
+    // In production, this would aggregate data from:
+    // - Government official gazettes
+    // - Mining ministries websites
+    // - International mining associations
+    // - Legal databases
+    // - News agencies
+
+    // For now, return mock data
+    res.json({
+      success: true,
+      changes: MOCK_REGULATORY_CHANGES,
+      total: MOCK_REGULATORY_CHANGES.length,
+      lastUpdate: new Date().toISOString(),
+    });
+  } catch (error: any) {
+    console.error('[Radar] Error fetching regulatory changes:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to fetch regulatory changes',
+    });
+  }
+});
+
