@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { useApi } from '../hooks/useApi';
+import { useAuth } from '../contexts/AuthContext';
 
 interface Audit {
   id: string;
@@ -12,9 +14,12 @@ interface Audit {
 
 export default function Audits() {
   const [, setLocation] = useLocation();
+  const { apiFetch } = useApi();
+  const { logout } = useAuth();
   const [audits, setAudits] = useState<Audit[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [creating, setCreating] = useState(false);
 
   useEffect(() => {
     fetchAudits();
@@ -22,21 +27,13 @@ export default function Audits() {
 
   const fetchAudits = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/audits', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch audits');
-      }
-
+      setLoading(true);
+      setError('');
+      const response = await apiFetch('/api/audits');
       const data = await response.json();
       setAudits(data.audits || []);
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || 'Não foi possível carregar as auditorias. Tente novamente.');
     } finally {
       setLoading(false);
     }
@@ -44,26 +41,24 @@ export default function Audits() {
 
   const createNewAudit = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('/api/audits', {
+      setCreating(true);
+      setError('');
+      const response = await apiFetch('/api/audits', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
         body: JSON.stringify({
           title: 'Nova Auditoria KRCI',
           type: 'KRCI',
         }),
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to create audit');
+      const data = await response.json();
+      if (data.success) {
+        await fetchAudits();
       }
-
-      fetchAudits();
     } catch (err: any) {
-      alert('Erro ao criar auditoria: ' + err.message);
+      setError(err.message || 'Erro ao criar auditoria. Tente novamente.');
+    } finally {
+      setCreating(false);
     }
   };
 
@@ -91,8 +86,9 @@ export default function Audits() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando auditorias...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-purple-600 border-t-transparent mx-auto"></div>
+          <p className="mt-6 text-lg font-medium text-gray-700">Carregando auditorias...</p>
+          <p className="mt-2 text-sm text-gray-500">Aguarde um momento</p>
         </div>
       </div>
     );
@@ -116,13 +112,13 @@ export default function Audits() {
             <div className="flex gap-3">
               <button
                 onClick={() => setLocation('/dashboard')}
-                className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors border border-gray-300 rounded-lg hover:bg-gray-50"
               >
                 Voltar ao Dashboard
               </button>
               <button
                 onClick={() => {
-                  localStorage.removeItem('token');
+                  logout();
                   setLocation('/login');
                 }}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
@@ -137,8 +133,19 @@ export default function Audits() {
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {error && (
-          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4">
-            <p className="text-red-800">Erro: {error}</p>
+          <div className="mb-6 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+            <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+            </svg>
+            <div className="flex-1">
+              <p className="text-red-800 font-medium">{error}</p>
+              <button
+                onClick={fetchAudits}
+                className="mt-2 text-sm text-red-600 hover:text-red-800 font-medium underline"
+              >
+                Tentar novamente
+              </button>
+            </div>
           </div>
         )}
 
@@ -150,9 +157,17 @@ export default function Audits() {
           </div>
           <button
             onClick={createNewAudit}
-            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-medium"
+            disabled={creating}
+            className="px-6 py-3 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:shadow-lg transition-all font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
-            + Nova Auditoria
+            {creating ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                Criando...
+              </>
+            ) : (
+              <>+ Nova Auditoria</>
+            )}
           </button>
         </div>
 
@@ -168,9 +183,10 @@ export default function Audits() {
             <p className="text-gray-600 mb-6">Comece criando sua primeira auditoria KRCI</p>
             <button
               onClick={createNewAudit}
-              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+              disabled={creating}
+              className="px-6 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Criar Primeira Auditoria
+              {creating ? 'Criando...' : 'Criar Primeira Auditoria'}
             </button>
           </div>
         ) : (
