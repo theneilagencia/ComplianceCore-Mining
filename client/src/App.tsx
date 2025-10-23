@@ -41,6 +41,7 @@ const RegulatoryRadar = lazy(() => import("./modules/technical-reports/pages/Reg
 const GovernanceSecurity = lazy(() => import("./modules/technical-reports/pages/GovernanceSecurity"));
 const HelpSupport = lazy(() => import("./pages/HelpSupport"));
 const Support = lazy(() => import("./pages/Support"));
+const RadarPage = lazy(() => import("./modules/radar/RadarPage"));
 
 // Loading component
 const PageLoader = () => (
@@ -125,6 +126,9 @@ function Router() {
         </Route>
         <Route path="/support">
           <PrivateRoute><Support /></PrivateRoute>
+        </Route>
+        <Route path="/radar">
+          <PrivateRoute><RadarPage /></PrivateRoute>
         </Route>
         <Route path="/reports/:reportId/review">
           {(params) => (
