@@ -193,7 +193,7 @@ export default function Dashboard() {
 
  {/* Radar Regulatório */}
  <button
- onClick={() => setLocation('/reports/regulatory')}
+  onClick={() => setLocation('/radar')}
  className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
  >
  <div className="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center mb-4">
