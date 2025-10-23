@@ -9,6 +9,9 @@ import paymentRouter from "../modules/payment/router";
 import licenseRouter from "../modules/licenses/router";
 import authRouter from "../modules/auth/router";
 import adminRouter from "../modules/admin/router";
+import reportsRouter from "../modules/reports/router";
+import auditsRouter from "../modules/audits/router";
+import settingsRouter from "../modules/settings/router";
 import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
@@ -74,6 +77,11 @@ async function startServer() {
   
   // Admin routes
   app.use("/api/admin", adminRouter);
+  
+  // Reports, Audits, and Settings routes
+  app.use("/api/reports", reportsRouter);
+  app.use("/api/audits", auditsRouter);
+  app.use("/api/settings", settingsRouter);
   // tRPC API
   app.use(
     "/api/trpc",
