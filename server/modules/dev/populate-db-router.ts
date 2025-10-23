@@ -58,19 +58,19 @@ router.post('/populate-db', async (req, res) => {
       audits: 0
     };
     
-    // 1. Verificar e criar tenant padrão se não existir (usando SQL raw)
+    // 1. Verificar e criar tenant padrão se não existir
     const tenantId = 'default_tenant';
     const existingTenant = await db.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1);
     
     if (existingTenant.length === 0) {
-      console.log('[Populate DB] Creating default tenant using raw SQL...');
-      // Usar SQL raw para evitar problemas com campos nullable do Drizzle
-      const sql = `
-        INSERT INTO tenants (id, name, "s3Prefix", "createdAt")
-        VALUES ('${tenantId}', 'QIVO Mining', 'qivo-mining', NOW())
-        ON CONFLICT (id) DO NOTHING
-      `;
-      await db.execute(sql);
+      console.log('[Populate DB] Creating default tenant...');
+      await db.insert(tenants).values({
+        id: tenantId,
+        name: 'QIVO Mining',
+        logoUrl: null,
+        s3Prefix: 'qivo-mining',
+        createdAt: new Date()
+      });
       console.log('[Populate DB] Tenant created successfully');
     } else {
       console.log('[Populate DB] Tenant already exists, skipping...');
@@ -129,7 +129,7 @@ router.post('/populate-db', async (req, res) => {
     for (const userId of userIds) {
       const planRand = Math.random();
       let plan: 'START' | 'PRO' | 'ENTERPRISE';
-      let billingPeriod: 'monthly' | 'annual' | null = null;
+      let billingPeriod: 'monthly' | 'annual' = 'monthly';
       let stripeSubscriptionId: string | null = null;
       let stripeCustomerId: string | null = null;
       
@@ -187,16 +187,17 @@ router.post('/populate-db', async (req, res) => {
         });
         
         stats.licenses++;
-      } catch (err) {
-        console.log(`[Populate DB] License for ${userId} error:`, err);
+      } catch (err: any) {
+        console.log(`[Populate DB] License for ${userId} error:`, err.message);
       }
     }
     
     console.log(`[Populate DB] Created ${stats.licenses} licenses`);
     
-    // 4. Criar relatórios
+    // 4. Criar relatórios (usando campos corretos do schema)
     console.log('[Populate DB] Creating reports...');
     const reportCount = 100;
+    const reportIds: string[] = [];
     
     for (let i = 0; i < reportCount; i++) {
       const reportId = `report_${String(i + 1).padStart(5, '0')}`;
@@ -206,8 +207,9 @@ router.post('/populate-db', async (req, res) => {
       const title = `Relatório Técnico - ${mineral} - ${location}`;
       const standard = randomChoice(['JORC_2012', 'NI_43_101', 'PERC', 'SAMREC', 'CRIRSCO', 'CBRR']);
       const status = randomChoice(['draft', 'parsing', 'needs_review', 'ready_for_audit', 'audited', 'certified', 'exported']);
+      const sourceType = randomChoice(['internal', 'external']);
       
-      const data = {
+      const parsingSummary = {
         mineral,
         location,
         reserves: randomInt(100000, 10000000),
@@ -221,60 +223,83 @@ router.post('/populate-db', async (req, res) => {
       try {
         await db.insert(reports).values({
           id: reportId,
+          tenantId,
           userId,
           title,
           standard,
           status,
-          data: JSON.stringify(data),
+          sourceType,
+          detectedStandard: standard,
+          s3NormalizedUrl: null,
+          s3OriginalUrl: null,
+          parsingSummary,
           createdAt,
           updatedAt
         }).onConflictDoNothing();
         
+        reportIds.push(reportId);
         stats.reports++;
-      } catch (err) {
-        console.log(`[Populate DB] Report ${reportId} error:`, err);
+      } catch (err: any) {
+        console.log(`[Populate DB] Report ${reportId} error:`, err.message);
       }
     }
     
     console.log(`[Populate DB] Created ${stats.reports} reports`);
     
-    // 5. Criar auditorias
+    // 5. Criar auditorias (usando campos corretos do schema)
     console.log('[Populate DB] Creating audits...');
-    const auditCount = 80;
+    const auditCount = Math.min(80, reportIds.length);
     
     for (let i = 0; i < auditCount; i++) {
       const auditId = `audit_${String(i + 1).padStart(5, '0')}`;
+      const reportId = reportIds[i % reportIds.length];
       const userId = randomChoice(userIds);
-      const mineral = randomChoice(MINERALS);
-      const location = randomChoice(LOCATIONS);
-      const title = `Auditoria KRCI - ${mineral} - ${location}`;
       const auditType = randomChoice(['full', 'partial']);
-      const status = randomChoice(['draft', 'in_progress', 'completed', 'approved', 'rejected']);
       
-      const data = {
-        criteria_checked: randomInt(10, 50),
-        issues_found: randomInt(0, 10),
-        compliance_score: randomInt(60, 100)
+      const totalRules = randomInt(20, 50);
+      const passedRules = randomInt(Math.floor(totalRules * 0.6), totalRules);
+      const failedRules = totalRules - passedRules;
+      const score = parseFloat(((passedRules / totalRules) * 100).toFixed(2));
+      
+      const krcisJson = {
+        categories: [
+          { name: "Geology", passed: randomInt(5, 10), failed: randomInt(0, 3) },
+          { name: "Resources", passed: randomInt(5, 10), failed: randomInt(0, 3) },
+          { name: "Reserves", passed: randomInt(5, 10), failed: randomInt(0, 3) },
+          { name: "Mining", passed: randomInt(5, 10), failed: randomInt(0, 3) }
+        ]
+      };
+      
+      const recommendationsJson = {
+        critical: randomInt(0, 3),
+        high: randomInt(0, 5),
+        medium: randomInt(0, 8),
+        low: randomInt(0, 10),
+        items: []
       };
       
       const createdAt = new Date(Date.now() - randomInt(1, 180) * 24 * 60 * 60 * 1000);
-      const updatedAt = new Date(createdAt.getTime() + randomInt(0, 30) * 24 * 60 * 60 * 1000);
       
       try {
         await db.insert(audits).values({
           id: auditId,
+          reportId,
+          tenantId,
           userId,
-          title,
           auditType,
-          status,
-          data: JSON.stringify(data),
-          createdAt,
-          updatedAt
+          score,
+          totalRules,
+          passedRules,
+          failedRules,
+          krcisJson,
+          recommendationsJson,
+          pdfUrl: null,
+          createdAt
         }).onConflictDoNothing();
         
         stats.audits++;
-      } catch (err) {
-        console.log(`[Populate DB] Audit ${auditId} error:`, err);
+      } catch (err: any) {
+        console.log(`[Populate DB] Audit ${auditId} error:`, err.message);
       }
     }
     
