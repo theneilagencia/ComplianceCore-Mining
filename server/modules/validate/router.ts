@@ -1,9 +1,12 @@
 import express from 'express';
 import multer from 'multer';
 import * as XLSX from 'xlsx';
-import pdfParse from 'pdf-parse';
+import { createRequire } from 'module';
 import fs from 'fs/promises';
 import path from 'path';
+
+const require = createRequire(import.meta.url);
+const pdfParse = require('pdf-parse');
 
 const router = express.Router();
 
