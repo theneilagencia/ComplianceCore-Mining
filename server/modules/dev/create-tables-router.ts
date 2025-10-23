@@ -16,11 +16,27 @@ router.post('/create-tables', async (req, res) => {
 
     const client = postgres(dbUrl, { ssl: 'require', max: 1 });
 
-    // Create ENUMs if they don't exist
-    await client`CREATE TYPE IF NOT EXISTS standard AS ENUM ('JORC_2012', 'NI_43_101', 'PERC', 'SAMREC', 'CRIRSCO', 'CBRR')`;
-    await client`CREATE TYPE IF NOT EXISTS status AS ENUM ('draft', 'parsing', 'needs_review', 'ready_for_audit', 'audited', 'certified', 'exported')`;
-    await client`CREATE TYPE IF NOT EXISTS source_type AS ENUM ('internal', 'external')`;
-    await client`CREATE TYPE IF NOT EXISTS audit_type AS ENUM ('full', 'partial')`;
+    // Create ENUMs (ignore if they already exist)
+    try {
+      await client`CREATE TYPE standard AS ENUM ('JORC_2012', 'NI_43_101', 'PERC', 'SAMREC', 'CRIRSCO', 'CBRR')`;
+    } catch (e: any) {
+      if (!e.message.includes('already exists')) throw e;
+    }
+    try {
+      await client`CREATE TYPE status AS ENUM ('draft', 'parsing', 'needs_review', 'ready_for_audit', 'audited', 'certified', 'exported')`;
+    } catch (e: any) {
+      if (!e.message.includes('already exists')) throw e;
+    }
+    try {
+      await client`CREATE TYPE source_type AS ENUM ('internal', 'external')`;
+    } catch (e: any) {
+      if (!e.message.includes('already exists')) throw e;
+    }
+    try {
+      await client`CREATE TYPE audit_type AS ENUM ('full', 'partial')`;
+    } catch (e: any) {
+      if (!e.message.includes('already exists')) throw e;
+    }
     console.log('[Dev] ✅ ENUMs created');
 
     // Create reports table
