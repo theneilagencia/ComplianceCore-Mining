@@ -77,18 +77,9 @@ export default function Admin() {
   }, [activeTab]);
 
   const checkAdminAccess = async () => {
-    const token = localStorage.getItem('accessToken');
-    if (!token) {
-      setLocation('/login');
-      return;
-    }
-
     // Check if user is admin by trying to fetch stats
     try {
       const response = await fetch('/api/admin/stats', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
         credentials: 'include',
       });
 
@@ -112,11 +103,7 @@ export default function Admin() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
       const response = await fetch('/api/admin/stats', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
         credentials: 'include',
       });
 
@@ -134,11 +121,7 @@ export default function Admin() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
       const response = await fetch('/api/admin/users?limit=100', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
         credentials: 'include',
       });
 
@@ -156,11 +139,7 @@ export default function Admin() {
   const fetchSubscriptions = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
       const response = await fetch('/api/admin/subscriptions', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
         credentials: 'include',
       });
 
@@ -178,11 +157,7 @@ export default function Admin() {
   const fetchRevenue = async () => {
     setLoading(true);
     try {
-      const token = localStorage.getItem('accessToken');
       const response = await fetch('/api/admin/revenue', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
         credentials: 'include',
       });
 
@@ -249,7 +224,6 @@ export default function Admin() {
               </button>
               <button
                 onClick={() => {
-                  localStorage.clear();
                   setLocation('/login');
                 }}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"

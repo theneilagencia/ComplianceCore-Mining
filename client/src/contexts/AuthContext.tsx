@@ -9,7 +9,6 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  token: string | null;
   plan: string;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
@@ -33,7 +32,6 @@ interface AuthProviderProps {
 
 export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
   const [plan, setPlan] = useState<string>('START');
   const [loading, setLoading] = useState(true);
 
@@ -44,19 +42,9 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const checkSession = async () => {
     try {
-      const storedToken = localStorage.getItem('accessToken');
-      setToken(storedToken);
-      
-      if (!storedToken) {
-        setLoading(false);
-        return;
-      }
-
+      // No need to check localStorage - cookies are sent automatically
       const response = await fetch('/api/auth/session', {
-        headers: {
-          'Authorization': `Bearer ${storedToken}`,
-        },
-        credentials: 'include',
+        credentials: 'include', // CRITICAL: Send cookies with request
       });
 
       if (response.ok) {
@@ -65,17 +53,19 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser(data.user);
           setPlan(data.plan);
         } else {
-          // Token invalid, clear it
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
+          // Session invalid
+          setUser(null);
+          setPlan('START');
         }
       } else {
         // Session expired or invalid
-        localStorage.removeItem('accessToken');
-        localStorage.removeItem('refreshToken');
+        setUser(null);
+        setPlan('START');
       }
     } catch (error) {
       console.error('[Auth] Session check failed:', error);
+      setUser(null);
+      setPlan('START');
     } finally {
       setLoading(false);
     }
@@ -87,6 +77,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       headers: {
         'Content-Type': 'application/json',
       },
+      credentials: 'include', // CRITICAL: Send cookies with request
       body: JSON.stringify({ email, password }),
     });
 
@@ -97,12 +88,8 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const data = await response.json();
     
-    // Store tokens
-    localStorage.setItem('accessToken', data.accessToken);
-    localStorage.setItem('refreshToken', data.refreshToken);
-    setToken(data.accessToken);
-    
-    // Set user data
+    // Tokens are now in HttpOnly cookies - no localStorage needed
+    // Just set user data from response
     setUser(data.user);
     
     // Get user's plan
@@ -111,23 +98,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      
-      if (token) {
-        await fetch('/api/auth/logout', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-          },
-        });
-      }
+      // Cookies are sent automatically
+      await fetch('/api/auth/logout', {
+        method: 'POST',
+        credentials: 'include', // CRITICAL: Send cookies with request
+      });
     } catch (error) {
       console.error('[Auth] Logout error:', error);
     } finally {
-      // Clear local state regardless of API call success
-      localStorage.removeItem('accessToken');
-      localStorage.removeItem('refreshToken');
-      setToken(null);
+      // Clear local state
       setUser(null);
       setPlan('START');
       
@@ -141,7 +120,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, token, plan, loading, login, logout, refreshSession }}>
+    <AuthContext.Provider value={{ user, plan, loading, login, logout, refreshSession }}>
       {children}
     </AuthContext.Provider>
   );

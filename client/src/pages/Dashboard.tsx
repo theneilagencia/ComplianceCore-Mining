@@ -12,16 +12,7 @@ export default function Dashboard() {
 
   const fetchLicense = async () => {
     try {
-      const token = localStorage.getItem('accessToken');
-      if (!token) {
-        setLocation('/login');
-        return;
-      }
-
       const response = await fetch('/api/license/subscription', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
         credentials: 'include',
       });
 

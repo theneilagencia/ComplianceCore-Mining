@@ -1,15 +1,15 @@
 import { useEffect } from 'react';
 import { useLocation, useSearch } from 'wouter';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function AuthCallbackPage() {
   const [, setLocation] = useLocation();
   const search = useSearch();
+  const { refreshSession } = useAuth();
 
   useEffect(() => {
     // Parse URL parameters
     const params = new URLSearchParams(search);
-    const accessToken = params.get('accessToken');
-    const refreshToken = params.get('refreshToken');
     const error = params.get('error');
 
     if (error) {
@@ -18,30 +18,15 @@ export default function AuthCallbackPage() {
       return;
     }
 
-    if (accessToken && refreshToken) {
-      // Store tokens
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
-
-      // Fetch user info
-      fetch('/api/auth/me', {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((user) => {
-          localStorage.setItem('user', JSON.stringify(user));
-          // Redirect to account page
-          setLocation('/account');
-        })
-        .catch(() => {
-          setLocation('/login?error=auth_failed');
-        });
-    } else {
-      setLocation('/login?error=missing_tokens');
-    }
-  }, [search, setLocation]);
+    // Google OAuth now sets cookies directly and redirects to /dashboard
+    // This page is only used for error handling
+    // If we reach here without error, refresh session and redirect to dashboard
+    refreshSession().then(() => {
+      setLocation('/dashboard');
+    }).catch(() => {
+      setLocation('/login?error=auth_failed');
+    });
+  }, [search, setLocation, refreshSession]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center">

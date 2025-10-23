@@ -45,8 +45,27 @@ router.post('/register', async (req: Request, res: Response) => {
     }
 
     const authTokens = await authService.registerUser({ email, password, name });
+    
+    // Set JWT in secure HTTP-only cookie
+    res.cookie('accessToken', authTokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000 // 15 minutes
+    });
+    
+    res.cookie('refreshToken', authTokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
 
-    res.json(authTokens);
+    // Return only user data - tokens are in HttpOnly cookies
+    res.json({
+      success: true,
+      user: authTokens.user
+    });
   } catch (error: any) {
     console.error('[Auth] Register error:', error);
     res.status(400).json({
@@ -71,8 +90,27 @@ router.post('/login', async (req: Request, res: Response) => {
     }
 
     const authTokens = await authService.loginUser({ email, password });
+    
+    // Set JWT in secure HTTP-only cookie
+    res.cookie('accessToken', authTokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000 // 15 minutes
+    });
+    
+    res.cookie('refreshToken', authTokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
 
-    res.json(authTokens);
+    // Return only user data - tokens are in HttpOnly cookies
+    res.json({
+      success: true,
+      user: authTokens.user
+    });
   } catch (error: any) {
     console.error('[Auth] Login error:', error);
     res.status(401).json({
@@ -113,19 +151,32 @@ router.post('/refresh', async (req: Request, res: Response) => {
  */
 router.post('/logout', async (req: Request, res: Response) => {
   try {
-    const authHeader = req.headers.authorization;
+    // Try to get token from cookie first, then from header
+    const token = req.cookies.accessToken || 
+      (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.substring(7) : null);
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      res.status(401).json({
-        error: 'No token provided',
-      });
-      return;
+    if (token) {
+      try {
+        const decoded = authService.verifyToken(token);
+        await authService.logoutUser(decoded.userId);
+      } catch (error) {
+        // Token invalid or expired, just clear cookies
+        console.log('[Auth] Token invalid during logout, clearing cookies anyway');
+      }
     }
-
-    const token = authHeader.substring(7);
-    const decoded = authService.verifyToken(token);
-
-    await authService.logoutUser(decoded.userId);
+    
+    // Clear cookies
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
+    
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
 
     res.json({ success: true });
   } catch (error: any) {
@@ -142,17 +193,17 @@ router.post('/logout', async (req: Request, res: Response) => {
  */
 router.get('/session', async (req: Request, res: Response) => {
   try {
-    const authHeader = req.headers.authorization;
+    // Try to get token from cookie first, then from header
+    const token = req.cookies.accessToken || 
+      (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.substring(7) : null);
 
-    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    if (!token) {
       res.status(401).json({
         authenticated: false,
         error: 'No token provided',
       });
       return;
     }
-
-    const token = authHeader.substring(7);
     const decoded = authService.verifyToken(token);
 
     const user = await authService.getUserById(decoded.userId);
@@ -244,10 +295,23 @@ router.get(
     try {
       const authTokens = req.user as any;
 
-      // Redirect to frontend with tokens in URL (will be stored in localStorage)
-      const redirectUrl = `${process.env.APP_URL || 'http://localhost:3000'}/auth/callback?` +
-        `accessToken=${authTokens.accessToken}&` +
-        `refreshToken=${authTokens.refreshToken}`;
+      // Set JWT in secure HTTP-only cookie
+      res.cookie('accessToken', authTokens.accessToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 15 * 60 * 1000 // 15 minutes
+      });
+      
+      res.cookie('refreshToken', authTokens.refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+      });
+
+      // Redirect to dashboard - tokens are in HttpOnly cookies
+      const redirectUrl = `${process.env.APP_URL || 'http://localhost:3000'}/dashboard`;
 
       res.redirect(redirectUrl);
     } catch (error: any) {

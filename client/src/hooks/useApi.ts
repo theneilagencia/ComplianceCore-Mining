@@ -5,7 +5,7 @@ interface FetchOptions extends RequestInit {
 }
 
 export function useApi() {
-  const { token, logout } = useAuth();
+  const { logout } = useAuth();
 
   const apiFetch = async (url: string, options: FetchOptions = {}) => {
     const { requireAuth = true, ...fetchOptions } = options;
@@ -15,10 +15,7 @@ export function useApi() {
       ...((fetchOptions.headers as Record<string, string>) || {}),
     };
 
-    // Add Authorization header if token exists and auth is required
-    if (requireAuth && token) {
-      headers['Authorization'] = `Bearer ${token}`;
-    }
+    // No need to add Authorization header - cookies are sent automatically
 
     try {
       const response = await fetch(url, {

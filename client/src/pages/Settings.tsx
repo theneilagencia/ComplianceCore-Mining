@@ -27,11 +27,8 @@ export default function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch('/api/settings', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
+        credentials: 'include',
       });
 
       if (!response.ok) {
@@ -55,13 +52,12 @@ export default function Settings() {
     setSuccess('');
 
     try {
-      const token = localStorage.getItem('token');
       const response = await fetch('/api/settings', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
         },
+        credentials: 'include',
         body: JSON.stringify({
           fullName: settings.fullName,
           company: settings.company,
@@ -130,7 +126,6 @@ export default function Settings() {
               </button>
               <button
                 onClick={() => {
-                  localStorage.removeItem('token');
                   setLocation('/login');
                 }}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"

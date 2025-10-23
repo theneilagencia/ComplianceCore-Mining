@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { setCookie } from '../utils/cookies';
 
 export default function RegisterPage() {
   const [, setLocation] = useLocation();
@@ -33,6 +32,7 @@ export default function RegisterPage() {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // CRITICAL: Send cookies with request
         body: JSON.stringify({ name, email, password }),
       });
 
@@ -42,16 +42,9 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // Store tokens in both localStorage and cookies
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      // Also save accessToken as cookie for backend authentication
-      setCookie('accessToken', data.accessToken, 7);
-
-      // Redirect to account page
-      setLocation('/account');
+      // Tokens are now in HttpOnly cookies - no localStorage needed
+      // Just redirect to dashboard
+      setLocation('/dashboard');
     } catch (err: any) {
       setError(err.message);
     } finally {
