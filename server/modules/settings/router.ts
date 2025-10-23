@@ -27,14 +27,12 @@ router.get('/', requireAuth, async (req: any, res) => {
     const user = await db
       .select({
         id: users.id,
+        name: users.name,
         email: users.email,
-        fullName: users.fullName,
-        company: users.company,
-        phone: users.phone,
-        language: users.language,
-        timezone: users.timezone,
-        notifications: users.notifications,
+        role: users.role,
+        loginMethod: users.loginMethod,
         createdAt: users.createdAt,
+        lastSignedIn: users.lastSignedIn,
       })
       .from(users)
       .where(eq(users.id, userId))
