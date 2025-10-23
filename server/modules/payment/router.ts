@@ -7,6 +7,7 @@ import express, { type Request, type Response } from 'express';
 import { sdk } from '../../_core/sdk';
 import * as stripeService from './stripe';
 import * as licenseService from '../licenses/service';
+import { authenticateFromCookie } from './auth-helper';
 
 const router = express.Router();
 
@@ -16,7 +17,8 @@ const router = express.Router();
  */
 router.post('/checkout', async (req: Request, res: Response) => {
   try {
-    const user = await sdk.authenticateRequest(req);
+    // Use cookie-based authentication as fallback until SDK build issue is resolved
+    const user = await authenticateFromCookie(req);
 
     const { plan, billingPeriod } = req.body;
 
