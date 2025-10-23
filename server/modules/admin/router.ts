@@ -34,7 +34,7 @@ async function requireAdmin(req: any, res: any, next: any) {
 // GET /api/admin/stats - Dashboard statistics
 router.get('/stats', requireAdmin, async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
 
     // Total users
     const totalUsersResult = await db
@@ -94,7 +94,7 @@ router.get('/stats', requireAdmin, async (req, res) => {
 // GET /api/admin/users - List all users with pagination
 router.get('/users', requireAdmin, async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
     const page = parseInt(req.query.page as string) || 1;
     const limit = parseInt(req.query.limit as string) || 20;
     const search = req.query.search as string;
@@ -162,7 +162,7 @@ router.get('/users', requireAdmin, async (req, res) => {
 // GET /api/admin/users/:userId - Get user details
 router.get('/users/:userId', requireAdmin, async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
     const { userId } = req.params;
 
     // Get user
@@ -204,7 +204,7 @@ router.get('/users/:userId', requireAdmin, async (req, res) => {
 // POST /api/admin/users/:userId/license - Update user license
 router.post('/users/:userId/license', requireAdmin, async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
     const { userId } = req.params;
     const { plan, status } = req.body;
 
@@ -258,7 +258,7 @@ router.post('/users/:userId/license', requireAdmin, async (req, res) => {
 // GET /api/admin/subscriptions - List all active subscriptions
 router.get('/subscriptions', requireAdmin, async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
 
     const subscriptions = await db
       .select({
@@ -291,7 +291,7 @@ router.get('/subscriptions', requireAdmin, async (req, res) => {
 // GET /api/admin/revenue - Revenue statistics
 router.get('/revenue', requireAdmin, async (req, res) => {
   try {
-    const db = getDb();
+    const db = await getDb();
 
     // Get active licenses by plan
     const licensesByPlan = await db
