@@ -241,7 +241,7 @@ export default function Dashboard() {
 
           {/* Help/Support */}
           <button
-            onClick={() => window.open('https://help.manus.im', '_blank')}
+            onClick={() => setLocation('/help')}
             className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
           >
             <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">

@@ -39,6 +39,7 @@ const ESGReporting = lazy(() => import("./modules/technical-reports/pages/ESGRep
 const ValuationAutomatic = lazy(() => import("./modules/technical-reports/pages/ValuationAutomatic"));
 const RegulatoryRadar = lazy(() => import("./modules/technical-reports/pages/RegulatoryRadar"));
 const GovernanceSecurity = lazy(() => import("./modules/technical-reports/pages/GovernanceSecurity"));
+const HelpSupport = lazy(() => import("./pages/HelpSupport"));
 
 // Loading component
 const PageLoader = () => (
@@ -117,6 +118,9 @@ function Router() {
         </Route>
         <Route path="/reports/governance">
           <PrivateRoute><GovernanceSecurity /></PrivateRoute>
+        </Route>
+        <Route path="/help">
+          <PrivateRoute><HelpSupport /></PrivateRoute>
         </Route>
         <Route path="/reports/:reportId/review">
           {(params) => (
