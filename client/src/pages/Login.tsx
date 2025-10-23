@@ -35,9 +35,7 @@ export default function LoginPage() {
       <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">
-            JI
-          </div>
+          <img src="/qivo-logo.png" alt="QIVO Mining" className="w-20 h-20" />
         </div>
 
         <h1 className="text-3xl font-bold text-center mb-2">Bem-vindo de Volta</h1>
@@ -50,12 +48,6 @@ export default function LoginPage() {
             {error}
           </div>
         )}
-
-        {/* Mensagem informativa sobre Google OAuth */}
-        <div className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded-lg mb-6 text-sm">
-          <p className="font-medium">Login com Google temporariamente indisponível.</p>
-          <p className="text-yellow-700 mt-1">Use e-mail/senha para acessar sua conta.</p>
-        </div>
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
