@@ -37,6 +37,18 @@ router.post('/create-tables', async (req, res) => {
       }
     }
 
+    // Create tenants table
+    await client.unsafe(`
+      CREATE TABLE IF NOT EXISTS tenants (
+        id VARCHAR(64) PRIMARY KEY,
+        name TEXT NOT NULL,
+        "logoUrl" TEXT,
+        "s3Prefix" VARCHAR(128) NOT NULL,
+        "createdAt" TIMESTAMP DEFAULT NOW()
+      )
+    `);
+    console.log('[Dev] ✅ Tenants table created');
+
     // Create reports table
     await client.unsafe(`
       CREATE TABLE IF NOT EXISTS reports (
@@ -86,11 +98,7 @@ router.post('/create-tables', async (req, res) => {
 
     await client.end();
 
-    res.json({ 
-      success: true, 
-      message: 'Tables created successfully',
-      tables: ['reports', 'audits']
-    });
+    res.json({ success: true, message: 'Tables created successfully', tables: ['tenants', 'reports', 'audits'] });
   } catch (error: any) {
     console.error('[Dev] Create tables error:', error);
     res.status(500).json({ error: error.message });
