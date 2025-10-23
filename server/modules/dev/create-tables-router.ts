@@ -1,20 +1,23 @@
 import { Router } from 'express';
 import { getDb } from '../../db';
 import { sql } from 'drizzle-orm';
+import postgres from 'postgres';
 
 const router = Router();
 
 router.post('/create-tables', async (req, res) => {
   try {
     console.log('[Dev] Creating missing tables...');
-    const db = await getDb();
     
-    if (!db) {
-      return res.status(500).json({ error: 'Database not available' });
+    const dbUrl = process.env.DATABASE_URL || process.env.DB_URL;
+    if (!dbUrl) {
+      return res.status(500).json({ error: 'Database URL not configured' });
     }
 
+    const client = postgres(dbUrl, { ssl: 'require', max: 1 });
+
     // Create reports table
-    await db.execute(sql`
+    await client`
       CREATE TABLE IF NOT EXISTS reports (
         id VARCHAR(64) PRIMARY KEY,
         "tenantId" VARCHAR(64) NOT NULL,
@@ -30,11 +33,11 @@ router.post('/create-tables', async (req, res) => {
         "createdAt" TIMESTAMP DEFAULT NOW(),
         "updatedAt" TIMESTAMP DEFAULT NOW()
       )
-    `);
+    `;
     console.log('[Dev] ✅ Reports table created');
 
     // Create audits table
-    await db.execute(sql`
+    await client`
       CREATE TABLE IF NOT EXISTS audits (
         id VARCHAR(64) PRIMARY KEY,
         "reportId" VARCHAR(64) NOT NULL,
@@ -50,15 +53,17 @@ router.post('/create-tables', async (req, res) => {
         "pdfUrl" TEXT,
         "createdAt" TIMESTAMP DEFAULT NOW()
       )
-    `);
+    `;
     console.log('[Dev] ✅ Audits table created');
 
     // Create indexes
-    await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_reports_userId ON reports("userId")`);
-    await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_reports_tenantId ON reports("tenantId")`);
-    await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_audits_reportId ON audits("reportId")`);
-    await db.execute(sql`CREATE INDEX IF NOT EXISTS idx_audits_userId ON audits("userId")`);
+    await client`CREATE INDEX IF NOT EXISTS idx_reports_userId ON reports("userId")`;
+    await client`CREATE INDEX IF NOT EXISTS idx_reports_tenantId ON reports("tenantId")`;
+    await client`CREATE INDEX IF NOT EXISTS idx_audits_reportId ON audits("reportId")`;
+    await client`CREATE INDEX IF NOT EXISTS idx_audits_userId ON audits("userId")`;
     console.log('[Dev] ✅ Indexes created');
+
+    await client.end();
 
     res.json({ 
       success: true, 
