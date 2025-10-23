@@ -13,6 +13,9 @@ pnpm install --frozen-lockfile --prefer-offline
 echo "🎨 Building client..."
 pnpm vite build
 
+echo "🧹 Cleaning old build..."
+rm -rf dist/
+
 echo "🚀 Building server..."
 pnpm esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
