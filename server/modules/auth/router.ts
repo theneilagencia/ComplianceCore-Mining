@@ -137,6 +137,57 @@ router.post('/logout', async (req: Request, res: Response) => {
 });
 
 /**
+ * GET /api/auth/session
+ * Check if user is authenticated and return session info
+ */
+router.get('/session', async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({
+        authenticated: false,
+        error: 'No token provided',
+      });
+      return;
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = authService.verifyToken(token);
+
+    const user = await authService.getUserById(decoded.userId);
+
+    if (!user) {
+      res.status(401).json({
+        authenticated: false,
+        error: 'User not found',
+      });
+      return;
+    }
+
+    // Get user's license/plan
+    const license = await authService.getUserLicense(user.id);
+
+    res.json({
+      authenticated: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+      plan: license?.plan || 'START',
+    });
+  } catch (error: any) {
+    console.error('[Auth] Session check error:', error);
+    res.status(401).json({
+      authenticated: false,
+      error: error.message || 'Authentication failed',
+    });
+  }
+});
+
+/**
  * GET /api/auth/me
  * Get current user info
  */

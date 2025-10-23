@@ -1,9 +1,11 @@
-import { lazy, Suspense } from 'react';
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { AuthProvider } from "./contexts/AuthContext";
+import PrivateRoute from "./components/PrivateRoute";
 
 // Páginas públicas (carregadas imediatamente)
 import Home from "./pages/Home";
@@ -51,28 +53,60 @@ function Router() {
       
       {/* Páginas autenticadas (com lazy loading) */}
       <Suspense fallback={<PageLoader />}>
-        {/* Auth Routes */}
+        {/* Auth Routes (públicas) */}
         <Route path={"/login"} component={Login} />
         <Route path={"/register"} component={Register} />
         <Route path={"/auth/callback"} component={AuthCallback} />
         
-        {/* Account Routes */}
-        <Route path={"/success"} component={Success} />
-        <Route path={"/cancel"} component={Cancel} />
-        <Route path={"/account"} component={Account} />
-        <Route path={"/subscription"} component={Subscription} />
-        <Route path={"/dashboard"} component={Dashboard} />
-        <Route path={"/admin"} component={Admin} />
-        <Route path={"/reports"} component={Reports} />
-        <Route path={"/audits"} component={Audits} />
-        <Route path={"/settings"} component={Settings} />
+        {/* Account Routes (protegidas) */}
+        <Route path={"/success"}>
+          <PrivateRoute><Success /></PrivateRoute>
+        </Route>
+        <Route path={"/cancel"}>
+          <PrivateRoute><Cancel /></PrivateRoute>
+        </Route>
+        <Route path={"/account"}>
+          <PrivateRoute><Account /></PrivateRoute>
+        </Route>
+        <Route path={"/subscription"}>
+          <PrivateRoute><Subscription /></PrivateRoute>
+        </Route>
+        <Route path={"/dashboard"}>
+          <PrivateRoute><Dashboard /></PrivateRoute>
+        </Route>
+        <Route path={"/admin"}>
+          <PrivateRoute><Admin /></PrivateRoute>
+        </Route>
+        <Route path={"/reports"}>
+          <PrivateRoute><Reports /></PrivateRoute>
+        </Route>
+        <Route path={"/audits"}>
+          <PrivateRoute><Audits /></PrivateRoute>
+        </Route>
+        <Route path={"/settings"}>
+          <PrivateRoute><Settings /></PrivateRoute>
+        </Route>
         
-        {/* Technical Reports Routes */}
-        <Route path={"/reports/generate"} component={GenerateReport} />
-        <Route path={"/reports/audit"} component={AuditKRCI} />
-        <Route path={"/reports/precert"} component={PreCertification} />
-        <Route path="/reports/export" component={ExportStandards} />
-        <Route path="/reports/:reportId/review" component={ReviewReport} />
+        {/* Technical Reports Routes (protegidas) */}
+        <Route path={"/reports/generate"}>
+          <PrivateRoute><GenerateReport /></PrivateRoute>
+        </Route>
+        <Route path={"/reports/audit"}>
+          <PrivateRoute><AuditKRCI /></PrivateRoute>
+        </Route>
+        <Route path={"/reports/precert"}>
+          <PrivateRoute><PreCertification /></PrivateRoute>
+        </Route>
+        <Route path="/reports/export">
+          <PrivateRoute><ExportStandards /></PrivateRoute>
+        </Route>
+        <Route path="/reports/:reportId/review">
+          {(params) => (
+            <PrivateRoute>
+              <ReviewReport {...params} />
+            </PrivateRoute>
+          )}
+        </Route>
       </Suspense>
       
       {/* Final fallback route */}
@@ -85,10 +119,12 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light">
-        <TooltipProvider>
-          <Toaster />
-          <Router />
-        </TooltipProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Router />
+          </TooltipProvider>
+        </AuthProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );

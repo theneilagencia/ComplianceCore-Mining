@@ -365,3 +365,11 @@ export async function getUserByEmail(email: string): Promise<User | null> {
   return user || null;
 }
 
+
+/**
+ * Get user's license/plan
+ */
+export async function getUserLicense(userId: string) {
+  return licenseService.getLicenseByUserId(userId);
+}
+

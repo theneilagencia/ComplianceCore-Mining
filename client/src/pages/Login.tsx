@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
-import { setCookie } from '../utils/cookies';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function LoginPage() {
   const [, setLocation] = useLocation();
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -15,28 +16,9 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Login failed');
-      }
-
-      // Store tokens in both localStorage and cookies
-      localStorage.setItem('accessToken', data.accessToken);
-      localStorage.setItem('refreshToken', data.refreshToken);
-      localStorage.setItem('user', JSON.stringify(data.user));
-      
-      // Also save accessToken as cookie for backend authentication
-      setCookie('accessToken', data.accessToken, 7);
-
-      // Redirect to account page
-      setLocation('/account');
+      await login(email, password);
+      // Redirect to dashboard after successful login
+      setLocation('/dashboard');
     } catch (err: any) {
       setError(err.message);
     } finally {
