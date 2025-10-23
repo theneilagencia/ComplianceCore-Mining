@@ -91,6 +91,7 @@ export default function PricingPage() {
       const response = await fetch('/api/payment/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Send cookies for authentication
         body: JSON.stringify({
           plan: planName,
           billingPeriod,

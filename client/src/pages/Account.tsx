@@ -28,6 +28,7 @@ export default function AccountPage() {
     try {
       const token = localStorage.getItem('accessToken');
       const response = await fetch('/api/license/status', {
+        credentials: 'include', // Send cookies for authentication
         headers: {
           'Authorization': `Bearer ${token}`,
         },

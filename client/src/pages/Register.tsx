@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
+import { setCookie } from '../utils/cookies';
 
 export default function RegisterPage() {
   const [, setLocation] = useLocation();
@@ -41,10 +42,13 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // Store tokens
+      // Store tokens in both localStorage and cookies
       localStorage.setItem('accessToken', data.accessToken);
       localStorage.setItem('refreshToken', data.refreshToken);
       localStorage.setItem('user', JSON.stringify(data.user));
+      
+      // Also save accessToken as cookie for backend authentication
+      setCookie('accessToken', data.accessToken, 7);
 
       // Redirect to account page
       setLocation('/account');
