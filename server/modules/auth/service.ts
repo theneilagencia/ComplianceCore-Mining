@@ -369,7 +369,7 @@ export async function getUserByEmail(email: string): Promise<User | null> {
 /**
  * Get user's license/plan
  */
-export async function getUserLicense(userId: string) {
-  return licenseService.getLicenseByUserId(userId);
+export async function getUserLicenseInfo(userId: string) {
+  return licenseService.getUserLicense(userId);
 }
 

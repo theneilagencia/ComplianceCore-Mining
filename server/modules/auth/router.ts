@@ -166,7 +166,7 @@ router.get('/session', async (req: Request, res: Response) => {
     }
 
     // Get user's license/plan
-    const license = await authService.getUserLicense(user.id);
+    const license = await authService.getUserLicenseInfo(user.id);
 
     res.json({
       authenticated: true,
