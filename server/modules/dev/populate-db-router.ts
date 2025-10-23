@@ -58,17 +58,19 @@ router.post('/populate-db', async (req, res) => {
       audits: 0
     };
     
-    // 1. Verificar e criar tenant padrão se não existir
+    // 1. Verificar e criar tenant padrão se não existir (usando SQL raw)
     const tenantId = 'default_tenant';
     const existingTenant = await db.select().from(tenants).where(eq(tenants.id, tenantId)).limit(1);
     
     if (existingTenant.length === 0) {
-      console.log('[Populate DB] Creating default tenant...');
-      await db.insert(tenants).values({
-        id: tenantId,
-        name: 'QIVO Mining',
-        s3Prefix: 'qivo-mining'
-      });
+      console.log('[Populate DB] Creating default tenant using raw SQL...');
+      // Usar SQL raw para evitar problemas com campos nullable do Drizzle
+      const sql = `
+        INSERT INTO tenants (id, name, "s3Prefix", "createdAt")
+        VALUES ('${tenantId}', 'QIVO Mining', 'qivo-mining', NOW())
+        ON CONFLICT (id) DO NOTHING
+      `;
+      await db.execute(sql);
       console.log('[Populate DB] Tenant created successfully');
     } else {
       console.log('[Populate DB] Tenant already exists, skipping...');
