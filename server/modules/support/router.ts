@@ -7,9 +7,13 @@ import { marked } from 'marked';
 const router = Router();
 
 // Diretório dos manuais (ES module compatible)
+// Em produção, o código compilado está em dist/, então precisamos ir até a raiz do projeto
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const DOCS_DIR = path.join(__dirname, '../../docs/support');
+
+// Caminho relativo ao diretório do projeto (funciona em dev e produção)
+const projectRoot = process.cwd();
+const DOCS_DIR = path.join(projectRoot, 'server/docs/support');
 
 // Lista de manuais disponíveis
 const MANUALS = [
