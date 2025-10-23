@@ -241,7 +241,7 @@ export default function Subscription() {
           <h2 className="text-2xl font-bold text-slate-800 mb-2">Erro ao Carregar</h2>
           <p className="text-slate-600 mb-6">{error || 'Não foi possível carregar os dados da assinatura'}</p>
           <button
-            onClick(() => setLocation('/dashboard'))
+            onClick={() => setLocation('/dashboard')}
             className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition"
           >
             Voltar ao Dashboard
@@ -264,7 +264,7 @@ export default function Subscription() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
-                onClick(() => setLocation('/dashboard'))
+                onClick={() => setLocation('/dashboard')}
                 className="p-2 hover:bg-slate-100 rounded-lg transition"
               >
                 <ArrowLeft className="w-5 h-5 text-slate-600" />
