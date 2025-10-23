@@ -63,6 +63,7 @@ router.post('/populate-db', async (req, res) => {
     await db.insert(tenants).values({
       id: tenantId,
       name: 'QIVO Mining',
+      logoUrl: null,
       s3Prefix: 'qivo-mining',
       createdAt: new Date()
     }).onConflictDoNothing();
