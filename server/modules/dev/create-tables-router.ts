@@ -1,6 +1,4 @@
 import { Router } from 'express';
-import { getDb } from '../../db';
-import { sql } from 'drizzle-orm';
 import postgres from 'postgres';
 
 const router = Router();
@@ -17,30 +15,30 @@ router.post('/create-tables', async (req, res) => {
     const client = postgres(dbUrl, { ssl: 'require', max: 1 });
 
     // Create ENUMs (ignore if they already exist)
-    try {
-      await client`CREATE TYPE standard AS ENUM ('JORC_2012', 'NI_43_101', 'PERC', 'SAMREC', 'CRIRSCO', 'CBRR')`;
-    } catch (e: any) {
-      if (!e.message.includes('already exists')) throw e;
+    const enums = [
+      { name: 'standard', values: ['JORC_2012', 'NI_43_101', 'PERC', 'SAMREC', 'CRIRSCO', 'CBRR'] },
+      { name: 'status', values: ['draft', 'parsing', 'needs_review', 'ready_for_audit', 'audited', 'certified', 'exported'] },
+      { name: 'source_type', values: ['internal', 'external'] },
+      { name: 'audit_type', values: ['full', 'partial'] }
+    ];
+
+    for (const enumDef of enums) {
+      try {
+        const values = enumDef.values.map(v => `'${v}'`).join(', ');
+        await client.unsafe(`CREATE TYPE ${enumDef.name} AS ENUM (${values})`);
+        console.log(`[Dev] ✅ ENUM ${enumDef.name} created`);
+      } catch (e: any) {
+        if (e.message && e.message.includes('already exists')) {
+          console.log(`[Dev] ℹ️  ENUM ${enumDef.name} already exists`);
+        } else {
+          console.error(`[Dev] ❌ Error creating ENUM ${enumDef.name}:`, e.message);
+          throw e;
+        }
+      }
     }
-    try {
-      await client`CREATE TYPE status AS ENUM ('draft', 'parsing', 'needs_review', 'ready_for_audit', 'audited', 'certified', 'exported')`;
-    } catch (e: any) {
-      if (!e.message.includes('already exists')) throw e;
-    }
-    try {
-      await client`CREATE TYPE source_type AS ENUM ('internal', 'external')`;
-    } catch (e: any) {
-      if (!e.message.includes('already exists')) throw e;
-    }
-    try {
-      await client`CREATE TYPE audit_type AS ENUM ('full', 'partial')`;
-    } catch (e: any) {
-      if (!e.message.includes('already exists')) throw e;
-    }
-    console.log('[Dev] ✅ ENUMs created');
 
     // Create reports table
-    await client`
+    await client.unsafe(`
       CREATE TABLE IF NOT EXISTS reports (
         id VARCHAR(64) PRIMARY KEY,
         "tenantId" VARCHAR(64) NOT NULL,
@@ -56,11 +54,11 @@ router.post('/create-tables', async (req, res) => {
         "createdAt" TIMESTAMP DEFAULT NOW(),
         "updatedAt" TIMESTAMP DEFAULT NOW()
       )
-    `;
+    `);
     console.log('[Dev] ✅ Reports table created');
 
     // Create audits table
-    await client`
+    await client.unsafe(`
       CREATE TABLE IF NOT EXISTS audits (
         id VARCHAR(64) PRIMARY KEY,
         "reportId" VARCHAR(64) NOT NULL,
@@ -76,14 +74,14 @@ router.post('/create-tables', async (req, res) => {
         "pdfUrl" TEXT,
         "createdAt" TIMESTAMP DEFAULT NOW()
       )
-    `;
+    `);
     console.log('[Dev] ✅ Audits table created');
 
     // Create indexes
-    await client`CREATE INDEX IF NOT EXISTS idx_reports_userId ON reports("userId")`;
-    await client`CREATE INDEX IF NOT EXISTS idx_reports_tenantId ON reports("tenantId")`;
-    await client`CREATE INDEX IF NOT EXISTS idx_audits_reportId ON audits("reportId")`;
-    await client`CREATE INDEX IF NOT EXISTS idx_audits_userId ON audits("userId")`;
+    await client.unsafe('CREATE INDEX IF NOT EXISTS idx_reports_userId ON reports("userId")');
+    await client.unsafe('CREATE INDEX IF NOT EXISTS idx_reports_tenantId ON reports("tenantId")');
+    await client.unsafe('CREATE INDEX IF NOT EXISTS idx_audits_reportId ON audits("reportId")');
+    await client.unsafe('CREATE INDEX IF NOT EXISTS idx_audits_userId ON audits("userId")');
     console.log('[Dev] ✅ Indexes created');
 
     await client.end();
