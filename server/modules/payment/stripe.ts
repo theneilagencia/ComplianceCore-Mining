@@ -228,3 +228,44 @@ export async function createCustomerPortalSession(
   return session.url;
 }
 
+/**
+ * Get subscription details
+ */
+export async function getSubscription(subscriptionId: string): Promise<Stripe.Subscription> {
+  const stripe = getStripe();
+  return await stripe.subscriptions.retrieve(subscriptionId);
+}
+
+/**
+ * Get customer invoices
+ */
+export async function getCustomerInvoices(customerId: string, limit: number = 10): Promise<Stripe.Invoice[]> {
+  const stripe = getStripe();
+  const invoices = await stripe.invoices.list({
+    customer: customerId,
+    limit,
+  });
+  return invoices.data;
+}
+
+/**
+ * Update subscription (change plan)
+ */
+export async function updateSubscription(
+  subscriptionId: string,
+  newPriceId: string
+): Promise<Stripe.Subscription> {
+  const stripe = getStripe();
+  const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+  
+  return await stripe.subscriptions.update(subscriptionId, {
+    items: [
+      {
+        id: subscription.items.data[0].id,
+        price: newPriceId,
+      },
+    ],
+    proration_behavior: 'create_prorations',
+  });
+}
+

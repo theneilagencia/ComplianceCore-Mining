@@ -19,6 +19,7 @@ const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 const Success = lazy(() => import("./pages/Success"));
 const Cancel = lazy(() => import("./pages/Cancel"));
 const Account = lazy(() => import("./pages/Account"));
+const Subscription = lazy(() => import("./pages/Subscription"));
 
 // Technical Reports Module Pages (lazy loading)
 const GenerateReport = lazy(() => import("./modules/technical-reports/pages/GenerateReport"));
@@ -54,6 +55,7 @@ function Router() {
         <Route path={"/success"} component={Success} />
         <Route path={"/cancel"} component={Cancel} />
         <Route path={"/account"} component={Account} />
+        <Route path={"/subscription"} component={Subscription} />
         
         {/* Technical Reports Routes */}
         <Route path={"/reports/generate"} component={GenerateReport} />
