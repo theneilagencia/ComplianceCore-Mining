@@ -16,6 +16,13 @@ router.post('/create-tables', async (req, res) => {
 
     const client = postgres(dbUrl, { ssl: 'require', max: 1 });
 
+    // Create ENUMs if they don't exist
+    await client`CREATE TYPE IF NOT EXISTS standard AS ENUM ('JORC_2012', 'NI_43_101', 'PERC', 'SAMREC', 'CRIRSCO', 'CBRR')`;
+    await client`CREATE TYPE IF NOT EXISTS status AS ENUM ('draft', 'parsing', 'needs_review', 'ready_for_audit', 'audited', 'certified', 'exported')`;
+    await client`CREATE TYPE IF NOT EXISTS source_type AS ENUM ('internal', 'external')`;
+    await client`CREATE TYPE IF NOT EXISTS audit_type AS ENUM ('full', 'partial')`;
+    console.log('[Dev] ✅ ENUMs created');
+
     // Create reports table
     await client`
       CREATE TABLE IF NOT EXISTS reports (
