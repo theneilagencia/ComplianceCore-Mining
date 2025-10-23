@@ -4,7 +4,7 @@
  */
 
 import type { Request } from 'express';
-import { db } from '../../db';
+import { getDb } from '../../db';
 import { ENV } from '../../_core/env';
 import jwt from 'jsonwebtoken';
 
@@ -24,6 +24,7 @@ export async function authenticateFromCookie(req: Request) {
     };
 
     // Fetch user from database
+    const db = await getDb();
     const user = await db.query.users.findFirst({
       where: (users, { eq }) => eq(users.id, decoded.userId),
     });
