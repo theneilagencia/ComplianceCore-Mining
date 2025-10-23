@@ -34,7 +34,7 @@ const menuItems = [
   { icon: ArrowRightLeft, label: "Exportar Padrões", path: "/reports/export" },
   { icon: Leaf, label: "ESG Reporting", path: "/reports/esg" },
   { icon: DollarSign, label: "Valuation Automático", path: "/reports/valuation" },
-  { icon: Bell, label: "Radar Regulatório", path: "/reports/regulatory" },
+  { icon: Bell, label: "Radar Regulatório", path: "/radar" },
   { icon: Shield, label: "Governança & Segurança", path: "/reports/governance" },
   { icon: HelpCircle, label: "Ajuda & Suporte", path: "/help" },
   { icon: BookOpen, label: "Central de Suporte", path: "/support" },
