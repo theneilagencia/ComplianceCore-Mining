@@ -6,6 +6,7 @@
 import express, { type Request, type Response } from 'express';
 import { sdk } from '../../_core/sdk';
 import * as licenseService from './service';
+import { authenticateFromCookie } from '../payment/auth-helper';
 
 const router = express.Router();
 
@@ -15,7 +16,7 @@ const router = express.Router();
  */
 router.get('/status', async (req: Request, res: Response) => {
   try {
-    const user = await sdk.authenticateRequest(req);
+    const user = await authenticateFromCookie(req);
     const license = await licenseService.getUserLicense(user.id);
 
     if (!license) {
@@ -52,7 +53,7 @@ router.get('/status', async (req: Request, res: Response) => {
  */
 router.get('/can-create-report', async (req: Request, res: Response) => {
   try {
-    const user = await sdk.authenticateRequest(req);
+    const user = await authenticateFromCookie(req);
     const result = await licenseService.canCreateReport(user.id);
 
     res.json(result);
@@ -70,7 +71,7 @@ router.get('/can-create-report', async (req: Request, res: Response) => {
  */
 router.post('/use-report', async (req: Request, res: Response) => {
   try {
-    const user = await sdk.authenticateRequest(req);
+    const user = await authenticateFromCookie(req);
     const result = await licenseService.canCreateReport(user.id);
 
     if (!result.allowed) {
@@ -127,7 +128,7 @@ router.get('/plans', async (req: Request, res: Response) => {
  */
 router.get('/subscription', async (req: Request, res: Response) => {
   try {
-    const user = await sdk.authenticateRequest(req);
+    const user = await authenticateFromCookie(req);
     const license = await licenseService.getUserLicense(user.id);
 
     if (!license) {
@@ -182,7 +183,7 @@ router.get('/subscription', async (req: Request, res: Response) => {
  */
 router.get('/invoices', async (req: Request, res: Response) => {
   try {
-    const user = await sdk.authenticateRequest(req);
+    const user = await authenticateFromCookie(req);
     const license = await licenseService.getUserLicense(user.id);
 
     if (!license || !license.stripeCustomerId) {
@@ -219,7 +220,7 @@ router.get('/invoices', async (req: Request, res: Response) => {
  */
 router.post('/change-plan', async (req: Request, res: Response) => {
   try {
-    const user = await sdk.authenticateRequest(req);
+    const user = await authenticateFromCookie(req);
     const { plan, billingPeriod } = req.body;
 
     if (!['PRO', 'ENTERPRISE'].includes(plan)) {
@@ -287,7 +288,7 @@ router.post('/change-plan', async (req: Request, res: Response) => {
  */
 router.post('/portal', async (req: Request, res: Response) => {
   try {
-    const user = await sdk.authenticateRequest(req);
+    const user = await authenticateFromCookie(req);
     const license = await licenseService.getUserLicense(user.id);
 
     if (!license || !license.stripeCustomerId) {
@@ -323,7 +324,7 @@ router.post('/portal', async (req: Request, res: Response) => {
  */
 router.post('/cancel', async (req: Request, res: Response) => {
   try {
-    const user = await sdk.authenticateRequest(req);
+    const user = await authenticateFromCookie(req);
     const license = await licenseService.getUserLicense(user.id);
 
     if (!license) {
