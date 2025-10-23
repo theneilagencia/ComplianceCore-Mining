@@ -40,12 +40,12 @@ O dashboard mostra métricas importantes:
 #### Lista de Usuários
 1. No painel admin, clique em **"Usuários"**
 2. Você verá uma tabela com:
-   - Nome
-   - Email
-   - Plano
-   - Status (Ativo/Inativo)
-   - Data de Cadastro
-   - Última Atividade
+ - Nome
+ - Email
+ - Plano
+ - Status (Ativo/Inativo)
+ - Data de Cadastro
+ - Última Atividade
 
 #### Filtros Disponíveis
 - **Por Plano:** START, PROFESSIONAL, ENTERPRISE
@@ -67,11 +67,11 @@ O dashboard mostra métricas importantes:
 #### Passo a passo
 1. Clique em **"Novo Usuário"**
 2. Preencha:
-   - **Nome completo**
-   - **Email** (será o login)
-   - **Senha temporária** (usuário deve trocar no primeiro login)
-   - **Plano:** START, PROFESSIONAL ou ENTERPRISE
-   - **Permissões:** Usuário ou Administrador
+ - **Nome completo**
+ - **Email** (será o login)
+ - **Senha temporária** (usuário deve trocar no primeiro login)
+ - **Plano:** START, PROFESSIONAL ou ENTERPRISE
+ - **Permissões:** Usuário ou Administrador
 3. Clique em **"Criar Usuário"**
 4. Sistema envia email de boas-vindas automaticamente
 
@@ -104,14 +104,14 @@ O dashboard mostra métricas importantes:
 4. Confirme a ação
 
 **Efeitos da suspensão:**
-- ❌ Usuário não consegue fazer login
-- ❌ Acesso a relatórios bloqueado
-- ✅ Dados preservados
-- ✅ Pode ser reativado a qualquer momento
+- Usuário não consegue fazer login
+- Acesso a relatórios bloqueado
+- Dados preservados
+- Pode ser reativado a qualquer momento
 
 ### Excluindo Usuários
 
-#### ⚠️ ATENÇÃO: Ação Irreversível!
+#### ATENÇÃO: Ação Irreversível!
 A exclusão remove permanentemente:
 - Conta do usuário
 - Todos os relatórios gerados
@@ -156,12 +156,12 @@ A exclusão remove permanentemente:
 #### Lista de Assinaturas
 1. No painel admin, clique em **"Assinaturas"**
 2. Você verá:
-   - Usuário
-   - Plano atual
-   - Status (Ativa/Cancelada/Vencida)
-   - Data de início
-   - Próxima cobrança
-   - Valor mensal
+ - Usuário
+ - Plano atual
+ - Status (Ativa/Cancelada/Vencida)
+ - Data de início
+ - Próxima cobrança
+ - Valor mensal
 
 #### Filtros
 - **Por Plano**
@@ -181,9 +181,9 @@ A exclusão remove permanentemente:
 2. Clique em **"Alterar Plano"**
 3. Escolha o novo plano
 4. Defina:
-   - **Data de início:** Imediato ou próximo ciclo
-   - **Ajuste de cobrança:** Proporcional ou integral
-   - **Motivo:** Documentar a mudança
+ - **Data de início:** Imediato ou próximo ciclo
+ - **Ajuste de cobrança:** Proporcional ou integral
+ - **Motivo:** Documentar a mudança
 5. Clique em **"Confirmar Alteração"**
 
 ### Aplicando Descontos
@@ -197,10 +197,10 @@ A exclusão remove permanentemente:
 1. Clique na assinatura
 2. Clique em **"Aplicar Desconto"**
 3. Preencha:
-   - **Tipo de desconto**
-   - **Valor/Percentual**
-   - **Duração:** Permanente ou temporário
-   - **Motivo:** Documentar
+ - **Tipo de desconto**
+ - **Valor/Percentual**
+ - **Duração:** Permanente ou temporário
+ - **Motivo:** Documentar
 4. Clique em **"Aplicar"**
 
 ### Cancelando Assinaturas
@@ -233,12 +233,12 @@ A exclusão remove permanentemente:
 #### Lista de Transações
 1. No painel admin, clique em **"Pagamentos"**
 2. Você verá:
-   - Data
-   - Usuário
-   - Valor
-   - Status (Pago/Pendente/Falhou/Reembolsado)
-   - Método (Cartão/Boleto/PIX)
-   - Fatura (link para PDF)
+ - Data
+ - Usuário
+ - Valor
+ - Status (Pago/Pendente/Falhou/Reembolsado)
+ - Método (Cartão/Boleto/PIX)
+ - Fatura (link para PDF)
 
 #### Filtros
 - **Por Status**
@@ -258,8 +258,8 @@ A exclusão remove permanentemente:
 1. Clique na transação
 2. Clique em **"Processar Reembolso"**
 3. Escolha:
-   - **Reembolso Total:** 100% do valor
-   - **Reembolso Parcial:** Especifique o valor
+ - **Reembolso Total:** 100% do valor
+ - **Reembolso Parcial:** Especifique o valor
 4. Informe o motivo
 5. Confirme a ação
 
@@ -311,7 +311,7 @@ A exclusão remove permanentemente:
 4. Marque **"Administrador"**
 5. Confirme a ação
 
-**⚠️ CUIDADO:** Administradores têm acesso total ao sistema!
+** CUIDADO:** Administradores têm acesso total ao sistema!
 
 ### Revogando Permissões de Admin
 
@@ -332,13 +332,13 @@ A exclusão remove permanentemente:
 1. Clique em **"Configurações"** → **"Planos"**
 2. Escolha o plano (START, PROFESSIONAL, ENTERPRISE)
 3. Edite:
-   - **Limite de relatórios/mês**
-   - **Limite de projetos ativos**
-   - **Preço mensal**
-   - **Recursos incluídos**
+ - **Limite de relatórios/mês**
+ - **Limite de projetos ativos**
+ - **Preço mensal**
+ - **Recursos incluídos**
 4. Clique em **"Salvar"**
 
-**⚠️ Mudanças afetam apenas novas assinaturas.**
+** Mudanças afetam apenas novas assinaturas.**
 
 ### Configurações de Email
 
@@ -391,10 +391,10 @@ Personalize emails automáticos:
 #### Como visualizar
 1. Clique em **"Logs"**
 2. Filtre por:
-   - **Tipo de evento**
-   - **Usuário**
-   - **Data**
-   - **IP de origem**
+ - **Tipo de evento**
+ - **Usuário**
+ - **Data**
+ - **IP de origem**
 3. Exporte logs em CSV para análise
 
 ### Alertas Automáticos
@@ -422,12 +422,12 @@ Receba notificações por email quando:
 #### Lista de Tickets
 1. Clique em **"Suporte"**
 2. Você verá:
-   - Número do ticket
-   - Usuário
-   - Assunto
-   - Status (Aberto/Em andamento/Resolvido)
-   - Prioridade (Baixa/Média/Alta/Urgente)
-   - Data de abertura
+ - Número do ticket
+ - Usuário
+ - Assunto
+ - Status (Aberto/Em andamento/Resolvido)
+ - Prioridade (Baixa/Média/Alta/Urgente)
+ - Data de abertura
 
 #### Como responder
 1. Clique no ticket
@@ -454,32 +454,32 @@ Receba notificações por email quando:
 ## 10. Melhores Práticas para Admins
 
 ### Segurança
-✅ Use senha forte e 2FA  
-✅ Nunca compartilhe credenciais de admin  
-✅ Revise logs de auditoria semanalmente  
-✅ Mantenha lista de admins atualizada  
-✅ Faça backup de dados regularmente
+ Use senha forte e 2FA 
+ Nunca compartilhe credenciais de admin 
+ Revise logs de auditoria semanalmente 
+ Mantenha lista de admins atualizada 
+ Faça backup de dados regularmente
 
 ### Gestão de Usuários
-✅ Responda tickets em até 24 horas  
-✅ Documente todas as alterações manuais  
-✅ Prefira suspender ao invés de excluir  
-✅ Monitore usuários inativos mensalmente  
-✅ Faça follow-up de cancelamentos
+ Responda tickets em até 24 horas 
+ Documente todas as alterações manuais 
+ Prefira suspender ao invés de excluir 
+ Monitore usuários inativos mensalmente 
+ Faça follow-up de cancelamentos
 
 ### Financeiro
-✅ Reconcilie pagamentos semanalmente  
-✅ Monitore taxa de churn mensalmente  
-✅ Analise motivos de cancelamento  
-✅ Ofereça descontos estrategicamente  
-✅ Gere relatórios financeiros mensais
+ Reconcilie pagamentos semanalmente 
+ Monitore taxa de churn mensalmente 
+ Analise motivos de cancelamento 
+ Ofereça descontos estrategicamente 
+ Gere relatórios financeiros mensais
 
 ### Compliance
-✅ Mantenha políticas de privacidade atualizadas  
-✅ Respeite LGPD e GDPR  
-✅ Documente processos administrativos  
-✅ Faça auditoria interna trimestral  
-✅ Treine novos admins adequadamente
+ Mantenha políticas de privacidade atualizadas 
+ Respeite LGPD e GDPR 
+ Documente processos administrativos 
+ Faça auditoria interna trimestral 
+ Treine novos admins adequadamente
 
 ---
 
@@ -527,6 +527,6 @@ Receba notificações por email quando:
 
 ---
 
-**Anterior:** [Manual PRO](/support/manual-pro)  
+**Anterior:** [Manual PRO](/support/manual-pro) 
 **Próximo:** [FAQ](/support/faq)
 

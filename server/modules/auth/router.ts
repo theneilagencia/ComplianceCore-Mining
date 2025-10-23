@@ -281,45 +281,24 @@ router.get('/me', async (req: Request, res: Response) => {
 /**
  * GET /api/auth/google
  * Initiate Google OAuth flow
+ * TEMPORARILY DISABLED - Returns 503
  */
-router.get('/google', passport.authenticate('google', { session: false }));
+router.get('/google', (req: Request, res: Response) => {
+  res.status(503).json({
+    error: 'Google login temporariamente desabilitado'
+  });
+});
 
 /**
  * GET /api/auth/google/callback
  * Google OAuth callback
+ * TEMPORARILY DISABLED - Returns 503
  */
-router.get(
-  '/google/callback',
-  passport.authenticate('google', { session: false, failureRedirect: '/login?error=google_auth_failed' }),
-  (req: Request, res: Response) => {
-    try {
-      const authTokens = req.user as any;
-
-      // Set JWT in secure HTTP-only cookie
-      res.cookie('accessToken', authTokens.accessToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 15 * 60 * 1000 // 15 minutes
-      });
-      
-      res.cookie('refreshToken', authTokens.refreshToken, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-        maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-      });
-
-      // Redirect to dashboard - tokens are in HttpOnly cookies
-      const redirectUrl = `${process.env.APP_URL || 'http://localhost:3000'}/dashboard`;
-
-      res.redirect(redirectUrl);
-    } catch (error: any) {
-      console.error('[Auth] Google callback error:', error);
-      res.redirect('/login?error=google_auth_failed');
-    }
-  }
-);
+router.get('/google/callback', (req: Request, res: Response) => {
+  res.status(503).json({
+    error: 'Google login temporariamente desabilitado'
+  });
+});
 
 export default router;
 

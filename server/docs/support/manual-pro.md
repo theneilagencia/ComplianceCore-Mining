@@ -29,7 +29,7 @@ Clique em **"Iniciar Auditoria"** e aguarde o processamento (2-10 minutos)
 #### Classificação de Risco
 - 🟢 **Baixo:** Conformidade total
 - 🟡 **Médio:** Requer atenção
-- 🔴 **Alto:** Requer ação imediata
+- **Alto:** Requer ação imediata
 
 #### Relatório de Auditoria
 O sistema gera um relatório detalhado com:
@@ -39,10 +39,10 @@ O sistema gera um relatório detalhado com:
 - Checklist de validação
 
 ### Melhores Práticas
-✅ Faça auditoria ANTES de enviar para certificação oficial  
-✅ Corrija todos os itens de risco ALTO  
-✅ Documente as justificativas para itens de risco MÉDIO  
-✅ Mantenha histórico de auditorias para rastreabilidade
+ Faça auditoria ANTES de enviar para certificação oficial 
+ Corrija todos os itens de risco ALTO 
+ Documente as justificativas para itens de risco MÉDIO 
+ Mantenha histórico de auditorias para rastreabilidade
 
 ---
 
@@ -69,18 +69,18 @@ Escolha o relatório que deseja validar
 
 #### Passo 4: Inicie a validação
 O sistema verificará:
-- ✅ Completude de dados obrigatórios
-- ✅ Conformidade com normas técnicas
-- ✅ Consistência de cálculos
-- ✅ Qualidade de documentação
-- ✅ Requisitos legais
+- Completude de dados obrigatórios
+- Conformidade com normas técnicas
+- Consistência de cálculos
+- Qualidade de documentação
+- Requisitos legais
 
 ### Resultados da Pré-Certificação
 
 #### Status Possíveis
-- ✅ **APROVADO:** Pronto para certificação
-- ⚠️ **APROVADO COM RESSALVAS:** Correções menores necessárias
-- ❌ **REPROVADO:** Correções críticas necessárias
+- **APROVADO:** Pronto para certificação
+- **APROVADO COM RESSALVAS:** Correções menores necessárias
+- **REPROVADO:** Correções críticas necessárias
 
 #### Relatório de Validação
 Inclui:
@@ -90,10 +90,10 @@ Inclui:
 - Estimativa de prazo para correção
 
 ### Dicas Importantes
-💡 Execute pré-certificação DEPOIS da auditoria KRCI  
-💡 Corrija todos os itens críticos antes de reenviar  
-💡 Mantenha documentação de suporte organizada  
-💡 Consulte um profissional certificado para casos complexos
+ Execute pré-certificação DEPOIS da auditoria KRCI 
+ Corrija todos os itens críticos antes de reenviar 
+ Mantenha documentação de suporte organizada 
+ Consulte um profissional certificado para casos complexos
 
 ---
 
@@ -123,16 +123,16 @@ Escolha o relatório que deseja converter
 Clique em **"Converter e Exportar"**
 
 ### Formatos de Exportação
-- 📄 **PDF:** Relatório completo formatado
-- 📊 **Excel:** Dados tabulares para análise
-- 📋 **CSV:** Dados brutos para integração
-- 📝 **Word:** Documento editável
+- **PDF:** Relatório completo formatado
+- **Excel:** Dados tabulares para análise
+- **CSV:** Dados brutos para integração
+- **Word:** Documento editável
 
 ### Limitações Importantes
-⚠️ Nem todas as conversões são 1:1 perfeitas  
-⚠️ Revise sempre o relatório convertido  
-⚠️ Algumas categorias podem requerer ajuste manual  
-⚠️ Consulte um especialista para conversões críticas
+ Nem todas as conversões são 1:1 perfeitas 
+ Revise sempre o relatório convertido 
+ Algumas categorias podem requerer ajuste manual 
+ Consulte um especialista para conversões críticas
 
 ---
 
@@ -173,11 +173,11 @@ No dashboard, clique em **"ESG Reporting"**
 O sistema cria um relatório ESG completo e auditável
 
 ### Melhores Práticas ESG
-✅ Colete dados mensalmente para facilitar o reporte anual  
-✅ Use métricas quantitativas sempre que possível  
-✅ Documente todas as fontes de dados  
-✅ Inclua metas e progresso ao longo do tempo  
-✅ Seja transparente sobre desafios e limitações
+ Colete dados mensalmente para facilitar o reporte anual 
+ Use métricas quantitativas sempre que possível 
+ Documente todas as fontes de dados 
+ Inclua metas e progresso ao longo do tempo 
+ Seja transparente sobre desafios e limitações
 
 ---
 
@@ -239,10 +239,10 @@ O sistema gera:
 - **Payback < 5 anos:** Recuperação rápida do investimento
 
 ### Limitações
-⚠️ Resultados são estimativas baseadas em premissas  
-⚠️ Sempre faça análise de sensibilidade  
-⚠️ Consulte um especialista em valuation para decisões críticas  
-⚠️ Considere fatores qualitativos não capturados pelo modelo
+ Resultados são estimativas baseadas em premissas 
+ Sempre faça análise de sensibilidade 
+ Consulte um especialista em valuation para decisões críticas 
+ Considere fatores qualitativos não capturados pelo modelo
 
 ---
 
@@ -263,8 +263,8 @@ No dashboard, clique em **"Radar Regulatório"**
 
 #### Passo 3: Visualize atualizações
 O dashboard mostra:
-- 🔴 **Novas Regulações:** Recém-publicadas
-- 🔵 **Em Vigência:** Ativas e aplicáveis
+- **Novas Regulações:** Recém-publicadas
+- **Em Vigência:** Ativas e aplicáveis
 - 🟡 **Consultas Públicas:** Abertas para comentários
 
 #### Passo 4: Leia detalhes
@@ -282,11 +282,11 @@ Clique em cada item para ver:
 - Normas internacionais (ISO, ASTM)
 
 ### Melhores Práticas
-✅ Configure alertas para sua jurisdição  
-✅ Revise atualizações semanalmente  
-✅ Participe de consultas públicas quando relevante  
-✅ Mantenha registro de conformidade regulatória  
-✅ Consulte advogado especializado para interpretação legal
+ Configure alertas para sua jurisdição 
+ Revise atualizações semanalmente 
+ Participe de consultas públicas quando relevante 
+ Mantenha registro de conformidade regulatória 
+ Consulte advogado especializado para interpretação legal
 
 ---
 
@@ -322,11 +322,11 @@ Módulo para gestão de compliance, segurança de dados e auditoria interna.
 - Monitore vencimentos
 
 ### Melhores Práticas
-✅ Faça auditorias internas trimestrais  
-✅ Registre TODOS os incidentes, mesmo menores  
-✅ Mantenha treinamentos atualizados  
-✅ Revise políticas de segurança anualmente  
-✅ Contrate auditoria externa anualmente
+ Faça auditorias internas trimestrais 
+ Registre TODOS os incidentes, mesmo menores 
+ Mantenha treinamentos atualizados 
+ Revise políticas de segurança anualmente 
+ Contrate auditoria externa anualmente
 
 ---
 
@@ -344,11 +344,11 @@ Módulo para gestão de compliance, segurança de dados e auditoria interna.
 8. **Governança** → Mantenha compliance
 
 ### Dicas de Produtividade
-💡 Use templates para padronizar processos  
-💡 Automatize alertas e notificações  
-💡 Integre com ferramentas externas via API  
-💡 Mantenha documentação centralizada  
-💡 Treine sua equipe nos módulos avançados
+ Use templates para padronizar processos 
+ Automatize alertas e notificações 
+ Integre com ferramentas externas via API 
+ Mantenha documentação centralizada 
+ Treine sua equipe nos módulos avançados
 
 ---
 

@@ -4,7 +4,7 @@ Respostas rápidas para as dúvidas mais comuns sobre a plataforma QIVO Mining.
 
 ---
 
-## 🚀 Primeiros Passos
+## Primeiros Passos
 
 ### Como criar uma conta?
 1. Acesse [https://qivo-mining.onrender.com](https://qivo-mining.onrender.com)
@@ -32,7 +32,7 @@ Você pode fazer login de duas formas:
 
 ---
 
-## 💳 Planos e Pagamentos
+## Planos e Pagamentos
 
 ### Quais são os planos disponíveis?
 
@@ -49,9 +49,9 @@ Você pode fazer login de duas formas:
 4. Confirme a assinatura
 
 ### Quais formas de pagamento são aceitas?
-- 💳 Cartão de crédito (Visa, Mastercard, Amex, Elo)
-- 🏦 Boleto bancário
-- 📱 PIX
+- Cartão de crédito (Visa, Mastercard, Amex, Elo)
+- Boleto bancário
+- PIX
 
 ### Posso cancelar minha assinatura a qualquer momento?
 **Sim!** Você pode cancelar a qualquer momento sem multa:
@@ -74,7 +74,7 @@ Seu acesso continua até o fim do período pago.
 
 ---
 
-## 📄 Relatórios Técnicos
+## Relatórios Técnicos
 
 ### Quanto tempo leva para gerar um relatório?
 Geralmente **2 a 5 minutos**, dependendo da complexidade e quantidade de dados.
@@ -120,15 +120,15 @@ Não diretamente, mas você pode:
 
 ---
 
-## 🔒 Segurança e Privacidade
+## Segurança e Privacidade
 
 ### Meus dados estão seguros?
 **Sim!** Implementamos segurança de classe mundial:
-- 🔐 Criptografia end-to-end
-- 🍪 Cookies HttpOnly seguros
-- 🔑 Autenticação multi-fator (2FA)
-- ✅ Conformidade com LGPD
-- 🛡️ Certificação ISO 27001
+- Criptografia end-to-end
+- Cookies HttpOnly seguros
+- Autenticação multi-fator (2FA)
+- Conformidade com LGPD
+- Certificação ISO 27001
 
 ### Como funciona a autenticação?
 Utilizamos **cookies HttpOnly seguros** com flags:
@@ -142,7 +142,7 @@ Utilizamos **cookies HttpOnly seguros** com flags:
 ### Posso excluir minha conta?
 **Sim!** Em **"Minha Conta"** → **"Excluir Conta"**.
 
-**⚠️ ATENÇÃO:** Esta ação é irreversível e remove:
+** ATENÇÃO:** Esta ação é irreversível e remove:
 - Sua conta
 - Todos os relatórios
 - Histórico de atividades
@@ -156,7 +156,7 @@ Utilizamos **cookies HttpOnly seguros** com flags:
 
 ---
 
-## 🛠️ Módulos e Funcionalidades
+## Módulos e Funcionalidades
 
 ### O que é Auditoria KRCI?
 **KRCI** (Key Risk and Critical Information) é uma auditoria que identifica critérios críticos de risco em relatórios técnicos. O sistema analisa automaticamente e aponta áreas que requerem atenção.
@@ -167,7 +167,7 @@ Utilizamos **cookies HttpOnly seguros** com flags:
 ### Posso converter relatórios entre padrões?
 **Sim!** Use o módulo **"Exportar Padrões"** para converter entre JORC, NI 43-101, PERC, etc.
 
-**⚠️ Importante:** Sempre revise o relatório convertido, pois nem todas as conversões são 1:1 perfeitas.
+** Importante:** Sempre revise o relatório convertido, pois nem todas as conversões são 1:1 perfeitas.
 
 ### O que é ESG Reporting?
 Relatórios de **Environmental, Social and Governance** (Ambiental, Social e Governança) para demonstrar sustentabilidade e impacto positivo conforme frameworks GRI, SASB e TCFD.
@@ -183,7 +183,7 @@ Monitoramento automático de mudanças em regulamentações de mineração no Br
 
 ---
 
-## 🎓 Uso e Limites
+## Uso e Limites
 
 ### Quantos relatórios posso gerar por mês?
 Depende do seu plano:
@@ -213,7 +213,7 @@ Um projeto ativo é aquele que você está trabalhando atualmente. Você pode ar
 
 ---
 
-## 📞 Suporte
+## Suporte
 
 ### Como entrar em contato com o suporte?
 - **Email:** suporte@qivo-mining.com
@@ -241,7 +241,7 @@ Um projeto ativo é aquele que você está trabalhando atualmente. Você pode ar
 
 ---
 
-## 🔧 Problemas Técnicos
+## Problemas Técnicos
 
 ### O relatório não foi gerado, o que faço?
 1. Verifique se todos os campos obrigatórios foram preenchidos
@@ -284,20 +284,20 @@ Um projeto ativo é aquele que você está trabalhando atualmente. Você pode ar
 
 ---
 
-## 🌍 Compatibilidade
+## Compatibilidade
 
 ### Quais navegadores são suportados?
-- ✅ Google Chrome (recomendado)
-- ✅ Mozilla Firefox
-- ✅ Microsoft Edge
-- ✅ Safari (macOS/iOS)
-- ⚠️ Internet Explorer (não recomendado)
+- Google Chrome (recomendado)
+- Mozilla Firefox
+- Microsoft Edge
+- Safari (macOS/iOS)
+- Internet Explorer (não recomendado)
 
 ### Posso usar no celular?
 **Sim!** A plataforma é totalmente responsiva e funciona em:
-- 📱 Smartphones (Android e iOS)
-- 📱 Tablets
-- 💻 Desktops
+- Smartphones (Android e iOS)
+- Tablets
+- Desktops
 
 **Recomendação:** Para melhor experiência, use desktop para gerar relatórios complexos.
 
@@ -306,7 +306,7 @@ Ainda não, mas está em desenvolvimento! Por enquanto, use o navegador mobile.
 
 ---
 
-## 🔄 Integrações
+## Integrações
 
 ### Posso integrar com outras ferramentas?
 **Sim!** Planos PROFESSIONAL e ENTERPRISE têm acesso à API REST para integração com:
@@ -332,31 +332,31 @@ Em desenvolvimento! Em breve você poderá:
 
 ---
 
-## 💡 Dicas e Melhores Práticas
+## Dicas e Melhores Práticas
 
 ### Como aproveitar melhor a plataforma?
-1. ✅ Comece com o formulário manual para entender o fluxo
-2. ✅ Use templates para padronizar processos
-3. ✅ Faça auditoria KRCI antes de pré-certificação
-4. ✅ Mantenha projetos organizados
-5. ✅ Assista aos tutoriais em vídeo
+1. Comece com o formulário manual para entender o fluxo
+2. Use templates para padronizar processos
+3. Faça auditoria KRCI antes de pré-certificação
+4. Mantenha projetos organizados
+5. Assista aos tutoriais em vídeo
 
 ### Como garantir qualidade dos relatórios?
-1. ✅ Preencha todos os campos obrigatórios
-2. ✅ Use dados precisos e atualizados
-3. ✅ Revise o relatório antes de finalizar
-4. ✅ Faça auditoria KRCI
-5. ✅ Consulte um profissional certificado para casos complexos
+1. Preencha todos os campos obrigatórios
+2. Use dados precisos e atualizados
+3. Revise o relatório antes de finalizar
+4. Faça auditoria KRCI
+5. Consulte um profissional certificado para casos complexos
 
 ### Como otimizar o uso de créditos?
-1. ✅ Planeje seus relatórios mensalmente
-2. ✅ Use o plano adequado ao seu volume
-3. ✅ Arquive projetos antigos
-4. ✅ Considere upgrade se atingir limites frequentemente
+1. Planeje seus relatórios mensalmente
+2. Use o plano adequado ao seu volume
+3. Arquive projetos antigos
+4. Considere upgrade se atingir limites frequentemente
 
 ---
 
-## 📚 Recursos Adicionais
+## Recursos Adicionais
 
 ### Onde encontro tutoriais?
 - **Ajuda & Suporte:** [/help](/help)
@@ -379,7 +379,7 @@ Em desenvolvimento! Em breve você poderá:
 
 ---
 
-## ❓ Não Encontrou sua Resposta?
+## Não Encontrou sua Resposta?
 
 Se sua dúvida não está aqui, entre em contato:
 
@@ -388,7 +388,7 @@ Se sua dúvida não está aqui, entre em contato:
 - **Telefone:** +55 11 1234-5678
 - **Central de Suporte:** [/support](/support)
 
-Teremos prazer em ajudar! 😊
+Teremos prazer em ajudar! 
 
 ---
 
