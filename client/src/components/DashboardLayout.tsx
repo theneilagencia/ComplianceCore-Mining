@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, BarChart3, CheckCircle, ArrowRightLeft } from "lucide-react";
+import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, BarChart3, CheckCircle, ArrowRightLeft, BookOpen, Leaf, DollarSign, Bell, Shield, HelpCircle } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -32,6 +32,12 @@ const menuItems = [
   { icon: BarChart3, label: "Auditoria & KRCI", path: "/reports/audit" },
   { icon: CheckCircle, label: "Pré-Certificação", path: "/reports/precert" },
   { icon: ArrowRightLeft, label: "Exportar Padrões", path: "/reports/export" },
+  { icon: Leaf, label: "ESG Reporting", path: "/reports/esg" },
+  { icon: DollarSign, label: "Valuation Automático", path: "/reports/valuation" },
+  { icon: Bell, label: "Radar Regulatório", path: "/reports/regulatory" },
+  { icon: Shield, label: "Governança & Segurança", path: "/reports/governance" },
+  { icon: HelpCircle, label: "Ajuda & Suporte", path: "/help" },
+  { icon: BookOpen, label: "Central de Suporte", path: "/support" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
