@@ -7,6 +7,8 @@ import type { Request } from 'express';
 import { getDb } from '../../db';
 import { ENV } from '../../_core/env';
 import jwt from 'jsonwebtoken';
+import { users } from '../../../drizzle/schema';
+import { eq } from 'drizzle-orm';
 
 export async function authenticateFromCookie(req: Request) {
   // Try to get token from Authorization header first (preferred)
@@ -43,9 +45,13 @@ export async function authenticateFromCookie(req: Request) {
 
     // Fetch user from database
     const db = await getDb();
-    const user = await db.query.users.findFirst({
-      where: (users, { eq }) => eq(users.id, decoded.userId),
-    });
+    if (!db) {
+      console.error('[Auth Helper] Database not available');
+      throw new Error('Database not available');
+    }
+    
+    const result = await db.select().from(users).where(eq(users.id, decoded.userId)).limit(1);
+    const user = result.length > 0 ? result[0] : null;
 
     if (!user) {
       console.error('[Auth Helper] User not found in database:', decoded.userId);
