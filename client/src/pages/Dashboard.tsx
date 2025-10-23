@@ -55,39 +55,6 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
-      {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                JI
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-slate-900">QIVO Mining</h1>
-                <p className="text-sm text-slate-600">Dashboard Principal</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => setLocation('/account')}
-                className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
-              >
-                Minha Conta
-              </button>
-              <button
-                onClick={() => {
-                  localStorage.clear();
-                  setLocation('/login');
-                }}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
-              >
-                Sair
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -261,7 +228,7 @@ export default function Dashboard() {
               <div className="flex items-center justify-between mb-2">
                 <span className="text-slate-700 font-medium">Projetos Ativos</span>
                 <span className="text-slate-900 font-bold">
-                  {license?.stats?.projectsActive || 0} / {license?.stats?.projectsLimit || 1}
+                  {license?.stats?.projectsActive || 0} / {license?.stats?.projectsLimit === 999999 || license?.stats?.projectsLimit === -1 ? 'Ilimitado' : license?.stats?.projectsLimit || 1}
                 </span>
               </div>
               <div className="w-full bg-slate-200 rounded-full h-3">

@@ -15,6 +15,7 @@ import NotFound from "@/pages/NotFound";
 // Auth Pages (lazy loading)
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const AuthCallback = lazy(() => import("./pages/AuthCallback"));
 
 // Account Pages (lazy loading)
@@ -56,6 +57,7 @@ function Router() {
         {/* Auth Routes (públicas) */}
         <Route path={"/login"} component={Login} />
         <Route path={"/register"} component={Register} />
+        <Route path={"/forgot-password"} component={ForgotPassword} />
         <Route path={"/auth/callback"} component={AuthCallback} />
         
         {/* Account Routes (protegidas) */}

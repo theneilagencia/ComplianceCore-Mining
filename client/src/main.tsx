@@ -8,6 +8,10 @@ import App from "./App";
 import { getLoginUrl } from "./const";
 import "./i18n"; // Inicializar i18n
 import "./index.css";
+import { initErrorMonitoring } from "./utils/errorMonitoring";
+
+// Initialize error monitoring
+initErrorMonitoring();
 
 const queryClient = new QueryClient();
 

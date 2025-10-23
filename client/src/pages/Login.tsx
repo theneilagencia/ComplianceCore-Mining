@@ -118,6 +118,16 @@ export default function LoginPage() {
             />
           </div>
 
+          <div className="flex items-center justify-end mb-4">
+            <button
+              type="button"
+              onClick={() => setLocation('/forgot-password')}
+              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+            >
+              Esqueci minha senha
+            </button>
+          </div>
+
           <button
             type="submit"
             disabled={loading}

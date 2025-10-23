@@ -12,6 +12,7 @@ import adminRouter from "../modules/admin/router";
 import reportsRouter from "../modules/reports/router";
 import auditsRouter from "../modules/audits/router";
 import settingsRouter from "../modules/settings/router";
+import uxRouter from "../modules/ux/router";
 import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
@@ -90,6 +91,9 @@ async function startServer() {
   app.use("/api/reports", reportsRouter);
   app.use("/api/audits", auditsRouter);
   app.use("/api/settings", settingsRouter);
+  
+  // UX monitoring route
+  app.use("/api/ux", uxRouter);
   // tRPC API
   app.use(
     "/api/trpc",
