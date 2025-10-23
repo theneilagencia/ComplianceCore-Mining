@@ -9,16 +9,24 @@ import { ENV } from '../../_core/env';
 import jwt from 'jsonwebtoken';
 
 export async function authenticateFromCookie(req: Request) {
-  // Try to get token from cookie first
-  const cookieToken = req.cookies?.accessToken;
+  // Try to get token from Authorization header first (preferred)
+  const authHeader = req.headers.authorization;
+  let token: string | undefined;
   
-  if (!cookieToken) {
-    throw new Error('No access token found in cookies');
+  if (authHeader && authHeader.startsWith('Bearer ')) {
+    token = authHeader.substring(7); // Remove 'Bearer ' prefix
+  } else {
+    // Fallback to cookie if no Authorization header
+    token = req.cookies?.accessToken;
+  }
+  
+  if (!token) {
+    throw new Error('No access token found in Authorization header or cookies');
   }
 
   // Verify JWT token
   try {
-    const decoded = jwt.verify(cookieToken, ENV.jwtSecret) as {
+    const decoded = jwt.verify(token, ENV.jwtSecret) as {
       userId: string;
       tenantId: string;
     };

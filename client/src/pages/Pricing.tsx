@@ -88,9 +88,15 @@ export default function PricingPage() {
     setLoading(planName);
 
     try {
+      // Get access token from localStorage
+      const accessToken = localStorage.getItem('accessToken');
+      
       const response = await fetch('/api/payment/checkout', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
+        },
         credentials: 'include', // Send cookies for authentication
         body: JSON.stringify({
           plan: planName,
