@@ -8,11 +8,13 @@ import { registerOAuthRoutes } from "./oauth";
 import paymentRouter from "../modules/payment/router";
 import licenseRouter from "../modules/licenses/router";
 import authRouter from "../modules/auth/router";
+import googleHealthRouter from "../modules/auth/google-health-router";
 import adminRouter from "../modules/admin/router";
 import reportsRouter from "../modules/reports/router";
 import auditsRouter from "../modules/audits/router";
 import settingsRouter from "../modules/settings/router";
 import uxRouter from "../modules/ux/router";
+import systemRouter from "../modules/system/router";
 import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
@@ -61,6 +63,7 @@ async function startServer() {
   
   // Authentication routes
   app.use("/api/auth", authRouter);
+  app.use("/api/auth", googleHealthRouter);
   
   // Development routes (only in dev mode)
   app.use("/api/dev", devRouter);
@@ -94,6 +97,9 @@ async function startServer() {
   
   // UX monitoring route
   app.use("/api/ux", uxRouter);
+  
+  // System status route
+  app.use("/api/system", systemRouter);
   // tRPC API
   app.use(
     "/api/trpc",
