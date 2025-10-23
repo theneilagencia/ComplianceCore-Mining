@@ -36,11 +36,11 @@ export interface CheckoutSessionParams {
  */
 export function getPriceId(plan: Plan, billingPeriod: 'monthly' | 'annual'): string {
   const priceIds: Record<string, string> = {
-    'START': process.env.STRIPE_PRICE_STARTER || 'price_START_000',
-    'PRO_monthly': process.env.STRIPE_PRICE_PRO_MONTHLY || 'price_PRO_899_M',
-    'PRO_annual': process.env.STRIPE_PRICE_PRO_ANNUAL || 'price_PRO_9600_Y',
-    'ENTERPRISE_monthly': process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY || 'price_ENT_1990_M',
-    'ENTERPRISE_annual': process.env.STRIPE_PRICE_ENTERPRISE_ANNUAL || 'price_ENT_21000_Y',
+    'START': process.env.STRIPE_PRICE_STARTER || '',
+    'PRO_monthly': process.env.STRIPE_PRICE_PRO_MONTHLY || 'price_1SLM9VGwHsvLMl1q4XSy1mZc',
+    'PRO_annual': process.env.STRIPE_PRICE_PRO_ANNUAL || 'price_1SLM9VGwHsvLMl1qDU9ti4Wv',
+    'ENTERPRISE_monthly': process.env.STRIPE_PRICE_ENTERPRISE_MONTHLY || 'price_1SLM9WGwHsvLMl1qPo2yp6OI',
+    'ENTERPRISE_annual': process.env.STRIPE_PRICE_ENTERPRISE_ANNUAL || 'price_1SLM9WGwHsvLMl1q1lj7bd0R',
   };
 
   if (plan === 'START') {
