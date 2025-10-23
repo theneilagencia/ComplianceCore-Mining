@@ -39,7 +39,7 @@ export async function authenticateFromCookie(req: Request) {
     console.log('[Auth Helper] Verifying token with JWT_SECRET...');
     const decoded = jwt.verify(token, ENV.jwtSecret) as {
       userId: string;
-      tenantId: string;
+      email?: string;
     };
     console.log('[Auth Helper] Token decoded successfully. UserId:', decoded.userId);
 
