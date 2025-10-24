@@ -11,7 +11,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { getSchemaByStandard, getAllStandards, type FieldDefinition } from '../schemas/standardSchemas';
+import { getSchemaByStandard, getAllStandards, type FieldDefinition } from '../schemas/standardSchemasExpanded';
+import ReportPreview from './ReportPreview';
 import { HelpCircle } from 'lucide-react';
 import {
   Tooltip,
@@ -28,6 +29,7 @@ interface DynamicReportFormProps {
 export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReportFormProps) {
   const [standard, setStandard] = useState<string>('NI_43_101');
   const [formData, setFormData] = useState<Record<string, any>>({});
+  const [showPreview, setShowPreview] = useState<boolean>(false);
 
   const schema = getSchemaByStandard(standard);
   const standards = getAllStandards();
@@ -39,8 +41,12 @@ export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReport
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handlePreview = (e: React.FormEvent) => {
     e.preventDefault();
+    setShowPreview(true);
+  };
+
+  const handleConfirmSubmit = () => {
     
     // Validar campos obrigatórios
     const requiredFields = schema.sections.flatMap((section) =>
@@ -58,6 +64,7 @@ export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReport
       standard,
       ...formData,
     });
+    setShowPreview(false);
   };
 
   const renderField = (field: FieldDefinition) => {
@@ -144,7 +151,8 @@ export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReport
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <>
+    <form onSubmit={handlePreview} className="space-y-6">
       {/* Standard Selector */}
       <Card className="p-6">
         <div className="space-y-4">
@@ -201,10 +209,22 @@ export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReport
           disabled={isLoading}
           className="w-full md:w-auto bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
         >
-          {isLoading ? 'Gerando...' : 'Iniciar Geração →'}
+          Preview do Relatório →
         </Button>
       </div>
     </form>
+
+    {showPreview && (
+      <ReportPreview
+        formData={formData}
+        standard={standard}
+        onClose={() => setShowPreview(false)}
+        onEdit={() => setShowPreview(false)}
+        onConfirm={handleConfirmSubmit}
+        isLoading={isLoading}
+      />
+    )}
+    </>
   );
 }
 
