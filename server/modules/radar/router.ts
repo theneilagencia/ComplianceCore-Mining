@@ -4,6 +4,7 @@
  */
 
 import express, { type Request, type Response } from 'express';
+import { aggregateAllData } from './services/dataAggregator';
 
 const router = express.Router();
 
@@ -225,26 +226,20 @@ const MOCK_OPERATIONS = [
  */
 router.get('/operations', async (req: Request, res: Response) => {
   try {
-    // In production, this would aggregate data from:
-    // 1. Global Mining Areas (GEE)
-    // 2. Resource Watch – Mining Concessions
-    // 3. Global Coal & Metal Mine Production – Nature Dataset
-    // 4. Brazil Mining Concessions – Global Forest Watch
-    // 5. Mineral Facilities of Latin America & Caribbean – USGS
-    // 6. Indo-Pacific USGS Mineral GIS
-    // 7. Philippines Mining Industry Statistics – Data.gov.ph
-    // 8. Pacific Data Portal – Mining Datasets (PNG, Solomon Islands)
-    // 9. Africa Major Mineral Deposits – RCMRD
-    // 10. Mineral Operations of Africa & Middle East – RCMRD
-    // 11. Australian Operating Mines – Atlas Gov
-    // 12. EU Mineral Resources Dataset – EuroGeoSurveys
-
-    // For now, return mock data
+    // Try to fetch real data from aggregator
+    const { operations, sources } = await aggregateAllData();
+    
+    // If no real data available, fallback to mock data
+    const finalOperations = operations.length > 0 ? operations : MOCK_OPERATIONS;
+    const activeSources = sources.filter(s => s.status === 'active').length;
+    
     res.json({
       success: true,
-      operations: MOCK_OPERATIONS,
-      sources: 12,
+      operations: finalOperations,
+      sources: activeSources || 12,
       lastUpdate: new Date().toISOString(),
+      dataSource: operations.length > 0 ? 'real' : 'mock',
+      sourceDetails: sources,
     });
   } catch (error: any) {
     console.error('[Radar] Error fetching operations:', error);

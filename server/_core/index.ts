@@ -18,6 +18,8 @@ import uxRouter from "../modules/ux/router";
 import systemRouter from "../modules/system/router";
 import supportRouter from "../modules/support/router";
 import radarRouter from "../modules/radar/router";
+import diagnosticRouter from "../modules/radar/diagnosticRouter";
+import { startDiagnosticCron } from "../modules/radar/services/diagnosticCron";
 import templatesRouter from "../modules/templates/router";
 import validateRouter from "../modules/validate/router";
 import { passport } from "../modules/auth/google-oauth";
@@ -122,6 +124,10 @@ async function startServer() {
   
   // Radar routes
   app.use("/api/radar", radarRouter);
+  app.use("/api/radar", diagnosticRouter);
+  
+  // Start diagnostic cron job
+  startDiagnosticCron();
   
   // Templates routes
   app.use("/api/templates", templatesRouter);
