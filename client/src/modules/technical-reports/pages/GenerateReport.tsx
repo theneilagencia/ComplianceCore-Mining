@@ -86,11 +86,67 @@ export default function GenerateReport() {
  });
  };
 
- const handleDownloadTemplate = (format: string) => {
- toast.success(`Template ${format} em desenvolvimento`, {
- description: "Esta funcionalidade será implementada em breve"
- });
- };
+	const handleDownloadTemplate = async (format: string) => {
+		try {
+			// Mapear formato para kind da API
+			const kindMap: Record<string, string> = {
+				"Excel": "xlsx",
+				"CSV": "csv",
+				"PDF": "pdf"
+			};
+			
+			const kind = kindMap[format] || "xlsx";
+			const standardMap: Record<string, string> = {
+				"JORC_2012": "jorc",
+				"NI_43_101": "ni43-101",
+				"PERC": "precert",
+				"SAMREC": "governance",
+				"CRIRSCO": "valuation",
+				"CBRR": "jorc"
+			};
+			
+			const templateType = standardMap[standard] || "jorc";
+			
+			// Fazer download via API
+			const url = `/api/templates/${kind}?type=${templateType}`;
+			const response = await fetch(url);
+			
+			if (!response.ok) {
+				throw new Error("Erro ao baixar template");
+			}
+			
+			// Extrair nome do arquivo do header Content-Disposition
+			const contentDisposition = response.headers.get("Content-Disposition");
+			let filename = `template_${templateType}.${kind}`;
+			
+			if (contentDisposition) {
+				const matches = /filename="?([^"]+)"?/.exec(contentDisposition);
+				if (matches && matches[1]) {
+					filename = matches[1];
+				}
+			}
+			
+			// Criar blob e fazer download
+			const blob = await response.blob();
+			const downloadUrl = window.URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = downloadUrl;
+			a.download = filename;
+			document.body.appendChild(a);
+			a.click();
+			document.body.removeChild(a);
+			window.URL.revokeObjectURL(downloadUrl);
+			
+			toast.success(`Template ${format} baixado com sucesso!`, {
+				description: `Arquivo: ${filename}`
+			});
+		} catch (error) {
+			console.error("Erro ao baixar template:", error);
+			toast.error("Erro ao baixar template", {
+				description: "Tente novamente ou entre em contato com o suporte"
+			});
+		}
+	};
 
  return (
  <DashboardLayout>
