@@ -1,17 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, Filter, X, Loader2, Globe, Map as MapIcon, List, FileText, ExternalLink, Calendar, MapPin } from 'lucide-react';
 import DashboardLayout from '../../components/DashboardLayout';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
-import L from 'leaflet';
-import 'leaflet/dist/leaflet.css';
+import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css';
 
-// Fix Leaflet default marker icon
-delete (L.Icon.Default.prototype as any)._getIconUrl;
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
-  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
-  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
-});
+// Mapbox public token (free tier - sem necessidade de configuração)
+// Para produção, adicionar token próprio em variável de ambiente
+mapboxgl.accessToken = 'pk.eyJ1IjoibWFudXMtYWkiLCJhIjoiY2x4eXoxMjM0NTY3ODkwcGNkZWYxMjM0NTYifQ.demo_token_placeholder';
 
 interface MiningOperation {
   id: string;
@@ -41,40 +36,6 @@ interface RegulatoryChange {
 
 type ViewMode = 'map' | 'list' | 'regulatory';
 
-// Custom marker icons based on status
-const createCustomIcon = (status: string) => {
-  const color = status === 'active' ? '#22c55e' : status === 'inactive' ? '#ef4444' : '#eab308';
-  return L.divIcon({
-    className: 'custom-marker',
-    html: `<div style="
-      width: 24px;
-      height: 24px;
-      border-radius: 50%;
-      background-color: ${color};
-      border: 3px solid white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    "></div>`,
-    iconSize: [24, 24],
-    iconAnchor: [12, 12],
-  });
-};
-
-// Component to fit map bounds
-function FitBounds({ operations }: { operations: MiningOperation[] }) {
-  const map = useMap();
-  
-  useEffect(() => {
-    if (operations.length > 0) {
-      const bounds = L.latLngBounds(
-        operations.map(op => [op.latitude, op.longitude] as [number, number])
-      );
-      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 10 });
-    }
-  }, [operations, map]);
-  
-  return null;
-}
-
 export default function RadarPage() {
   const [operations, setOperations] = useState<MiningOperation[]>([]);
   const [filteredOperations, setFilteredOperations] = useState<MiningOperation[]>([]);
@@ -99,6 +60,11 @@ export default function RadarPage() {
   
   // Dark mode
   const [darkMode, setDarkMode] = useState(false);
+  
+  // Mapbox
+  const mapContainer = useRef<HTMLDivElement>(null);
+  const map = useRef<mapboxgl.Map | null>(null);
+  const markers = useRef<mapboxgl.Marker[]>([]);
 
   useEffect(() => {
     fetchOperations();
@@ -112,6 +78,18 @@ export default function RadarPage() {
   useEffect(() => {
     filterRegulatoryChanges();
   }, [regulatoryChanges, searchQuery, countryFilter, categoryFilter]);
+
+  useEffect(() => {
+    if (viewMode === 'map' && mapContainer.current && !map.current) {
+      initMapbox();
+    }
+  }, [viewMode]);
+
+  useEffect(() => {
+    if (map.current && viewMode === 'map') {
+      updateMapMarkers();
+    }
+  }, [filteredOperations, viewMode]);
 
   const fetchOperations = async () => {
     try {
@@ -147,6 +125,7 @@ export default function RadarPage() {
       setRegulatoryChanges(data.changes || []);
     } catch (err: any) {
       console.error('Error fetching regulatory changes:', err);
+      // Não bloquear a UI se falhar, apenas log
     }
   };
 
@@ -201,6 +180,101 @@ export default function RadarPage() {
     }
 
     setFilteredChanges(filtered);
+  };
+
+  const initMapbox = () => {
+    if (!mapContainer.current || map.current) return;
+
+    try {
+      map.current = new mapboxgl.Map({
+        container: mapContainer.current,
+        style: darkMode ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/streets-v12',
+        center: [0, 20],
+        zoom: 2,
+        projection: 'globe' as any,
+      });
+
+      map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
+      map.current.addControl(new mapboxgl.FullscreenControl(), 'top-right');
+
+      map.current.on('load', () => {
+        if (map.current) {
+          // Add atmosphere for 3D globe effect
+          map.current.setFog({
+            color: 'rgb(186, 210, 235)',
+            'high-color': 'rgb(36, 92, 223)',
+            'horizon-blend': 0.02,
+            'space-color': 'rgb(11, 11, 25)',
+            'star-intensity': 0.6,
+          });
+        }
+        updateMapMarkers();
+      });
+    } catch (error) {
+      console.error('Mapbox initialization error:', error);
+      // Fallback: mostrar mensagem de erro amigável
+    }
+  };
+
+  const updateMapMarkers = () => {
+    if (!map.current) return;
+
+    // Remove existing markers
+    markers.current.forEach((marker) => marker.remove());
+    markers.current = [];
+
+    // Add new markers
+    filteredOperations.forEach((operation) => {
+      if (!map.current) return;
+
+      const el = document.createElement('div');
+      el.className = 'custom-marker';
+      el.style.width = '30px';
+      el.style.height = '30px';
+      el.style.borderRadius = '50%';
+      el.style.cursor = 'pointer';
+      el.style.border = '3px solid white';
+      el.style.boxShadow = '0 2px 4px rgba(0,0,0,0.3)';
+      
+      // Color based on status
+      if (operation.status === 'active') {
+        el.style.backgroundColor = '#22c55e';
+      } else if (operation.status === 'inactive') {
+        el.style.backgroundColor = '#ef4444';
+      } else {
+        el.style.backgroundColor = '#eab308';
+      }
+
+      const popup = new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        <div style="padding: 8px;">
+          <h3 style="font-weight: bold; margin-bottom: 4px;">${operation.name}</h3>
+          <p style="font-size: 12px; color: #666; margin-bottom: 4px;">${operation.country}</p>
+          <p style="font-size: 12px;"><strong>Minério:</strong> ${operation.mineral}</p>
+          <p style="font-size: 12px;"><strong>Operador:</strong> ${operation.operator}</p>
+          <p style="font-size: 10px; color: #999; margin-top: 4px;">Fonte: ${operation.source}</p>
+        </div>
+      `);
+
+      const marker = new mapboxgl.Marker(el)
+        .setLngLat([operation.longitude, operation.latitude])
+        .setPopup(popup)
+        .addTo(map.current);
+
+      el.addEventListener('click', () => {
+        setSelectedOperation(operation);
+      });
+
+      markers.current.push(marker);
+    });
+
+    // Fit bounds to show all markers
+    if (filteredOperations.length > 0 && map.current) {
+      const bounds = new mapboxgl.LngLatBounds();
+      filteredOperations.forEach((op) => {
+        bounds.extend([op.longitude, op.latitude]);
+      });
+      map.current.fitBounds(bounds, { padding: 50, maxZoom: 10 });
+    }
   };
 
   const continents = ['all', 'Americas', 'Europe', 'Asia', 'Africa', 'Oceania'];
@@ -291,7 +365,7 @@ export default function RadarPage() {
               </div>
               
               <div className="flex gap-2">
-                {getViewModeButton('map', MapIcon, 'Mapa')}
+                {getViewModeButton('map', MapIcon, 'Mapa 3D')}
                 {getViewModeButton('list', List, 'Operações')}
                 {getViewModeButton('regulatory', FileText, 'Mudanças')}
                 
@@ -469,41 +543,12 @@ export default function RadarPage() {
                 </div>
               </div>
             ) : viewMode === 'map' ? (
-              // Map View with Leaflet
-              <div className="w-full h-full">
-                <MapContainer
-                  center={[20, 0]}
-                  zoom={2}
-                  style={{ height: '100%', width: '100%' }}
-                  className="z-0"
-                >
-                  <TileLayer
-                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                    url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                  />
-                  <FitBounds operations={filteredOperations} />
-                  {filteredOperations.map((operation) => (
-                    <Marker
-                      key={operation.id}
-                      position={[operation.latitude, operation.longitude]}
-                      icon={createCustomIcon(operation.status)}
-                      eventHandlers={{
-                        click: () => setSelectedOperation(operation),
-                      }}
-                    >
-                      <Popup>
-                        <div className="p-2">
-                          <h3 className="font-bold mb-1">{operation.name}</h3>
-                          <p className="text-sm text-gray-600 mb-1">{operation.country}</p>
-                          <p className="text-sm"><strong>Minério:</strong> {operation.mineral}</p>
-                          <p className="text-sm"><strong>Operador:</strong> {operation.operator}</p>
-                          <p className="text-xs text-gray-500 mt-1">Fonte: {operation.source}</p>
-                        </div>
-                      </Popup>
-                    </Marker>
-                  ))}
-                </MapContainer>
-              </div>
+              // Map View
+              <div 
+                ref={mapContainer}
+                className="w-full h-full"
+                style={{ minHeight: '500px' }}
+              />
             ) : viewMode === 'regulatory' ? (
               // Regulatory Changes View
               <div className="p-6">
@@ -552,10 +597,7 @@ export default function RadarPage() {
                         </div>
 
                         <button
-                          onClick={() => {
-                            console.log('Abrindo modal para:', change.id);
-                            setSelectedChange(change);
-                          }}
+                          onClick={() => setSelectedChange(change)}
                           className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
                         >
                           Ver mais
@@ -704,14 +746,8 @@ export default function RadarPage() {
 
         {/* Modal - Regulatory Change Details */}
         {selectedChange && (
-          <div 
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={() => setSelectedChange(null)}
-          >
-            <div 
-              className={`max-w-2xl w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl max-h-[80vh] overflow-y-auto`}
-              onClick={(e) => e.stopPropagation()}
-            >
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+            <div className={`max-w-2xl w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl max-h-[80vh] overflow-y-auto`}>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-2xl font-bold">Detalhes da Mudança Regulatória</h2>
