@@ -293,6 +293,12 @@ export const technicalReportsRouter = router({
         };
       }),
 
+    // Listar exportações do tenant
+    list: protectedProcedure.query(async ({ ctx }) => {
+      // Implementação futura: buscar do banco
+      return [];
+    }),
+
     // Baixar arquivo exportado
     download: protectedProcedure
       .input(z.object({ exportId: z.string() }))

@@ -3,6 +3,7 @@ import DashboardLayout from '@/components/DashboardLayout';
 import { toast } from 'sonner';
 import { Download, FileText, FileSpreadsheet, FileCode, Loader2, CheckCircle2, Clock, ArrowRight, AlertCircle, RefreshCw } from 'lucide-react';
 import { useApi } from '@/hooks/useApi';
+import { trpc } from '@/lib/trpc';
 
 interface Report {
   id: string;
@@ -97,16 +98,11 @@ export default function ExportStandards() {
       setLoadingReports(true);
       setError('');
       
-      const response = await retryWithBackoff(async () => {
-        return await apiFetch('/api/technical-reports/list');
+      const data = await retryWithBackoff(async () => {
+        return await trpc.technicalReports.generate.list.query();
       });
       
-      if (!response.ok) {
-        throw new Error('Erro ao carregar relatórios');
-      }
-      
-      const data = await response.json();
-      setReports(data.reports || []);
+      setReports(data || []);
     } catch (err: any) {
       console.error('Erro ao carregar relatórios:', err);
       setError('Não foi possível carregar a lista de relatórios. Tente novamente.');
@@ -122,16 +118,11 @@ export default function ExportStandards() {
     try {
       setLoadingExports(true);
       
-      const response = await retryWithBackoff(async () => {
-        return await apiFetch('/api/technical-reports/exports/list');
+      const data = await retryWithBackoff(async () => {
+        return await trpc.technicalReports.export.list.query();
       });
       
-      if (!response.ok) {
-        throw new Error('Erro ao carregar exportações');
-      }
-      
-      const data = await response.json();
-      setExports(data.exports || []);
+      setExports(data || []);
     } catch (err: any) {
       console.error('Erro ao carregar exportações:', err);
       // Não mostrar erro para exports, apenas log
