@@ -148,80 +148,80 @@ export default function PreCertification() {
           {activeTab === 'select' ? (
             <div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            {/* Report Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Relatório
-              </label>
-              <select
-                value={selectedReportId}
-                onChange={(e) => setSelectedReportId(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                {/* Report Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Relatório
+                  </label>
+                  <select
+                    value={selectedReportId}
+                    onChange={(e) => setSelectedReportId(e.target.value)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    <option value="">Selecione um relatório...</option>
+                    {reportsQuery.data?.map((report: any) => (
+                      <option key={report.id} value={report.id}>
+                        {report.title} ({report.standard}) - {report.status}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Regulator Selection */}
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Regulador
+                  </label>
+                  <select
+                    value={regulator}
+                    onChange={(e) => setRegulator(e.target.value as any)}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                  >
+                    {regulators.map((reg) => (
+                      <option key={reg.id} value={reg.id}>
+                        {reg.name} - {reg.description}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div className="mb-6">
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Informações Adicionais (Opcional)
+                </label>
+                <textarea
+                  value={notes}
+                  onChange={(e) => setNotes(e.target.value)}
+                  rows={3}
+                  placeholder="Adicione observações ou contexto adicional..."
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                />
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <p className="text-sm text-blue-800">
+                  ⏱️ <strong>Tempo estimado:</strong> 5-15 dias úteis para análise completa
+                </p>
+              </div>
+
+              <button
+                onClick={handleSubmit}
+                disabled={submitMutation.isPending || !selectedReportId}
+                className="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
               >
-                <option value="">Selecione um relatório...</option>
-                {reportsQuery.data?.map((report: any) => (
-                  <option key={report.id} value={report.id}>
-                    {report.title} ({report.standard}) - {report.status}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* Regulator Selection */}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Regulador
-              </label>
-              <select
-                value={regulator}
-                onChange={(e) => setRegulator(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-              >
-                {regulators.map((reg) => (
-                  <option key={reg.id} value={reg.id}>
-                    {reg.name} - {reg.description}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div className="mb-6">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Informações Adicionais (Opcional)
-            </label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              rows={3}
-              placeholder="Adicione observações ou contexto adicional..."
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-            />
-          </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <p className="text-sm text-blue-800">
-              ⏱️ <strong>Tempo estimado:</strong> 5-15 dias úteis para análise completa
-            </p>
-          </div>
-
-          <button
-            onClick={handleSubmit}
-            disabled={submitMutation.isPending || !selectedReportId}
-            className="w-full bg-green-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
-          >
-            {submitMutation.isPending ? (
-              <>
-                <Loader2 className="w-5 h-5 animate-spin" />
-                Processando...
-              </>
-            ) : (
-              <>
-                <Award className="w-5 h-5" />
-                Enviar Solicitação
-              </>
-            )}
+                {submitMutation.isPending ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Processando...
+                  </>
+                ) : (
+                  <>
+                    <Award className="w-5 h-5" />
+                    Enviar Solicitação
+                  </>
+                )}
               </button>
             </div>
           ) : (

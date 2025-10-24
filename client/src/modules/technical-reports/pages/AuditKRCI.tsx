@@ -210,30 +210,28 @@ export default function AuditKRCI() {
               <p className="text-sm text-gray-600 mb-4">
                 Selecione um relatório para executar auditoria KRCI completa (22 regras)
               </p>
-            </div>
-          </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <Label htmlFor="report">Relatório</Label>
-              <Select value={selectedReport} onValueChange={setSelectedReport}>
-                <SelectTrigger id="report">
-                  <SelectValue placeholder="Selecione um relatório..." />
-                </SelectTrigger>
-                <SelectContent>
-                  {reports?.map((report) => (
-                    <SelectItem key={report.id} value={report.id}>
-                      {report.title} ({report.standard}) - {report.status}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+                <div>
+                  <Label htmlFor="report">Relatório</Label>
+                  <Select value={selectedReport} onValueChange={setSelectedReport}>
+                    <SelectTrigger id="report">
+                      <SelectValue placeholder="Selecione um relatório..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {reports?.map((report) => (
+                        <SelectItem key={report.id} value={report.id}>
+                          {report.title} ({report.standard}) - {report.status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
 
-            <div className="pt-4">
-              <Button type="submit" className="w-full" disabled={runAudit.isPending}>
-                {runAudit.isPending ? "Executando auditoria..." : "Executar Auditoria"}
-              </Button>
+                <div className="pt-4">
+                  <Button type="submit" className="w-full" disabled={runAudit.isPending}>
+                    {runAudit.isPending ? "Executando auditoria..." : "Executar Auditoria"}
+                  </Button>
                 </div>
               </form>
             </div>
