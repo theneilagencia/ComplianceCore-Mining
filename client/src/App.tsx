@@ -43,6 +43,7 @@ const HelpSupport = lazy(() => import("./pages/HelpSupport"));
 const Support = lazy(() => import("./pages/Support"));
 const RadarPage = lazy(() => import("./modules/radar/RadarPage"));
 const ReportCreate = lazy(() => import("./pages/ReportCreate"));
+const JORCReportCreate = lazy(() => import("./pages/JORCReportCreate"));
 
 // Loading component
 const PageLoader = () => (
@@ -103,6 +104,9 @@ function Router() {
         </Route>
         <Route path={"/reports/create"}>
           <PrivateRoute><ReportCreate /></PrivateRoute>
+        </Route>
+        <Route path={"/reports/create/jorc"}>
+          <PrivateRoute><JORCReportCreate /></PrivateRoute>
         </Route>
         <Route path={"/reports/audit"}>
           <PrivateRoute><AuditKRCI /></PrivateRoute>
