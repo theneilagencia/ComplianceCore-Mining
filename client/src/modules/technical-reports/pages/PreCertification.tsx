@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { trpc } from '@/lib/trpc';
 import DashboardLayout from '@/components/DashboardLayout';
 import { toast } from 'sonner';
+import DocumentUploadValidator from '@/components/DocumentUploadValidator';
 import { Download, FileCheck, Loader2, CheckCircle2, Clock, AlertCircle, Award } from 'lucide-react';
 
 export default function PreCertification() {
   const [selectedReportId, setSelectedReportId] = useState('');
   const [regulator, setRegulator] = useState<'ASX' | 'TSX' | 'JSE' | 'CRIRSCO'>('ASX');
   const [notes, setNotes] = useState('');
+  const [activeTab, setActiveTab] = useState<'select' | 'upload'>('select');
 
   // Queries
   const reportsQuery = trpc.technicalReports.generate.list.useQuery();
@@ -115,11 +117,37 @@ export default function PreCertification() {
             </div>
             <div>
               <h2 className="text-xl font-semibold text-gray-900">Nova Solicitação</h2>
-              <p className="text-sm text-gray-600">Submeta seu relatório para validação de conformidade</p>
+              <p className="text-sm text-gray-600">Submeta seu relatório ou faça upload de um documento para validação</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Tabs */}
+          <div className="flex gap-2 mb-6 border-b">
+            <button
+              onClick={() => setActiveTab('select')}
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === 'select'
+                  ? 'text-green-600 border-b-2 border-green-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Selecionar Relatório
+            </button>
+            <button
+              onClick={() => setActiveTab('upload')}
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === 'upload'
+                  ? 'text-green-600 border-b-2 border-green-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Upload de Documento
+            </button>
+          </div>
+
+          {activeTab === 'select' ? (
+            <div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             {/* Report Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -194,7 +222,17 @@ export default function PreCertification() {
                 Enviar Solicitação
               </>
             )}
-          </button>
+              </button>
+            </div>
+          ) : (
+            <DocumentUploadValidator
+              onValidationComplete={(result) => {
+                toast.success('Validação concluída!', {
+                  description: `Score: ${result.score}% - ${result.criteria.length} critérios verificados`
+                });
+              }}
+            />
+          )}
         </div>
 
         {/* Certifications History */}

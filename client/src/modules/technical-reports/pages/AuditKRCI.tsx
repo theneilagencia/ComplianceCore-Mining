@@ -15,11 +15,13 @@ import { Shield, CheckCircle, AlertTriangle, FileSearch, Download, ExternalLink 
 import GuardRailModal from "../components/GuardRailModal";
 import { useState } from "react";
 import { toast } from "sonner";
+import DocumentUploadValidator from "@/components/DocumentUploadValidator";
 
 export default function AuditKRCI() {
   const [selectedReport, setSelectedReport] = useState<string>("");
   const [showGuardRail, setShowGuardRail] = useState<boolean>(false);
   const [auditResult, setAuditResult] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState<'select' | 'upload'>('select');
 
   // Query para listar relatórios (sem polling)
   const { data: reports } = trpc.technicalReports.generate.list.useQuery(
@@ -174,12 +176,44 @@ export default function AuditKRCI() {
             <div>
               <h2 className="text-xl font-semibold">Nova Auditoria</h2>
               <p className="text-sm text-gray-600">
+                Selecione um relatório existente ou faça upload de um documento para validação
+              </p>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-2 mb-6 border-b">
+            <button
+              onClick={() => setActiveTab('select')}
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === 'select'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Selecionar Relatório
+            </button>
+            <button
+              onClick={() => setActiveTab('upload')}
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === 'upload'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              Upload de Documento
+            </button>
+          </div>
+
+          {activeTab === 'select' ? (
+            <div>
+              <p className="text-sm text-gray-600 mb-4">
                 Selecione um relatório para executar auditoria KRCI completa (22 regras)
               </p>
             </div>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <Label htmlFor="report">Relatório</Label>
               <Select value={selectedReport} onValueChange={setSelectedReport}>
@@ -200,8 +234,18 @@ export default function AuditKRCI() {
               <Button type="submit" className="w-full" disabled={runAudit.isPending}>
                 {runAudit.isPending ? "Executando auditoria..." : "Executar Auditoria"}
               </Button>
+                </div>
+              </form>
             </div>
-          </form>
+          ) : (
+            <DocumentUploadValidator
+              onValidationComplete={(result) => {
+                toast.success('Validação concluída!', {
+                  description: `Score: ${result.score}% - ${result.criteria.length} critérios verificados`
+                });
+              }}
+            />
+          )}
         </Card>
 
         {/* Resultado da Auditoria */}
