@@ -108,7 +108,7 @@ export default function GenerateReport() {
 			const templateType = standardMap[standard] || "jorc";
 			
 			// Fazer download via API
-			const url = `/api/templates/${kind}?type=${templateType}`;
+			const url = `/api/templates/${templateType}?format=${kind}&type=report`;
 			const response = await fetch(url);
 			
 			if (!response.ok) {
