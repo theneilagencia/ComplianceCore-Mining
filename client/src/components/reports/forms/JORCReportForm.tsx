@@ -416,7 +416,7 @@ export const JORCReportForm: React.FC = () => {
 
             <div className="flex items-center gap-4">
               <button
-                onClick(() => setLocation('/reports')}
+                onClick={() => setLocation("/reports")}
                 className="px-6 py-3 text-slate-700 hover:bg-slate-100 rounded-lg font-medium transition-colors"
               >
                 Cancelar
