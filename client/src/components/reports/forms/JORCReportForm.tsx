@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { ArrowLeft, Save, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
 import { BasicInformation } from '../sections/shared/BasicInformation';
 import { CompetentPerson } from '../sections/shared/CompetentPerson';
@@ -104,7 +104,7 @@ const initialData: JORCReportData = {
 };
 
 export const JORCReportForm: React.FC = () => {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const [formData, setFormData] = useState<JORCReportData>(initialData);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [saveStatus, setSaveStatus] = useState<'unsaved' | 'saving' | 'saved'>('unsaved');
@@ -229,7 +229,7 @@ export const JORCReportForm: React.FC = () => {
       setTimeout(() => toast.remove(), 3000);
       
       // Navigate back
-      setTimeout(() => navigate('/reports'), 1500);
+      setTimeout(() => setLocation('/reports'), 1500);
     } catch (error) {
       console.error('Failed to save report:', error);
       const toast = document.createElement('div');
@@ -271,7 +271,7 @@ export const JORCReportForm: React.FC = () => {
         <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <button
-              onClick={() => navigate('/reports/create')}
+              onClick={() => setLocation('/reports/create')}
               className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -416,7 +416,7 @@ export const JORCReportForm: React.FC = () => {
 
             <div className="flex items-center gap-4">
               <button
-                onClick={() => navigate('/reports')}
+                onClick(() => setLocation('/reports')}
                 className="px-6 py-3 text-slate-700 hover:bg-slate-100 rounded-lg font-medium transition-colors"
               >
                 Cancelar

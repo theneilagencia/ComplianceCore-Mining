@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation } from 'wouter';
 import { FileText, Globe, MapPin, Award } from 'lucide-react';
 
 interface Standard {
@@ -52,10 +52,10 @@ const standards: Standard[] = [
 ];
 
 export const StandardSelector: React.FC = () => {
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
 
   const handleSelectStandard = (standardId: string) => {
-    navigate(`/reports/create/${standardId}`);
+    setLocation(`/reports/create/${standardId}`);
   };
 
   return (
@@ -139,7 +139,7 @@ export const StandardSelector: React.FC = () => {
         {/* Back Button */}
         <div className="mt-8 text-center">
           <button
-            onClick={() => navigate('/reports')}
+            onClick={() => setLocation('/reports')}
             className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
           >
             ← Voltar para Relatórios
