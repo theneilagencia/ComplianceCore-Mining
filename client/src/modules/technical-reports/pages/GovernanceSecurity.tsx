@@ -1,8 +1,16 @@
 import DashboardLayout from "@/components/DashboardLayout";
+import GovernanceWizard from "@/components/wizards/GovernanceWizard";
+
+export default function GovernanceSecurity() {
+  return <GovernanceWizard />;
+}
+
+// Old static page (commented out)
+/*
 import { Card } from "@/components/ui/card";
 import { Shield, Lock, FileCheck, Users, AlertTriangle, CheckCircle2 } from "lucide-react";
 
-export default function GovernanceSecurity() {
+function GovernanceSecurityOld() {
   const complianceItems = [
     { name: "LGPD - Lei Geral de Proteção de Dados", status: "compliant", score: 95 },
     { name: "ISO 27001 - Segurança da Informação", status: "compliant", score: 88 },
@@ -158,4 +166,4 @@ export default function GovernanceSecurity() {
     </DashboardLayout>
   );
 }
-
+*/
