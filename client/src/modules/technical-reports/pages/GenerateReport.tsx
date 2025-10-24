@@ -19,6 +19,7 @@ import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
+import DynamicReportForm from "../components/DynamicReportForm";
 
 export default function GenerateReport() {
  const [standard, setStandard] = useState<string>("JORC_2012");
@@ -190,9 +191,27 @@ export default function GenerateReport() {
  </TabsTrigger>
  </TabsList>
 
- {/* Tab: Preencher Manualmente */}
- <TabsContent value="manual">
- <form onSubmit={handleSubmit} className="space-y-4">
+				{/* Tab: Preencher Manualmente */}
+				<TabsContent value="manual">
+					<DynamicReportForm
+						onSubmit={(data) => {
+							if (!data.title || data.title.length < 5) {
+								toast.error("Título inválido", {
+									description: "O título deve ter no mínimo 5 caracteres",
+								});
+								return;
+							}
+							createReport.mutate({
+								standard: data.standard as any,
+								title: data.title,
+								projectName: data.projectName || undefined,
+								location: data.location || undefined,
+							});
+						}}
+						isLoading={createReport.isPending}
+					/>
+					{/* OLD FORM - REMOVED
+					<form onSubmit={handleSubmit} className="space-y-4">
  <div>
  <Label htmlFor="standard">Padrão Internacional</Label>
  <Select value={standard} onValueChange={setStandard}>
@@ -295,9 +314,10 @@ export default function GenerateReport() {
  className="w-full" 
  disabled={createReport.isPending}
  >
- {createReport.isPending ? "Gerando..." : "Iniciar Geração →"}
- </Button>
- </form>
+						{createReport.isPending ? "Gerando..." : "Iniciar Geração →"}
+						</Button>
+					</form>
+					END OLD FORM */}
 
  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
  <p className="text-sm text-blue-700">
