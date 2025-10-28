@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Locale, getInitialLocale, saveLocale, t as translate } from '@/i18n';
+import { Locale, getInitialLocale, saveLocale, t as translate } from '../i18n';
 
 interface LocaleContextType {
   locale: Locale;
