@@ -116,7 +116,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const refreshSession = async () => {
-    await checkSession();
+    try {
+      // Try to refresh the access token using refresh token cookie
+      const response = await fetch('/api/auth/refresh', {
+        method: 'POST',
+        credentials: 'include', // Send refresh token cookie
+      });
+
+      if (response.ok) {
+        // New access token is now in cookie, re-check session
+        await checkSession();
+      } else {
+        // Refresh failed, clear session
+        setUser(null);
+        setPlan('START');
+      }
+    } catch (error) {
+      console.error('[Auth] Refresh session failed:', error);
+      setUser(null);
+      setPlan('START');
+    }
   };
 
   return (

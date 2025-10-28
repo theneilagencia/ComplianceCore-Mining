@@ -121,24 +121,39 @@ router.post('/login', async (req: Request, res: Response) => {
 
 /**
  * POST /api/auth/refresh
- * Refresh access token using refresh token
+ * Refresh access token using refresh token from cookie
  */
 router.post('/refresh', async (req: Request, res: Response) => {
   try {
-    const { refreshToken } = req.body;
+    // Get refresh token from cookie
+    const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      res.status(400).json({
-        error: 'Refresh token is required',
+      res.status(401).json({
+        error: 'No refresh token provided',
       });
       return;
     }
 
+    // Generate new access token
     const result = await authService.refreshAccessToken(refreshToken);
 
-    res.json(result);
+    // Set new access token in cookie
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000 // 15 minutes
+    });
+
+    res.json({ success: true, message: 'Token refreshed successfully' });
   } catch (error: any) {
     console.error('[Auth] Refresh error:', error);
+    
+    // Clear cookies if refresh failed
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    
     res.status(401).json({
       error: error.message || 'Token refresh failed',
     });
