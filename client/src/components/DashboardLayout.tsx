@@ -22,6 +22,8 @@ import {
 import { APP_LOGO, APP_TITLE, getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import { LayoutDashboard, LogOut, PanelLeft, Users, FileText, BarChart3, CheckCircle, ArrowRightLeft, BookOpen, Leaf, DollarSign, Bell, Shield, HelpCircle } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
+import { LocaleSelector } from "@/components/LocaleSelector";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -238,7 +240,15 @@ function DashboardLayoutContent({
             </SidebarMenu>
           </SidebarContent>
 
-          <SidebarFooter className="p-3">
+          <SidebarFooter className="p-3 space-y-2">
+            <div className="flex items-center justify-between px-1 group-data-[collapsible=icon]:justify-center">
+              <span className="text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">Theme</span>
+              <ThemeToggle />
+            </div>
+            <div className="flex items-center justify-between px-1 group-data-[collapsible=icon]:justify-center">
+              <span className="text-xs text-muted-foreground group-data-[collapsible=icon]:hidden">Language</span>
+              <LocaleSelector />
+            </div>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="flex items-center gap-3 rounded-lg px-1 py-1 hover:bg-accent/50 transition-colors w-full text-left group-data-[collapsible=icon]:justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-ring">
@@ -291,6 +301,10 @@ function DashboardLayoutContent({
                   </span>
                 </div>
               </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <LocaleSelector />
+              <ThemeToggle />
             </div>
           </div>
         )}

@@ -16,6 +16,7 @@ import {
   getESGRating,
 } from './services/esgScoreService';
 import type { ESGReport, ESGReportInput } from './types';
+import { generateESGPDF, verifyPDFHash, getPDFGenerationStatus } from './pdfGenerator';
 
 // In-memory storage for demo (replace with database in production)
 const esgReports: Map<string, ESGReport> = new Map();
@@ -253,5 +254,60 @@ export const esgRouter = router({
         risk,
       };
     }),
+
+  /**
+   * Generate ESG PDF with AI Accountability Hash
+   */
+  generatePDF: protectedProcedure
+    .input(
+      z.object({
+        reportId: z.string(),
+        projectName: z.string(),
+        framework: z.string(),
+        environmental: z.object({
+          score: z.number(),
+          metrics: z.any(),
+        }),
+        social: z.object({
+          score: z.number(),
+          metrics: z.any(),
+        }),
+        governance: z.object({
+          score: z.number(),
+          metrics: z.any(),
+        }),
+        overallScore: z.number(),
+        rating: z.string(),
+      })
+    )
+    .mutation(async ({ input }) => {
+      const result = await generateESGPDF({
+        ...input,
+        reportDate: new Date().toISOString(),
+      });
+      return result;
+    }),
+
+  /**
+   * Verify PDF hash
+   */
+  verifyPDFHash: protectedProcedure
+    .input(
+      z.object({
+        pdfUrl: z.string().url(),
+        expectedHash: z.string(),
+      })
+    )
+    .query(async ({ input }) => {
+      const isValid = await verifyPDFHash(input.pdfUrl, input.expectedHash);
+      return { isValid };
+    }),
+
+  /**
+   * Get PDF generation status
+   */
+  getPDFStatus: protectedProcedure.query(() => {
+    return getPDFGenerationStatus();
+  }),
 });
 

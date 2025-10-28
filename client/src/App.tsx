@@ -3,8 +3,10 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
+import { LocaleProvider } from "./contexts/LocaleContext";
 import PrivateRoute from "./components/PrivateRoute";
 
 // Páginas públicas (carregadas imediatamente)
@@ -44,6 +46,7 @@ const Support = lazy(() => import("./pages/Support"));
 const RadarPage = lazy(() => import("./modules/radar/RadarPage"));
 const ReportCreate = lazy(() => import("./pages/ReportCreate"));
 const JORCReportCreate = lazy(() => import("./pages/JORCReportCreate"));
+const ExplainabilityView = lazy(() => import("./modules/technical-reports/pages/ExplainabilityView"));
 
 // Loading component
 const PageLoader = () => (
@@ -145,6 +148,13 @@ function Router() {
             </PrivateRoute>
           )}
         </Route>
+        <Route path="/reports/:reportId/explainability">
+          {(params) => (
+            <PrivateRoute>
+              <ExplainabilityView {...params} />
+            </PrivateRoute>
+          )}
+        </Route>
       </Suspense>
       
       {/* Final fallback route */}
@@ -156,13 +166,16 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
-        <AuthProvider>
+      <ThemeProvider defaultTheme="light" switchable={true}>
+        <LocaleProvider>
+          <AuthProvider>
           <TooltipProvider>
             <Toaster />
+            <PWAInstallPrompt />
             <Router />
           </TooltipProvider>
         </AuthProvider>
+        </LocaleProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
