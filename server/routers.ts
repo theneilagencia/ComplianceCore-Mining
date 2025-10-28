@@ -3,8 +3,8 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { technicalReportsRouter } from "./modules/technical-reports/router";
-import { esgRouter } from "./modules/esg/router";
-import { valuationRouter } from "./modules/valuation/router";
+// esgRouter removed (not in briefing)
+// valuationRouter removed (not in briefing)
 import { billingRouter } from "./modules/billing/router";
 import { integrationsRouter } from "./modules/integrations/router";
 import { storageRouter } from "./modules/storage/router";
@@ -24,8 +24,8 @@ export const appRouter = router({
   }),
 
   technicalReports: technicalReportsRouter,
-  esg: esgRouter,
-  valuation: valuationRouter,
+  // esg: esgRouter, // removed
+  // valuation: valuationRouter, // removed
   billing: billingRouter,
   integrations: integrationsRouter,
   storage: storageRouter,

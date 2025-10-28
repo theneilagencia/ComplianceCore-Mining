@@ -34,19 +34,19 @@ const Settings = lazy(() => import("./pages/Settings"));
 // Technical Reports Module Pages (lazy loading)
 const GenerateReport = lazy(() => import("./modules/technical-reports/pages/GenerateReport"));
 const AuditKRCI = lazy(() => import("./modules/technical-reports/pages/AuditKRCI"));
-const PreCertification = lazy(() => import("./modules/technical-reports/pages/PreCertification"));
+// PreCertification removed (replaced by KRCI)
 const ExportStandards = lazy(() => import("./modules/technical-reports/pages/ExportStandards"));
 const ReviewReport = lazy(() => import("./modules/technical-reports/pages/ReviewReport"));
-const ESGReporting = lazy(() => import("./modules/technical-reports/pages/ESGReportingNew"));
-const ValuationAutomatic = lazy(() => import("./modules/valuation/pages/ValuationCalculator"));
+// ESGReporting removed (not in briefing)
+// ValuationAutomatic removed (not in briefing)
 const RegulatoryRadar = lazy(() => import("./modules/technical-reports/pages/RegulatoryRadar"));
-const GovernanceSecurity = lazy(() => import("./modules/technical-reports/pages/GovernanceSecurity"));
+// GovernanceSecurity removed (not in briefing)
 const HelpSupport = lazy(() => import("./pages/HelpSupport"));
 const Support = lazy(() => import("./pages/Support"));
 const RadarPage = lazy(() => import("./modules/radar/RadarPage"));
 const ReportCreate = lazy(() => import("./pages/ReportCreate"));
 const JORCReportCreate = lazy(() => import("./pages/JORCReportCreate"));
-const ExplainabilityView = lazy(() => import("./modules/technical-reports/pages/ExplainabilityView"));
+// ExplainabilityView removed (not in briefing)
 
 // Loading component
 const PageLoader = () => (
@@ -114,24 +114,16 @@ function Router() {
         <Route path={"/reports/audit"}>
           <PrivateRoute><AuditKRCI /></PrivateRoute>
         </Route>
-        <Route path={"/reports/precert"}>
-          <PrivateRoute><PreCertification /></PrivateRoute>
-        </Route>
+          {/* PreCertification removed - replaced by KRCI */}
         <Route path="/reports/export">
           <PrivateRoute><ExportStandards /></PrivateRoute>
         </Route>
-        <Route path="/reports/esg">
-          <PrivateRoute><ESGReporting /></PrivateRoute>
-        </Route>
-        <Route path="/reports/valuation">
-          <PrivateRoute><ValuationAutomatic /></PrivateRoute>
-        </Route>
+        {/* ESG Reporting removed - not in briefing */}
+        {/* Valuation Automatic removed - not in briefing */}
         <Route path="/reports/regulatory">
           <PrivateRoute><RegulatoryRadar /></PrivateRoute>
         </Route>
-        <Route path="/reports/governance">
-          <PrivateRoute><GovernanceSecurity /></PrivateRoute>
-        </Route>
+        {/* Governance & Security removed - not in briefing */}
         <Route path="/help">
           <PrivateRoute><HelpSupport /></PrivateRoute>
         </Route>
@@ -148,13 +140,7 @@ function Router() {
             </PrivateRoute>
           )}
         </Route>
-        <Route path="/reports/:reportId/explainability">
-          {(params) => (
-            <PrivateRoute>
-              <ExplainabilityView {...params} />
-            </PrivateRoute>
-          )}
-        </Route>
+        {/* Explainability View removed - not in briefing */}
       </Suspense>
       
       {/* Final fallback route */}
