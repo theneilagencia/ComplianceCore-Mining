@@ -35,8 +35,8 @@ const AuditKRCI = lazy(() => import("./modules/technical-reports/pages/AuditKRCI
 const PreCertification = lazy(() => import("./modules/technical-reports/pages/PreCertification"));
 const ExportStandards = lazy(() => import("./modules/technical-reports/pages/ExportStandards"));
 const ReviewReport = lazy(() => import("./modules/technical-reports/pages/ReviewReport"));
-const ESGReporting = lazy(() => import("./modules/technical-reports/pages/ESGReporting"));
-const ValuationAutomatic = lazy(() => import("./modules/technical-reports/pages/ValuationAutomatic"));
+const ESGReporting = lazy(() => import("./modules/technical-reports/pages/ESGReportingNew"));
+const ValuationAutomatic = lazy(() => import("./modules/valuation/pages/ValuationCalculator"));
 const RegulatoryRadar = lazy(() => import("./modules/technical-reports/pages/RegulatoryRadar"));
 const GovernanceSecurity = lazy(() => import("./modules/technical-reports/pages/GovernanceSecurity"));
 const HelpSupport = lazy(() => import("./pages/HelpSupport"));

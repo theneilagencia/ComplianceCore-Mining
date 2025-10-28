@@ -4,7 +4,7 @@
  */
 
 import { z } from 'zod';
-import { router, protectedProcedure } from '../../routers';
+import { router, protectedProcedure } from '../../_core/trpc';
 import { createId } from '@paralleldrive/cuid2';
 import { fetchIBAMALicense, validateLicenseStatus } from './services/ibamaService';
 import { fetchCopernicusData, assessEnvironmentalRisk } from './services/copernicusService';
