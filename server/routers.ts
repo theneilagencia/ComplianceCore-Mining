@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { technicalReportsRouter } from "./modules/technical-reports/router";
 import { esgRouter } from "./modules/esg/router";
+import { valuationRouter } from "./modules/valuation/router";
 
 export const appRouter = router({
   system: systemRouter,
@@ -21,6 +22,7 @@ export const appRouter = router({
 
   technicalReports: technicalReportsRouter,
   esg: esgRouter,
+  valuation: valuationRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({
