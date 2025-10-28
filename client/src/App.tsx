@@ -3,6 +3,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
+import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 import { LocaleProvider } from "./contexts/LocaleContext";
@@ -170,6 +171,7 @@ function App() {
           <AuthProvider>
           <TooltipProvider>
             <Toaster />
+            <PWAInstallPrompt />
             <Router />
           </TooltipProvider>
         </AuthProvider>
