@@ -6,7 +6,7 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
-import { LocaleProvider } from "./contexts/LocaleContext";
+// import { LocaleProvider } from "./contexts/LocaleContext"; // Temporarily disabled
 import PrivateRoute from "./components/PrivateRoute";
 
 // Páginas públicas (carregadas imediatamente)
@@ -167,15 +167,13 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light" switchable={true}>
-        <LocaleProvider>
-          <AuthProvider>
+        <AuthProvider>
           <TooltipProvider>
             <Toaster />
             <PWAInstallPrompt />
             <Router />
           </TooltipProvider>
         </AuthProvider>
-        </LocaleProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
