@@ -45,6 +45,7 @@ const Support = lazy(() => import("./pages/Support"));
 const RadarPage = lazy(() => import("./modules/radar/RadarPage"));
 const ReportCreate = lazy(() => import("./pages/ReportCreate"));
 const JORCReportCreate = lazy(() => import("./pages/JORCReportCreate"));
+const ExplainabilityView = lazy(() => import("./modules/technical-reports/pages/ExplainabilityView"));
 
 // Loading component
 const PageLoader = () => (
@@ -143,6 +144,13 @@ function Router() {
           {(params) => (
             <PrivateRoute>
               <ReviewReport {...params} />
+            </PrivateRoute>
+          )}
+        </Route>
+        <Route path="/reports/:reportId/explainability">
+          {(params) => (
+            <PrivateRoute>
+              <ExplainabilityView {...params} />
             </PrivateRoute>
           )}
         </Route>
