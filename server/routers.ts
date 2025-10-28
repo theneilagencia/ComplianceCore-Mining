@@ -5,6 +5,7 @@ import { publicProcedure, router } from "./_core/trpc";
 import { technicalReportsRouter } from "./modules/technical-reports/router";
 import { esgRouter } from "./modules/esg/router";
 import { valuationRouter } from "./modules/valuation/router";
+import { billingRouter } from "./modules/billing/router";
 
 export const appRouter = router({
   system: systemRouter,
@@ -23,6 +24,7 @@ export const appRouter = router({
   technicalReports: technicalReportsRouter,
   esg: esgRouter,
   valuation: valuationRouter,
+  billing: billingRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({
