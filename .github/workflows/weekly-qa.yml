@@ -144,19 +144,55 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  # Job para notificação (opcional)
+  # Job para notificação inteligente (Email + WhatsApp + Log)
   notify:
-    name: Notificar Resultado
+    name: Notificar Resultado (Email + WhatsApp)
     runs-on: ubuntu-latest
     needs: [qa-automation, update-docs]
     if: always()
     
     steps:
-      - name: 📢 Notify completion
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🔧 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: 📦 Install dependencies
+        run: pip install requests
+      
+      - name: 🔔 Send notifications (Email + WhatsApp + Log)
+        run: python backend/jobs/notify_qa.py
+        env:
+          QA_STATUS: ${{ needs.qa-automation.result }}
+          QA_PARTIAL: ${{ needs.qa-automation.outputs.has_warnings || '0' }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          TWILIO_SID: ${{ secrets.TWILIO_SID }}
+          TWILIO_TOKEN: ${{ secrets.TWILIO_TOKEN }}
+          WHATSAPP_FROM: ${{ secrets.WHATSAPP_FROM }}
+          WHATSAPP_TO: ${{ secrets.WHATSAPP_TO }}
+          GUPSHUP_API: ${{ secrets.GUPSHUP_API }}
+          GUPSHUP_KEY: ${{ secrets.GUPSHUP_KEY }}
+          GUPSHUP_APP: ${{ secrets.GUPSHUP_APP }}
+          REPO_URL: ${{ vars.REPO_URL || 'https://github.com/theneilagencia/ComplianceCore-Mining' }}
+          PROD_URL: ${{ vars.PROD_URL || 'https://qivo-mining.onrender.com' }}
+      
+      - name: 📤 Commit log updates
         run: |
-          if [ "${{ needs.qa-automation.result }}" == "success" ]; then
-            echo "✅ QA semanal concluído com sucesso!"
-          else
-            echo "❌ QA semanal falhou. Verificar logs."
-          fi
+          git config user.name "QIVO QA Bot"
+          git config user.email "qa@qivomining.com"
+          git add docs/QA_STATUS_LOG.md
+          git commit -m "chore(qa): update QA status log - $(date +%Y-%m-%d)" || echo "No changes to commit"
+          git push || echo "Nothing to push"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
