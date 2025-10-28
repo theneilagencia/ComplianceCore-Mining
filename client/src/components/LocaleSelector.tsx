@@ -7,7 +7,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLocale } from "@/contexts/LocaleContext";
-import { SUPPORTED_LOCALES, LOCALE_NAMES, Locale } from "@/i18n";
+import { SUPPORTED_LOCALES, LOCALE_NAMES, Locale } from "../i18n/index";
 
 export function LocaleSelector() {
   const { locale, setLocale } = useLocale();
