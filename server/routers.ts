@@ -3,6 +3,7 @@ import { getSessionCookieOptions } from "./_core/cookies";
 import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, router } from "./_core/trpc";
 import { technicalReportsRouter } from "./modules/technical-reports/router";
+import { esgRouter } from "./modules/esg/router";
 
 export const appRouter = router({
   system: systemRouter,
@@ -19,6 +20,7 @@ export const appRouter = router({
   }),
 
   technicalReports: technicalReportsRouter,
+  esg: esgRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({
