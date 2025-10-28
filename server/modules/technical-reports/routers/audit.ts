@@ -2,6 +2,7 @@ import { z } from "zod";
 import { protectedProcedure, router } from "../../../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { runAudit } from "../services/audit";
+import { runKRCIScan, getKRCIStats, ScanMode } from "../services/krci-extended";
 import { generateAuditPDF } from "../services/pdf-generator";
 import { eq } from "drizzle-orm";
 
@@ -226,6 +227,110 @@ export const auditRouter = router({
       }
 
       return audit;
+    }),
+
+  // KRCI Extended Scan (100+ rules)
+  scanExtended: protectedProcedure
+    .input(
+      z.object({
+        reportId: z.string(),
+        mode: z.enum(["light", "full", "deep"]).optional().default("full"),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { reports, audits } = await import("../../../../drizzle/schema");
+
+      // Buscar relatório
+      const [report] = await db.select().from(reports).where(eq(reports.id, input.reportId)).limit(1);
+
+      if (!report) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Relatório não encontrado",
+        });
+      }
+
+      // Mock normalized report (em produção, buscar do S3)
+      const normalizedReport = {
+        metadata: {
+          title: report.title,
+          projectName: undefined,
+          effectiveDate: report.createdAt?.toISOString(),
+          standard: report.standard,
+        },
+        sections: [
+          { title: "Executive Summary", content: "..." },
+          { title: "Introduction", content: "..." },
+          { title: "Geology", content: "..." },
+          { title: "Sampling and Analysis", content: "..." },
+          { title: "Resource Estimate", content: "..." },
+        ],
+        resourceEstimates: [
+          {
+            category: "Measured",
+            tonnage: 1000000,
+            grade: 2.5,
+            cutoffGrade: 0.5,
+          },
+        ],
+        competentPersons: [
+          {
+            name: "John Doe",
+            qualification: "MAusIMM",
+            organization: "Mining Consultants Inc.",
+          },
+        ],
+        economicAssumptions: {
+          capex: 50000000,
+          opex: 25,
+          recoveryRate: 85,
+        },
+        qaQc: {
+          samplingMethod: "Diamond drilling with HQ core",
+          qualityControl: "Certified reference materials and blanks",
+        },
+      };
+
+      // Run KRCI Extended Scan
+      const scanResult = runKRCIScan(normalizedReport, input.mode as ScanMode);
+
+      // Save audit to database
+      const auditId = `aud_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+
+      await db.insert(audits).values({
+        id: auditId,
+        reportId: report.id,
+        tenantId: report.tenantId,
+        userId: ctx.user.id,
+        auditType: input.mode === "light" ? "partial" : "full",
+        score: scanResult.score,
+        totalRules: scanResult.totalRules,
+        passedRules: scanResult.passedRules,
+        failedRules: scanResult.failedRules,
+        krcisJson: scanResult.krcis,
+        recommendationsJson: scanResult.recommendations,
+        pdfUrl: null, // Generate PDF separately if needed
+        createdAt: new Date(),
+      });
+
+      return {
+        auditId,
+        ...scanResult,
+      };
+    }),
+
+  // Get KRCI Statistics
+  getStats: protectedProcedure
+    .query(() => {
+      return getKRCIStats();
     }),
 });
 

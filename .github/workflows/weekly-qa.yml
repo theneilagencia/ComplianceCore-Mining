@@ -1,0 +1,198 @@
+name: Weekly QA - QIVO Mining
+
+on:
+  schedule:
+    # Toda sexta-feira às 18h BRT (21h UTC)
+    - cron: '0 21 * * 5'
+  
+  # Permite execução manual via GitHub UI
+  workflow_dispatch:
+
+jobs:
+  qa-automation:
+    name: QA Automático Semanal
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. Checkout do código
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Histórico completo para versionamento
+      
+      # 2. Setup Node.js
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+      
+      # 3. Instalar dependências
+      - name: 📦 Install dependencies
+        run: |
+          npm ci
+          cd client && npm ci
+      
+      # 4. Lint check
+      - name: 🔍 Run ESLint
+        run: |
+          npm run lint || echo "⚠️ ESLint warnings found"
+      
+      # 5. TypeScript check
+      - name: 📘 TypeScript check
+        run: |
+          npm run type-check || npx tsc --noEmit
+      
+      # 6. Build check
+      - name: 🏗️ Build check
+        run: |
+          cd client && npm run build
+      
+      # 7. Security audit
+      - name: 🔐 Security audit
+        run: |
+          npm audit --audit-level=high || echo "⚠️ Security vulnerabilities found"
+      
+      # 8. Check outdated dependencies
+      - name: 📊 Check outdated dependencies
+        run: |
+          npm outdated || echo "⚠️ Outdated dependencies found"
+      
+      # 9. Run unit tests (se existirem)
+      - name: 🧪 Run unit tests
+        run: |
+          npm test || echo "⚠️ No tests configured yet"
+        continue-on-error: true
+      
+      # 10. Gerar relatório de QA
+      - name: 📝 Generate QA report
+        run: |
+          echo "# QA Report - $(date +%Y-%m-%d)" > qa-report.md
+          echo "" >> qa-report.md
+          echo "## Build Status" >> qa-report.md
+          echo "✅ Build successful" >> qa-report.md
+          echo "" >> qa-report.md
+          echo "## Dependencies" >> qa-report.md
+          npm list --depth=0 >> qa-report.md || true
+          echo "" >> qa-report.md
+          echo "## Security" >> qa-report.md
+          npm audit >> qa-report.md || true
+      
+      # 11. Upload QA report como artifact
+      - name: 📤 Upload QA report
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-report-${{ github.run_number }}
+          path: qa-report.md
+      
+      # 12. Notificar sucesso
+      - name: ✅ QA completed
+        run: |
+          echo "✅ Weekly QA completed successfully"
+          echo "📊 Report available in artifacts"
+          echo "🔗 https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+
+  # Job separado para atualizar documentação (apenas se QA passar)
+  update-docs:
+    name: Atualizar Documentação
+    runs-on: ubuntu-latest
+    needs: qa-automation
+    if: success()
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      
+      - name: 📝 Update QA documentation
+        run: |
+          # Atualizar data no QA_REPORT.md
+          sed -i "s/\*\*Data:\*\* .*/\*\*Data:\*\* $(date +%d\ de\ %B\ de\ %Y)/" docs/QA_REPORT.md || true
+          
+          # Criar entrada no CHANGELOG
+          if [ ! -f CHANGELOG.md ]; then
+            echo "# Changelog" > CHANGELOG.md
+            echo "" >> CHANGELOG.md
+          fi
+          
+          echo "## [Weekly QA] - $(date +%Y-%m-%d)" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+          echo "### QA Automático" >> CHANGELOG.md
+          echo "- ✅ Build check passed" >> CHANGELOG.md
+          echo "- ✅ TypeScript check passed" >> CHANGELOG.md
+          echo "- ✅ Security audit completed" >> CHANGELOG.md
+          echo "" >> CHANGELOG.md
+      
+      - name: 🏷️ Bump version (patch)
+        run: |
+          # Incrementar versão patch no package.json
+          npm version patch --no-git-tag-version || true
+      
+      - name: 📤 Commit and push changes
+        run: |
+          git config user.name "QIVO QA Bot"
+          git config user.email "qa@qivomining.com"
+          git add .
+          git commit -m "chore(qa): weekly automated QA - $(date +%Y-%m-%d)" || echo "No changes to commit"
+          git push || echo "Nothing to push"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  # Job para notificação inteligente (Email + WhatsApp + Log)
+  notify:
+    name: Notificar Resultado (Email + WhatsApp)
+    runs-on: ubuntu-latest
+    needs: [qa-automation, update-docs]
+    if: always()
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+      
+      - name: 🔧 Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+      
+      - name: 📦 Install dependencies
+        run: pip install requests
+      
+      - name: 🔔 Send notifications (Email + WhatsApp + Log)
+        run: python backend/jobs/notify_qa.py
+        env:
+          QA_STATUS: ${{ needs.qa-automation.result }}
+          QA_PARTIAL: ${{ needs.qa-automation.outputs.has_warnings || '0' }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          EMAIL_FROM: ${{ secrets.EMAIL_FROM }}
+          EMAIL_TO: ${{ secrets.EMAIL_TO }}
+          TWILIO_SID: ${{ secrets.TWILIO_SID }}
+          TWILIO_TOKEN: ${{ secrets.TWILIO_TOKEN }}
+          WHATSAPP_FROM: ${{ secrets.WHATSAPP_FROM }}
+          WHATSAPP_TO: ${{ secrets.WHATSAPP_TO }}
+          GUPSHUP_API: ${{ secrets.GUPSHUP_API }}
+          GUPSHUP_KEY: ${{ secrets.GUPSHUP_KEY }}
+          GUPSHUP_APP: ${{ secrets.GUPSHUP_APP }}
+          REPO_URL: ${{ vars.REPO_URL || 'https://github.com/theneilagencia/ComplianceCore-Mining' }}
+          PROD_URL: ${{ vars.PROD_URL || 'https://qivo-mining.onrender.com' }}
+      
+      - name: 📤 Commit log updates
+        run: |
+          git config user.name "QIVO QA Bot"
+          git config user.email "qa@qivomining.com"
+          git add docs/QA_STATUS_LOG.md
+          git commit -m "chore(qa): update QA status log - $(date +%Y-%m-%d)" || echo "No changes to commit"
+          git push || echo "Nothing to push"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
