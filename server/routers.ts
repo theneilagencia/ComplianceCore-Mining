@@ -6,6 +6,7 @@ import { technicalReportsRouter } from "./modules/technical-reports/router";
 import { esgRouter } from "./modules/esg/router";
 import { valuationRouter } from "./modules/valuation/router";
 import { billingRouter } from "./modules/billing/router";
+import { integrationsRouter } from "./modules/integrations/router";
 
 export const appRouter = router({
   system: systemRouter,
@@ -25,6 +26,7 @@ export const appRouter = router({
   esg: esgRouter,
   valuation: valuationRouter,
   billing: billingRouter,
+  integrations: integrationsRouter,
 
   // TODO: add feature routers here, e.g.
   // todo: router({
