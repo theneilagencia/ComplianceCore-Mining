@@ -116,6 +116,8 @@ router.get('/users', requireAdmin, async (req, res) => {
     const offset = (page - 1) * limit;
 
     // Fetch users first
+    console.log(`[Admin] Fetching users: page=${page}, limit=${limit}, offset=${offset}`);
+    
     const allUsers = await db
       .select({
         id: users.id,
@@ -130,6 +132,7 @@ router.get('/users', requireAdmin, async (req, res) => {
       .offset(offset);
 
     console.log(`[Admin] Fetched ${allUsers.length} users from DB`);
+    console.log(`[Admin] First user:`, allUsers[0]);
 
     // Fetch active licenses for these users
     const userIds = allUsers.map(u => u.id);
@@ -174,7 +177,7 @@ router.get('/users', requireAdmin, async (req, res) => {
     if (search) {
       filteredUsers = transformedUsers.filter(u => 
         u.email?.toLowerCase().includes(search.toLowerCase()) ||
-        u.name?.toLowerCase().includes(search.toLowerCase())
+        u.fullName?.toLowerCase().includes(search.toLowerCase())
       );
     }
 
