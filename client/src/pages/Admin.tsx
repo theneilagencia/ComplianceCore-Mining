@@ -527,13 +527,6 @@ export default function Admin() {
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
                 />
-                <button
-                  onClick={handleOpenCreateUserModal}
-                  className="px-4 py-2 bg-[#7ed957] text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
-                >
-                  <Users className="w-4 h-4" />
-                  Criar Usuário
-                </button>
               </div>
             </div>
 
