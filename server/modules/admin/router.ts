@@ -331,6 +331,33 @@ router.delete('/users/:userId', requireAdmin, async (req, res) => {
   }
 });
 
+// PATCH /api/admin/users/:userId - Update user information
+router.patch('/users/:userId', requireAdmin, async (req, res) => {
+  try {
+    const db = await getDb();
+    const { userId } = req.params;
+    const { fullName } = req.body;
+
+    if (!fullName) {
+      return res.status(400).json({ error: 'Full name is required' });
+    }
+
+    // Update user
+    await db
+      .update(users)
+      .set({
+        fullName: fullName.trim(),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+
+    res.json({ success: true, message: 'User updated successfully' });
+  } catch (error) {
+    console.error('[Admin] Update user error:', error);
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
 // POST /api/admin/users/:userId/reset-password - Reset user password
 router.post('/users/:userId/reset-password', requireAdmin, async (req, res) => {
   try {

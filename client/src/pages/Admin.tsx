@@ -227,24 +227,37 @@ export default function Admin() {
     }
   };
 
-  const handleUpdateUserLicense = async (userId: string, plan: string, status: string) => {
+  const handleUpdateUserLicense = async (userId: string, plan: string, status: string, fullName?: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/license`, {
+      // Atualizar licença
+      const licenseResponse = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/license`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ plan, status }),
       });
 
-      if (!response.ok) throw new Error('Failed to update license');
+      if (!licenseResponse.ok) throw new Error('Failed to update license');
 
-      alert('Licença atualizada com sucesso!');
+      // Atualizar nome se fornecido
+      if (fullName && fullName.trim()) {
+        const userResponse = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ fullName: fullName.trim() }),
+        });
+
+        if (!userResponse.ok) console.warn('Failed to update user name');
+      }
+
+      alert('Usuário atualizado com sucesso!');
       setShowEditModal(false);
       setEditingUser(null);
       fetchUsers();
     } catch (error) {
-      console.error('Error updating license:', error);
-      alert('Erro ao atualizar licença');
+      console.error('Error updating user:', error);
+      alert('Erro ao atualizar usuário');
     }
   };
 
@@ -869,7 +882,18 @@ export default function Admin() {
                   type="text"
                   value={editingUser.email}
                   disabled
-                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white"
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white opacity-60 cursor-not-allowed"
+                />
+                <p className="text-xs text-gray-500 mt-1">O email não pode ser alterado</p>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Nome Completo</label>
+                <input
+                  type="text"
+                  defaultValue={editingUser.fullName || ''}
+                  id="fullname-input"
+                  placeholder="Nome completo do usuário"
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
                 />
               </div>
               <div>
@@ -911,11 +935,12 @@ export default function Admin() {
                     onClick={() => {
                       const plan = (document.getElementById('plan-select') as HTMLSelectElement).value;
                       const status = (document.getElementById('status-select') as HTMLSelectElement).value;
-                      handleUpdateUserLicense(editingUser.id, plan, status);
+                      const fullName = (document.getElementById('fullname-input') as HTMLInputElement).value;
+                      handleUpdateUserLicense(editingUser.id, plan, status, fullName);
                     }}
                     className="flex-1 px-4 py-2 bg-[#7ed957] text-white rounded-lg hover:opacity-90 transition-opacity"
                   >
-                    Salvar
+                    Salvar Alterações
                   </button>
                 </div>
                 <div className="flex gap-3">
