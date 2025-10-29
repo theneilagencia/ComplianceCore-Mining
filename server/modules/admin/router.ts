@@ -115,7 +115,7 @@ router.get('/users', requireAdmin, async (req, res) => {
     const search = req.query.search as string;
     const offset = (page - 1) * limit;
 
-    // Build query - fetch users and licenses separately to avoid nested object issues
+    // Fetch users first
     const allUsers = await db
       .select({
         id: users.id,
@@ -123,38 +123,52 @@ router.get('/users', requireAdmin, async (req, res) => {
         fullName: users.fullName,
         createdAt: users.createdAt,
         lastLoginAt: users.lastLoginAt,
-        licenseId: licenses.id,
-        licensePlan: licenses.plan,
-        licenseStatus: licenses.status,
-        reportsUsed: licenses.reportsUsed,
-        reportsLimit: licenses.reportsLimit,
-        projectsActive: licenses.projectsActive,
-        projectsLimit: licenses.projectsLimit,
       })
       .from(users)
-      .leftJoin(licenses, eq(users.id, licenses.userId))
       .orderBy(desc(users.createdAt))
       .limit(limit)
       .offset(offset);
 
+    console.log(`[Admin] Fetched ${allUsers.length} users from DB`);
+
+    // Fetch active licenses for these users
+    const userIds = allUsers.map(u => u.id);
+    const activeLicenses = userIds.length > 0 ? await db
+      .select()
+      .from(licenses)
+      .where(and(
+        sql`${licenses.userId} = ANY(${userIds})`,
+        eq(licenses.status, 'active')
+      )) : [];
+
+    console.log(`[Admin] Fetched ${activeLicenses.length} active licenses`);
+
+    // Create a map of userId -> license
+    const licenseMap = new Map();
+    activeLicenses.forEach(lic => {
+      licenseMap.set(lic.userId, lic);
+    });
+
     // Transform to expected format
-    const transformedUsers = allUsers.map(u => ({
-      id: u.id,
-      email: u.email,
-      fullName: u.fullName,
-      createdAt: u.createdAt,
-      lastLoginAt: u.lastLoginAt,
-      license: u.licenseId ? {
-        id: u.licenseId,
-        plan: u.licensePlan,
-        status: u.licenseStatus,
-        reportsUsed: u.reportsUsed,
-        reportsLimit: u.reportsLimit,
-        projectsActive: u.projectsActive,
-        projectsLimit: u.projectsLimit,
-      } : null,
-    }));
-    console.log(`[Admin] Fetched ${transformedUsers.length} users (total in DB: ${allUsers.length})`);
+    const transformedUsers = allUsers.map(u => {
+      const license = licenseMap.get(u.id);
+      return {
+        id: u.id,
+        email: u.email,
+        fullName: u.fullName,
+        createdAt: u.createdAt,
+        lastLoginAt: u.lastLoginAt,
+        license: license ? {
+          id: license.id,
+          plan: license.plan,
+          status: license.status,
+          reportsUsed: license.reportsUsed,
+          reportsLimit: license.reportsLimit,
+          projectsActive: license.projectsActive,
+          projectsLimit: license.projectsLimit,
+        } : null,
+      };
+    });
 
     // Filter by search if provided
     let filteredUsers = transformedUsers;
