@@ -32,7 +32,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#000020] via-[#171a4a] to-[#2f2c79] flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8">
+      <div className="max-w-md w-full bg-white/5/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src="/assets/logo-Qivo.png" alt="QIVO Mining" className="h-12 w-auto" />
@@ -61,7 +61,7 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
+              className="w-full px-4 py-3 bg-white/5/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="seu@email.com"
             />
           </div>
@@ -76,7 +76,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
+              className="w-full px-4 py-3 bg-white/5/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="••••••••"
             />
           </div>

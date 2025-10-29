@@ -45,12 +45,12 @@ export default function Reports() {
 
   const getStatusBadge = (status: string) => {
     const colors: Record<string, string> = {
-      draft: 'bg-gray-100 text-gray-800',
+      draft: 'bg-[#171a4a] text-gray-800',
       in_progress: 'bg-blue-100 text-blue-800',
       completed: 'bg-green-100 text-green-800',
       published: 'bg-purple-100 text-purple-800',
     };
-    return colors[status] || 'bg-gray-100 text-gray-800';
+    return colors[status] || 'bg-[#171a4a] text-gray-800';
   };
 
   const getStatusLabel = (status: string) => {
@@ -68,7 +68,7 @@ export default function Reports() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-blue-600 border-t-transparent mx-auto"></div>
-          <p className="mt-6 text-lg font-medium text-gray-700">Carregando relatórios...</p>
+          <p className="mt-6 text-lg font-medium text-gray-300">Carregando relatórios...</p>
           <p className="mt-2 text-sm text-gray-500">Aguarde um momento</p>
         </div>
       </div>
@@ -78,7 +78,7 @@ export default function Reports() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-white/5 shadow-sm border-b border-white/20">
+      <div className="bg-white/5/5 shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -87,13 +87,13 @@ export default function Reports() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">Relatórios Técnicos</h1>
-                <p className="text-sm text-gray-600">Gerencie seus relatórios JORC e NI 43-101</p>
+                <p className="text-sm text-gray-400">Gerencie seus relatórios JORC e NI 43-101</p>
               </div>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => setLocation('/dashboard')}
-                className="px-4 py-2 text-gray-700 hover:text-white font-medium transition-colors border border-white/20 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 text-gray-300 hover:text-white font-medium transition-colors border border-white/20 rounded-lg hover:bg-[#000020]"
               >
                 Voltar ao Dashboard
               </button>
@@ -134,7 +134,7 @@ export default function Reports() {
         <div className="mb-6 flex justify-between items-center">
           <div>
             <h2 className="text-xl font-semibold text-white">Meus Relatórios</h2>
-            <p className="text-sm text-gray-600 mt-1">{reports.length} relatórios encontrados</p>
+            <p className="text-sm text-gray-400 mt-1">{reports.length} relatórios encontrados</p>
           </div>
           <button
             onClick={createNewReport}
@@ -146,17 +146,17 @@ export default function Reports() {
 
         {/* Reports Grid */}
         {reports.length === 0 ? (
-          <div className="bg-white/5 rounded-xl shadow-sm border border-white/20 p-12 text-center">
-            <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="bg-white/5/5 rounded-xl shadow-sm border border-white/20 p-12 text-center">
+            <div className="w-16 h-16 bg-[#171a4a] rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
               </svg>
             </div>
             <h3 className="text-lg font-semibold text-white mb-2">Nenhum relatório encontrado</h3>
-            <p className="text-gray-600 mb-6">Comece criando seu primeiro relatório técnico</p>
+            <p className="text-gray-400 mb-6">Comece criando seu primeiro relatório técnico</p>
             <button
               onClick={createNewReport}
-              className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              className="px-6 py-2 bg-[#2f2c79] text-white rounded-lg hover:bg-[#b96e48] transition-colors"
             >
               Criar Primeiro Relatório
             </button>
@@ -166,7 +166,7 @@ export default function Reports() {
             {reports.map((report) => (
               <div
                 key={report.id}
-                className="bg-white/5 rounded-xl shadow-sm border border-white/20 p-6 hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white/5/5 rounded-xl shadow-sm border border-white/20 p-6 hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => setLocation(`/reports/${report.id}/edit`)}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -180,7 +180,7 @@ export default function Reports() {
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-white mb-2">{report.title}</h3>
-                <p className="text-sm text-gray-600 mb-4">Tipo: {report.type}</p>
+                <p className="text-sm text-gray-400 mb-4">Tipo: {report.type}</p>
                 <div className="text-xs text-gray-500">
                   <p>Criado: {new Date(report.createdAt).toLocaleDateString('pt-BR')}</p>
                   <p>Atualizado: {new Date(report.updatedAt).toLocaleDateString('pt-BR')}</p>

@@ -203,7 +203,7 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Header */}
-      <header className="bg-white/5 border-b border-slate-200 shadow-sm">
+      <header className="bg-white/5/5 border-b border-white/20 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -211,14 +211,14 @@ export default function Admin() {
                 A
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-slate-900">Painel de Administração</h1>
-                <p className="text-sm text-slate-600">Gerenciamento de Usuários e Assinaturas</p>
+                <h1 className="text-2xl font-bold text-white">Painel de Administração</h1>
+                <p className="text-sm text-gray-400">Gerenciamento de Usuários e Assinaturas</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setLocation('/dashboard')}
-                className="px-4 py-2 text-slate-700 hover:bg-slate-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-300 hover:bg-[#171a4a] rounded-lg transition-colors"
               >
                 Voltar ao Dashboard
               </button>
@@ -236,7 +236,7 @@ export default function Admin() {
       </header>
 
       {/* Tabs */}
-      <div className="bg-white/5 border-b border-slate-200">
+      <div className="bg-white/5/5 border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-6">
             <button
@@ -244,7 +244,7 @@ export default function Admin() {
               className={`px-4 py-3 font-medium transition-colors border-b-2 ${
                 activeTab === 'dashboard'
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  : 'border-transparent text-gray-400 hover:text-white'
               }`}
             >
               Dashboard
@@ -254,7 +254,7 @@ export default function Admin() {
               className={`px-4 py-3 font-medium transition-colors border-b-2 ${
                 activeTab === 'users'
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  : 'border-transparent text-gray-400 hover:text-white'
               }`}
             >
               Usuários
@@ -264,7 +264,7 @@ export default function Admin() {
               className={`px-4 py-3 font-medium transition-colors border-b-2 ${
                 activeTab === 'subscriptions'
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  : 'border-transparent text-gray-400 hover:text-white'
               }`}
             >
               Assinaturas
@@ -274,7 +274,7 @@ export default function Admin() {
               className={`px-4 py-3 font-medium transition-colors border-b-2 ${
                 activeTab === 'revenue'
                   ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-slate-600 hover:text-slate-900'
+                  : 'border-transparent text-gray-400 hover:text-white'
               }`}
             >
               Receita
@@ -290,11 +290,11 @@ export default function Admin() {
           <div className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
+              <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm">Total de Usuários</p>
-                    <p className="text-3xl font-bold text-slate-900 mt-2">{stats.totalUsers}</p>
+                    <p className="text-gray-400 text-sm">Total de Usuários</p>
+                    <p className="text-3xl font-bold text-white mt-2">{stats.totalUsers}</p>
                   </div>
                   <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
                     <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,11 +305,11 @@ export default function Admin() {
                 <p className="text-green-600 text-sm mt-2">+{stats.recentUsers} nos últimos 30 dias</p>
               </div>
 
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
+              <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm">MRR</p>
-                    <p className="text-3xl font-bold text-slate-900 mt-2">{formatCurrency(stats.mrr)}</p>
+                    <p className="text-gray-400 text-sm">MRR</p>
+                    <p className="text-3xl font-bold text-white mt-2">{formatCurrency(stats.mrr)}</p>
                   </div>
                   <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
                     <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -320,11 +320,11 @@ export default function Admin() {
                 <p className="text-slate-500 text-sm mt-2">Receita Recorrente Mensal</p>
               </div>
 
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
+              <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm">Planos PRO</p>
-                    <p className="text-3xl font-bold text-slate-900 mt-2">{stats.stats.proUsers}</p>
+                    <p className="text-gray-400 text-sm">Planos PRO</p>
+                    <p className="text-3xl font-bold text-white mt-2">{stats.stats.proUsers}</p>
                   </div>
                   <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
                     <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -335,11 +335,11 @@ export default function Admin() {
                 <p className="text-slate-500 text-sm mt-2">Assinaturas Ativas</p>
               </div>
 
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
+              <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-slate-600 text-sm">Planos ENTERPRISE</p>
-                    <p className="text-3xl font-bold text-slate-900 mt-2">{stats.stats.enterpriseUsers}</p>
+                    <p className="text-gray-400 text-sm">Planos ENTERPRISE</p>
+                    <p className="text-3xl font-bold text-white mt-2">{stats.stats.enterpriseUsers}</p>
                   </div>
                   <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
                     <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -352,22 +352,22 @@ export default function Admin() {
             </div>
 
             {/* Chart Placeholder */}
-            <div className="bg-white/5 rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Distribuição de Planos</h3>
+            <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-bold text-white mb-4">Distribuição de Planos</h3>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
                   <div className="text-4xl font-bold text-slate-400">{stats.stats.startUsers}</div>
-                  <div className="text-slate-600 mt-2">START</div>
+                  <div className="text-gray-400 mt-2">START</div>
                   <div className="text-slate-500 text-sm">Gratuito</div>
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-purple-600">{stats.stats.proUsers}</div>
-                  <div className="text-slate-600 mt-2">PRO</div>
+                  <div className="text-gray-400 mt-2">PRO</div>
                   <div className="text-slate-500 text-sm">{formatCurrency(899)}/mês</div>
                 </div>
                 <div className="text-center">
                   <div className="text-4xl font-bold text-orange-600">{stats.stats.enterpriseUsers}</div>
-                  <div className="text-slate-600 mt-2">ENTERPRISE</div>
+                  <div className="text-gray-400 mt-2">ENTERPRISE</div>
                   <div className="text-slate-500 text-sm">{formatCurrency(1990)}/mês</div>
                 </div>
               </div>
@@ -379,7 +379,7 @@ export default function Admin() {
         {activeTab === 'users' && (
           <div className="space-y-6">
             {/* Search */}
-            <div className="bg-white/5 rounded-xl shadow-lg p-4">
+            <div className="bg-white/5/5 rounded-xl shadow-lg p-4">
               <input
                 type="text"
                 placeholder="Buscar por email ou nome..."
@@ -390,9 +390,9 @@ export default function Admin() {
             </div>
 
             {/* Users Table */}
-            <div className="bg-white/5 rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white/5/5 rounded-xl shadow-lg overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#000020] border-b border-slate-200">
+                <thead className="bg-[#000020] border-b border-white/20">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Email</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Nome</th>
@@ -405,13 +405,13 @@ export default function Admin() {
                 <tbody className="divide-y divide-slate-200">
                   {filteredUsers.map((user) => (
                     <tr key={user.id} className="hover:bg-[#000020]">
-                      <td className="px-6 py-4 text-sm text-slate-900">{user.email}</td>
-                      <td className="px-6 py-4 text-sm text-slate-900">{user.fullName || '-'}</td>
+                      <td className="px-6 py-4 text-sm text-white">{user.email}</td>
+                      <td className="px-6 py-4 text-sm text-white">{user.fullName || '-'}</td>
                       <td className="px-6 py-4 text-sm">
                         <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                           user.license?.plan === 'ENTERPRISE' ? 'bg-orange-100 text-orange-800' :
                           user.license?.plan === 'PRO' ? 'bg-purple-100 text-purple-800' :
-                          'bg-slate-100 text-slate-800'
+                          'bg-[#171a4a] text-slate-800'
                         }`}>
                           {user.license?.plan || 'Nenhum'}
                         </span>
@@ -423,10 +423,10 @@ export default function Admin() {
                           {user.license?.status === 'active' ? 'Ativo' : 'Inativo'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">
+                      <td className="px-6 py-4 text-sm text-gray-400">
                         {user.license ? `${user.license.reportsUsed}/${user.license.reportsLimit} relatórios` : '-'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-slate-600">{formatDate(user.createdAt)}</td>
+                      <td className="px-6 py-4 text-sm text-gray-400">{formatDate(user.createdAt)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -437,9 +437,9 @@ export default function Admin() {
 
         {/* Subscriptions Tab */}
         {activeTab === 'subscriptions' && (
-          <div className="bg-white/5 rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-white/5/5 rounded-xl shadow-lg overflow-hidden">
             <table className="w-full">
-              <thead className="bg-[#000020] border-b border-slate-200">
+              <thead className="bg-[#000020] border-b border-white/20">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Usuário</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Email</th>
@@ -452,24 +452,24 @@ export default function Admin() {
               <tbody className="divide-y divide-slate-200">
                 {subscriptions.map((sub) => (
                   <tr key={sub.licenseId} className="hover:bg-[#000020]">
-                    <td className="px-6 py-4 text-sm text-slate-900">{sub.userName || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-slate-900">{sub.userEmail}</td>
+                    <td className="px-6 py-4 text-sm text-white">{sub.userName || '-'}</td>
+                    <td className="px-6 py-4 text-sm text-white">{sub.userEmail}</td>
                     <td className="px-6 py-4 text-sm">
                       <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
                         sub.plan === 'ENTERPRISE' ? 'bg-orange-100 text-orange-800' :
                         sub.plan === 'PRO' ? 'bg-purple-100 text-purple-800' :
-                        'bg-slate-100 text-slate-800'
+                        'bg-[#171a4a] text-slate-800'
                       }`}>
                         {sub.plan}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
+                    <td className="px-6 py-4 text-sm text-gray-400">
                       {sub.reportsUsed}/{sub.reportsLimit}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">
+                    <td className="px-6 py-4 text-sm text-gray-400">
                       {sub.projectsActive}/{sub.projectsLimit === 999 ? '∞' : sub.projectsLimit}
                     </td>
-                    <td className="px-6 py-4 text-sm text-slate-600">{formatDate(sub.createdAt)}</td>
+                    <td className="px-6 py-4 text-sm text-gray-400">{formatDate(sub.createdAt)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -482,33 +482,33 @@ export default function Admin() {
           <div className="space-y-6">
             {/* Revenue Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
-                <p className="text-slate-600 text-sm">MRR (Receita Recorrente Mensal)</p>
+              <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
+                <p className="text-gray-400 text-sm">MRR (Receita Recorrente Mensal)</p>
                 <p className="text-4xl font-bold text-green-600 mt-2">{formatCurrency(revenue.mrr)}</p>
               </div>
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
-                <p className="text-slate-600 text-sm">ARR (Receita Recorrente Anual)</p>
+              <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
+                <p className="text-gray-400 text-sm">ARR (Receita Recorrente Anual)</p>
                 <p className="text-4xl font-bold text-blue-600 mt-2">{formatCurrency(revenue.arr)}</p>
               </div>
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
-                <p className="text-slate-600 text-sm">Assinaturas Ativas</p>
+              <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
+                <p className="text-gray-400 text-sm">Assinaturas Ativas</p>
                 <p className="text-4xl font-bold text-purple-600 mt-2">{revenue.totalActiveSubscriptions}</p>
               </div>
             </div>
 
             {/* Revenue by Plan */}
-            <div className="bg-white/5 rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-slate-900 mb-4">Receita por Plano</h3>
+            <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
+              <h3 className="text-lg font-bold text-white mb-4">Receita por Plano</h3>
               <div className="space-y-4">
                 {Object.entries(revenue.revenueByPlan).map(([plan, data]) => (
                   <div key={plan} className="flex items-center justify-between p-4 bg-[#000020] rounded-lg">
                     <div>
-                      <p className="font-semibold text-slate-900">{plan}</p>
-                      <p className="text-sm text-slate-600">{data.count} assinaturas</p>
+                      <p className="font-semibold text-white">{plan}</p>
+                      <p className="text-sm text-gray-400">{data.count} assinaturas</p>
                     </div>
                     <div className="text-right">
                       <p className="text-2xl font-bold text-green-600">{formatCurrency(data.revenue)}</p>
-                      <p className="text-sm text-slate-600">por mês</p>
+                      <p className="text-sm text-gray-400">por mês</p>
                     </div>
                   </div>
                 ))}

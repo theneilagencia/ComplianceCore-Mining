@@ -86,7 +86,7 @@ export default function Settings() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Carregando configurações...</p>
+          <p className="mt-4 text-gray-400">Carregando configurações...</p>
         </div>
       </div>
     );
@@ -105,7 +105,7 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-white/5 shadow-sm border-b border-white/20">
+      <div className="bg-white/5/5 shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -114,13 +114,13 @@ export default function Settings() {
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-white">Configurações</h1>
-                <p className="text-sm text-gray-600">Gerencie suas preferências e conta</p>
+                <p className="text-sm text-gray-400">Gerencie suas preferências e conta</p>
               </div>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => setLocation('/dashboard')}
-                className="px-4 py-2 text-gray-700 hover:text-white font-medium transition-colors"
+                className="px-4 py-2 text-gray-300 hover:text-white font-medium transition-colors"
               >
                 Voltar ao Dashboard
               </button>
@@ -152,13 +152,13 @@ export default function Settings() {
         )}
 
         {/* Settings Form */}
-        <div className="bg-white/5 rounded-xl shadow-sm border border-white/20 overflow-hidden">
+        <div className="bg-white/5/5 rounded-xl shadow-sm border border-white/20 overflow-hidden">
           {/* Personal Information */}
           <div className="p-6 border-b border-white/20">
             <h2 className="text-lg font-semibold text-white mb-4">Informações Pessoais</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Nome Completo
                 </label>
                 <input
@@ -169,18 +169,18 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   value={settings.email}
                   disabled
-                  className="w-full px-4 py-2 border border-white/20 rounded-lg bg-gray-50 text-gray-500"
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg bg-[#000020] text-gray-500"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Empresa
                 </label>
                 <input
@@ -191,7 +191,7 @@ export default function Settings() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Telefone
                 </label>
                 <input
@@ -209,7 +209,7 @@ export default function Settings() {
             <h2 className="text-lg font-semibold text-white mb-4">Preferências</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Idioma
                 </label>
                 <select
@@ -223,7 +223,7 @@ export default function Settings() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   Fuso Horário
                 </label>
                 <select
@@ -240,9 +240,9 @@ export default function Settings() {
           </div>
 
           {/* Account Info */}
-          <div className="p-6 bg-gray-50">
+          <div className="p-6 bg-[#000020]">
             <h2 className="text-lg font-semibold text-white mb-4">Informações da Conta</h2>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm text-gray-400">
               <p>Conta criada em: {new Date(settings.createdAt).toLocaleDateString('pt-BR')}</p>
               <p className="mt-2">ID da conta: {settings.id}</p>
             </div>
@@ -253,7 +253,7 @@ export default function Settings() {
         <div className="mt-6 flex justify-end gap-4">
           <button
             onClick={() => setLocation('/dashboard')}
-            className="px-6 py-2 text-gray-700 hover:text-white font-medium transition-colors"
+            className="px-6 py-2 text-gray-300 hover:text-white font-medium transition-colors"
           >
             Cancelar
           </button>

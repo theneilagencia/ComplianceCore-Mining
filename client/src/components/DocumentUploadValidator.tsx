@@ -120,11 +120,11 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
   return (
     <div className="space-y-6">
       {/* Upload Area */}
-      <div className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
+      <div className="border-2 border-dashed border-white/20 rounded-lg p-8 text-center hover:border-blue-400 transition-colors">
         {!file ? (
           <div>
             <Upload className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-            <p className="text-lg font-medium text-gray-700 mb-2">
+            <p className="text-lg font-medium text-gray-300 mb-2">
               Faça upload do documento para validação
             </p>
             <p className="text-sm text-gray-500 mb-4">
@@ -137,18 +137,18 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
                 onChange={handleFileChange}
                 className="hidden"
               />
-              <span className="px-6 py-3 bg-blue-600 text-white rounded-lg cursor-pointer hover:bg-blue-700 transition-colors inline-flex items-center gap-2">
+              <span className="px-6 py-3 bg-[#2f2c79] text-white rounded-lg cursor-pointer hover:bg-[#b96e48] transition-colors inline-flex items-center gap-2">
                 <Upload className="w-5 h-5" />
                 Selecionar Arquivo
               </span>
             </label>
           </div>
         ) : (
-          <div className="flex items-center justify-between bg-gray-50 rounded-lg p-4">
+          <div className="flex items-center justify-between bg-[#000020] rounded-lg p-4">
             <div className="flex items-center gap-3">
               <FileText className="w-8 h-8 text-blue-600" />
               <div className="text-left">
-                <p className="font-medium text-gray-900">{file.name}</p>
+                <p className="font-medium text-white">{file.name}</p>
                 <p className="text-sm text-gray-500">
                   {(file.size / 1024 / 1024).toFixed(2)} MB
                 </p>
@@ -159,7 +159,7 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
                 <button
                   onClick={handleUpload}
                   disabled={uploading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                  className="px-4 py-2 bg-[#2f2c79] text-white rounded-lg hover:bg-[#b96e48] disabled:bg-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
                 >
                   {uploading ? (
                     <>
@@ -192,10 +192,10 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
           <div className={`border-2 rounded-lg p-6 ${getScoreBgColor(validationResult.score)}`}>
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-1">
+                <h3 className="text-lg font-semibold text-white mb-1">
                   Resultado da Validação
                 </h3>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-400">
                   Padrão: {validationResult.standard}
                 </p>
               </div>
@@ -203,27 +203,27 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
                 <div className={`text-4xl font-bold ${getScoreColor(validationResult.score)}`}>
                   {validationResult.score}%
                 </div>
-                <p className="text-sm text-gray-600">
+                <p className="text-sm text-gray-400">
                   {validationResult.valid ? 'Conforme' : 'Não Conforme'}
                 </p>
               </div>
             </div>
 
-            <div className="bg-white rounded-lg p-4 border border-gray-200">
-              <p className="text-sm text-gray-700">{validationResult.summary}</p>
+            <div className="bg-white/5 rounded-lg p-4 border border-white/20">
+              <p className="text-sm text-gray-300">{validationResult.summary}</p>
             </div>
           </div>
 
           {/* Criteria Details */}
           <div className="border rounded-lg overflow-hidden">
-            <div className="bg-gray-50 px-6 py-3 border-b">
-              <h4 className="font-semibold text-gray-900">
+            <div className="bg-[#000020] px-6 py-3 border-b">
+              <h4 className="font-semibold text-white">
                 Critérios Verificados ({validationResult.criteria.length})
               </h4>
             </div>
             <div className="divide-y">
               {validationResult.criteria.map((criterion, index) => (
-                <div key={index} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                <div key={index} className="px-6 py-4 hover:bg-[#000020] transition-colors">
                   <div className="flex items-start gap-3">
                     {criterion.met ? (
                       <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
@@ -232,7 +232,7 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
                     )}
                     <div className="flex-1">
                       <div className="flex items-center justify-between mb-1">
-                        <p className="font-medium text-gray-900">{criterion.name}</p>
+                        <p className="font-medium text-white">{criterion.name}</p>
                         <span
                           className={`px-2 py-1 rounded text-xs font-medium ${
                             criterion.met
@@ -243,7 +243,7 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
                           {criterion.met ? 'Atende' : 'Não Atende'}
                         </span>
                       </div>
-                      <p className="text-sm text-gray-600">{criterion.details}</p>
+                      <p className="text-sm text-gray-400">{criterion.details}</p>
                     </div>
                   </div>
                 </div>
@@ -261,8 +261,8 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
               </div>
               <div className="divide-y">
                 {validationResult.recommendations.map((recommendation, index) => (
-                  <div key={index} className="px-6 py-3 bg-white">
-                    <p className="text-sm text-gray-700 flex items-start gap-2">
+                  <div key={index} className="px-6 py-3 bg-white/5">
+                    <p className="text-sm text-gray-300 flex items-start gap-2">
                       <span className="text-blue-600 font-bold">•</span>
                       {recommendation}
                     </p>

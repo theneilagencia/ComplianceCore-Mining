@@ -35,8 +35,8 @@ interface QivoCardProps {
 
 export function QivoCard({ children, className = '', variant = 'glass' }: QivoCardProps) {
   const variantClasses = {
-    glass: "bg-white/10 backdrop-blur-sm border border-white/20",
-    solid: "bg-white/5 border border-white/10",
+    glass: "bg-white/5/10 backdrop-blur-sm border border-white/20",
+    solid: "bg-white/5/5 border border-white/10",
     outline: "bg-transparent border border-white/20"
   };
 
@@ -71,8 +71,8 @@ export function QivoButton({
   const variantClasses = {
     primary: "bg-[#2f2c79] text-white hover:bg-[#b96e48]",
     secondary: "bg-[#b96e48] text-white hover:bg-[#8d4925]",
-    outline: "bg-transparent border-2 border-white/20 text-white hover:bg-white/10",
-    ghost: "bg-transparent text-white hover:bg-white/10"
+    outline: "bg-transparent border-2 border-white/20 text-white hover:bg-white/5/10",
+    ghost: "bg-transparent text-white hover:bg-white/5/10"
   };
 
   const sizeClasses = {
@@ -128,7 +128,7 @@ export function QivoInput({
         onChange={onChange}
         placeholder={placeholder}
         required={required}
-        className={`w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400 ${className}`}
+        className={`w-full px-4 py-3 bg-white/5/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400 ${className}`}
       />
     </div>
   );

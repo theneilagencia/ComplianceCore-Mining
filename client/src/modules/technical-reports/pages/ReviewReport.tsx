@@ -104,7 +104,7 @@ export default function ReviewReport() {
  return (
  <DashboardLayout>
  <div className="text-center py-12">
- <p className="text-gray-600">Relatório não encontrado</p>
+ <p className="text-gray-400">Relatório não encontrado</p>
  </div>
  </DashboardLayout>
  );
@@ -119,7 +119,7 @@ export default function ReviewReport() {
  <div className="space-y-6">
  <div>
  <h1 className="text-3xl font-bold">Revisão Humana</h1>
- <p className="text-gray-600 mt-2">
+ <p className="text-gray-400 mt-2">
  Valide os campos extraídos automaticamente para garantir precisão
  </p>
  </div>
@@ -144,7 +144,7 @@ export default function ReviewReport() {
  <Card className="p-6">
  <div className="flex items-center justify-between mb-4">
  <div>
- <p className="text-sm text-gray-600">Progresso da Revisão</p>
+ <p className="text-sm text-gray-400">Progresso da Revisão</p>
  <p className="text-2xl font-bold">
  {resolvedFields} / {totalFields}
  </p>
@@ -155,7 +155,7 @@ export default function ReviewReport() {
  </div>
  <div className="bg-gray-200 rounded-full h-3">
  <div
- className="bg-blue-600 h-3 rounded-full transition-all duration-500"
+ className="bg-[#2f2c79] h-3 rounded-full transition-all duration-500"
  style={{ width: `${progress}%` }}
  />
  </div>
@@ -183,8 +183,8 @@ export default function ReviewReport() {
  </Badge>
  )}
  </div>
- <p className="text-sm text-gray-600 mb-1">
- <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+ <p className="text-sm text-gray-400 mb-1">
+ <span className="font-mono text-xs bg-[#171a4a] px-2 py-1 rounded">
  {field.path}
  </span>
  </p>

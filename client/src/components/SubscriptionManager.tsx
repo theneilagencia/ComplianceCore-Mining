@@ -81,14 +81,14 @@ export default function SubscriptionManager({
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-6">
+    <div className="bg-white/5 rounded-xl shadow-lg p-6">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h3 className="text-xl font-bold text-gray-900 mb-1">
+          <h3 className="text-xl font-bold text-white mb-1">
             Assinatura Atual
           </h3>
-          <p className="text-gray-600 text-sm">
+          <p className="text-gray-400 text-sm">
             Gerencie sua assinatura e método de pagamento
           </p>
         </div>
@@ -126,7 +126,7 @@ export default function SubscriptionManager({
           <button
             onClick={handleManageSubscription}
             disabled={loading}
-            className="w-full flex items-center justify-center px-4 py-3 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full flex items-center justify-center px-4 py-3 bg-[#2f2c79] text-white font-semibold rounded-lg hover:bg-[#b96e48] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -155,7 +155,7 @@ export default function SubscriptionManager({
         {plan === 'PRO' && (
           <a
             href="/pricing"
-            className="w-full flex items-center justify-center px-4 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-all"
+            className="w-full flex items-center justify-center px-4 py-3 bg-[#171a4a] text-gray-300 font-semibold rounded-lg hover:bg-gray-200 transition-all"
           >
             Upgrade para ENTERPRISE
           </a>
@@ -163,11 +163,11 @@ export default function SubscriptionManager({
       </div>
 
       {/* Info */}
-      <div className="mt-6 pt-6 border-t border-gray-200">
-        <p className="text-sm text-gray-600">
+      <div className="mt-6 pt-6 border-t border-white/20">
+        <p className="text-sm text-gray-400">
           No portal de gerenciamento você pode:
         </p>
-        <ul className="mt-2 space-y-1 text-sm text-gray-600">
+        <ul className="mt-2 space-y-1 text-sm text-gray-400">
           <li>• Atualizar método de pagamento</li>
           <li>• Ver histórico de faturas</li>
           <li>• Fazer upgrade ou downgrade</li>

@@ -119,7 +119,7 @@ export const JORCReportForm: React.FC = () => {
         setFormData(parsed);
         // Show toast notification
         const toast = document.createElement('div');
-        toast.className = 'fixed top-4 right-4 bg-blue-600 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
+        toast.className = 'fixed top-4 right-4 bg-[#2f2c79] text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in';
         toast.innerHTML = `
           <div class="flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -268,11 +268,11 @@ export const JORCReportForm: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 py-8 px-4">
       <div className="max-w-5xl mx-auto">
         {/* Header */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div className="bg-white/5 rounded-xl shadow-lg p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <button
               onClick={() => setLocation('/reports/create')}
-              className="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors"
+              className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
             >
               <ArrowLeft className="w-5 h-5" />
               <span>Voltar</span>
@@ -281,7 +281,7 @@ export const JORCReportForm: React.FC = () => {
             <div className="flex items-center gap-4">
               <div className="flex items-center gap-2">
                 {getSaveStatusIcon()}
-                <span className="text-sm text-slate-600">{getSaveStatusText()}</span>
+                <span className="text-sm text-gray-400">{getSaveStatusText()}</span>
               </div>
               
               <button
@@ -300,16 +300,16 @@ export const JORCReportForm: React.FC = () => {
               JORC
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-slate-900">
+              <h1 className="text-2xl font-bold text-white">
                 Relatório Técnico JORC 2012
               </h1>
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-gray-400">
                 Australasian Code for Reporting of Exploration Results, Mineral Resources and Ore Reserves
               </p>
             </div>
           </div>
 
-          <p className="text-sm text-slate-600 mt-3">
+          <p className="text-sm text-gray-400 mt-3">
             Preencha os campos conforme a Table 1 do JORC Code 2012. O formulário é salvo automaticamente a cada 30 segundos.
           </p>
         </div>
@@ -317,12 +317,12 @@ export const JORCReportForm: React.FC = () => {
         {/* Form Sections */}
         <div className="space-y-6">
           {/* Section: Basic Information */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white/5 rounded-xl shadow-lg p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
                 1
               </div>
-              <h2 className="text-xl font-bold text-slate-900">Informações Básicas</h2>
+              <h2 className="text-xl font-bold text-white">Informações Básicas</h2>
             </div>
             <BasicInformation
               data={{
@@ -337,12 +337,12 @@ export const JORCReportForm: React.FC = () => {
           </div>
 
           {/* Section: Competent Person */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white/5 rounded-xl shadow-lg p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
                 2
               </div>
-              <h2 className="text-xl font-bold text-slate-900">Competent Person</h2>
+              <h2 className="text-xl font-bold text-white">Competent Person</h2>
             </div>
             <CompetentPerson
               data={formData.competentPerson}
@@ -355,14 +355,14 @@ export const JORCReportForm: React.FC = () => {
           </div>
 
           {/* Section 1: Sampling Techniques and Data */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white/5 rounded-xl shadow-lg p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
                 3
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Section 1: Sampling Techniques and Data</h2>
-                <p className="text-sm text-slate-600 mt-1">
+                <h2 className="text-xl font-bold text-white">Section 1: Sampling Techniques and Data</h2>
+                <p className="text-sm text-gray-400 mt-1">
                   Criteria in this section apply to all succeeding sections
                 </p>
               </div>
@@ -375,14 +375,14 @@ export const JORCReportForm: React.FC = () => {
           </div>
 
           {/* Section 3: Mineral Resources */}
-          <div className="bg-white rounded-xl shadow-lg p-8">
+          <div className="bg-white/5 rounded-xl shadow-lg p-8">
             <div className="flex items-center gap-3 mb-6">
               <div className="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold">
                 4
               </div>
               <div>
-                <h2 className="text-xl font-bold text-slate-900">Section 3: Estimation and Reporting of Mineral Resources</h2>
-                <p className="text-sm text-slate-600 mt-1">
+                <h2 className="text-xl font-bold text-white">Section 3: Estimation and Reporting of Mineral Resources</h2>
+                <p className="text-sm text-gray-400 mt-1">
                   Criteria listed in Section 1 also apply to this section
                 </p>
               </div>
@@ -396,7 +396,7 @@ export const JORCReportForm: React.FC = () => {
         </div>
 
         {/* Footer Actions */}
-        <div className="bg-white rounded-xl shadow-lg p-6 mt-6">
+        <div className="bg-white/5 rounded-xl shadow-lg p-6 mt-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-sm">
               {Object.keys(errors).length === 0 ? (
@@ -417,7 +417,7 @@ export const JORCReportForm: React.FC = () => {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setLocation("/reports")}
-                className="px-6 py-3 text-slate-700 hover:bg-slate-100 rounded-lg font-medium transition-colors"
+                className="px-6 py-3 text-gray-300 hover:bg-[#171a4a] rounded-lg font-medium transition-colors"
               >
                 Cancelar
               </button>

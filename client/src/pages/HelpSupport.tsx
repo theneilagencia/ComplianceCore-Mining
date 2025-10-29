@@ -109,8 +109,8 @@ export default function HelpSupport() {
  </svg>
  </div>
  <div>
- <h1 className="text-3xl font-bold text-slate-900">Ajuda & Suporte</h1>
- <p className="text-slate-600">Documentação, tutoriais e suporte técnico</p>
+ <h1 className="text-3xl font-bold text-white">Ajuda & Suporte</h1>
+ <p className="text-gray-400">Documentação, tutoriais e suporte técnico</p>
  </div>
  </div>
 
@@ -133,36 +133,36 @@ export default function HelpSupport() {
  <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
  <button className="p-6 bg-blue-50 rounded-xl hover:bg-blue-100 transition-colors text-left">
  <div className="text-3xl mb-2"></div>
- <h3 className="font-semibold text-slate-900 mb-1">Email Suporte</h3>
- <p className="text-sm text-slate-600">suporte@qivo-mining.com</p>
+ <h3 className="font-semibold text-white mb-1">Email Suporte</h3>
+ <p className="text-sm text-gray-400">suporte@qivo-mining.com</p>
  </button>
 
  <button className="p-6 bg-green-50 rounded-xl hover:bg-green-100 transition-colors text-left">
  <div className="text-3xl mb-2"></div>
- <h3 className="font-semibold text-slate-900 mb-1">Chat ao Vivo</h3>
- <p className="text-sm text-slate-600">Seg-Sex, 9h-18h BRT</p>
+ <h3 className="font-semibold text-white mb-1">Chat ao Vivo</h3>
+ <p className="text-sm text-gray-400">Seg-Sex, 9h-18h BRT</p>
  </button>
 
  <button className="p-6 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors text-left">
  <div className="text-3xl mb-2"></div>
- <h3 className="font-semibold text-slate-900 mb-1">Telefone</h3>
- <p className="text-sm text-slate-600">+55 11 1234-5678</p>
+ <h3 className="font-semibold text-white mb-1">Telefone</h3>
+ <p className="text-sm text-gray-400">+55 11 1234-5678</p>
  </button>
  </div>
 
  {/* Tutorials */}
  <div className="mb-8">
- <h2 className="text-2xl font-bold text-slate-900 mb-4"> Tutoriais em Vídeo</h2>
+ <h2 className="text-2xl font-bold text-white mb-4"> Tutoriais em Vídeo</h2>
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
  {tutorials.map((tutorial, index) => (
  <a
  key={index}
  href={tutorial.url}
- className="block p-4 bg-white rounded-lg shadow hover:shadow-lg transition-shadow"
+ className="block p-4 bg-white/5 rounded-lg shadow hover:shadow-lg transition-shadow"
  >
  <div className="text-5xl mb-3 text-center">{tutorial.thumbnail}</div>
- <h3 className="font-semibold text-slate-900 mb-1 text-sm">{tutorial.title}</h3>
- <p className="text-xs text-slate-600">{tutorial.duration}</p>
+ <h3 className="font-semibold text-white mb-1 text-sm">{tutorial.title}</h3>
+ <p className="text-xs text-gray-400">{tutorial.duration}</p>
  </a>
  ))}
  </div>
@@ -178,7 +178,7 @@ export default function HelpSupport() {
  className={`px-4 py-2 rounded-lg font-medium transition-colors ${
  selectedCategory === category.id
  ? 'bg-yellow-500 text-white'
- : 'bg-white text-slate-700 hover:bg-slate-100'
+ : 'bg-white/5 text-gray-300 hover:bg-[#171a4a]'
  }`}
  >
  <span className="mr-2">{category.icon}</span>
@@ -189,25 +189,25 @@ export default function HelpSupport() {
  </div>
 
  {/* FAQs */}
- <div className="bg-white/5 rounded-xl shadow-lg p-6">
- <h2 className="text-2xl font-bold text-slate-900 mb-6"> Perguntas Frequentes</h2>
+ <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
+ <h2 className="text-2xl font-bold text-white mb-6"> Perguntas Frequentes</h2>
  
  {filteredFaqs.length === 0 ? (
  <div className="text-center py-12">
  <div className="text-5xl mb-4"></div>
- <p className="text-slate-600">Nenhum resultado encontrado para "{searchQuery}"</p>
+ <p className="text-gray-400">Nenhum resultado encontrado para "{searchQuery}"</p>
  </div>
  ) : (
  <div className="space-y-4">
  {filteredFaqs.map((faq, index) => (
  <details key={index} className="group">
- <summary className="flex items-center justify-between cursor-pointer p-4 bg-[#000020] rounded-lg hover:bg-slate-100 transition-colors">
- <span className="font-semibold text-slate-900">{faq.question}</span>
+ <summary className="flex items-center justify-between cursor-pointer p-4 bg-[#000020] rounded-lg hover:bg-[#171a4a] transition-colors">
+ <span className="font-semibold text-white">{faq.question}</span>
  <svg className="w-5 h-5 text-slate-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
  </svg>
  </summary>
- <div className="p-4 text-slate-600 leading-relaxed">
+ <div className="p-4 text-gray-400 leading-relaxed">
  {faq.answer}
  </div>
  </details>
@@ -219,16 +219,16 @@ export default function HelpSupport() {
  {/* Documentation Links */}
  <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">
  <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-6">
- <h3 className="text-xl font-bold text-slate-900 mb-2"> Documentação Completa</h3>
- <p className="text-slate-600 mb-4">Guias detalhados sobre todas as funcionalidades da plataforma</p>
- <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+ <h3 className="text-xl font-bold text-white mb-2"> Documentação Completa</h3>
+ <p className="text-gray-400 mb-4">Guias detalhados sobre todas as funcionalidades da plataforma</p>
+ <button className="px-4 py-2 bg-[#2f2c79] text-white rounded-lg hover:bg-[#b96e48] transition-colors">
  Acessar Docs
  </button>
  </div>
 
  <div className="bg-gradient-to-br from-green-50 to-green-100 rounded-xl p-6">
- <h3 className="text-xl font-bold text-slate-900 mb-2"> Status do Sistema</h3>
- <p className="text-slate-600 mb-4">Verifique o status operacional de todos os serviços</p>
+ <h3 className="text-xl font-bold text-white mb-2"> Status do Sistema</h3>
+ <p className="text-gray-400 mb-4">Verifique o status operacional de todos os serviços</p>
  <button className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
  Ver Status
  </button>
@@ -236,13 +236,13 @@ export default function HelpSupport() {
  </div>
 
  {/* Contact Form */}
- <div className="mt-8 bg-white rounded-xl shadow-lg p-6">
- <h2 className="text-2xl font-bold text-slate-900 mb-4"> Ainda precisa de ajuda?</h2>
- <p className="text-slate-600 mb-6">Envie uma mensagem para nossa equipe de suporte</p>
+ <div className="mt-8 bg-white/5 rounded-xl shadow-lg p-6">
+ <h2 className="text-2xl font-bold text-white mb-4"> Ainda precisa de ajuda?</h2>
+ <p className="text-gray-400 mb-6">Envie uma mensagem para nossa equipe de suporte</p>
  
  <form className="space-y-4">
  <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Assunto</label>
+ <label className="block text-sm font-medium text-gray-300 mb-2">Assunto</label>
  <input
  type="text"
  placeholder="Ex: Dúvida sobre relatório JORC"
@@ -251,7 +251,7 @@ export default function HelpSupport() {
  </div>
 
  <div>
- <label className="block text-sm font-medium text-slate-700 mb-2">Mensagem</label>
+ <label className="block text-sm font-medium text-gray-300 mb-2">Mensagem</label>
  <textarea
  rows={5}
  placeholder="Descreva sua dúvida ou problema..."

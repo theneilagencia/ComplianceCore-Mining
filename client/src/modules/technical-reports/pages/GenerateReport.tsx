@@ -155,7 +155,7 @@ export default function GenerateReport() {
  <div className="flex items-center justify-between">
  <div>
  <h1 className="text-3xl font-bold">Gerar Relatório</h1>
- <p className="text-gray-600 mt-2">
+ <p className="text-gray-400 mt-2">
  Crie relatórios técnicos estruturados conforme padrões internacionais
  </p>
  </div>
@@ -168,7 +168,7 @@ export default function GenerateReport() {
  </div>
  <div className="flex-1">
  <h2 className="text-xl font-semibold">Novo Relatório</h2>
- <p className="text-sm text-gray-600">
+ <p className="text-sm text-gray-400">
  Selecione o padrão e preencha os dados
  </p>
  </div>
@@ -330,11 +330,11 @@ export default function GenerateReport() {
  <TabsContent value="upload">
  <div className="space-y-6">
  {/* Download Templates */}
- <div className="border-2 border-dashed border-gray-300 rounded-lg p-6">
+ <div className="border-2 border-dashed border-white/20 rounded-lg p-6">
  <div className="text-center mb-4">
  <Download className="h-12 w-12 text-blue-600 mx-auto mb-3" />
  <h3 className="text-lg font-semibold mb-2">Download de Templates</h3>
- <p className="text-sm text-gray-600 mb-4">
+ <p className="text-sm text-gray-400 mb-4">
  Baixe um template pré-formatado, preencha com seus dados e faça upload
  </p>
  </div>
@@ -368,11 +368,11 @@ export default function GenerateReport() {
  </div>
 
  {/* Upload Area */}
- <div className="border-2 border-dashed border-gray-300 rounded-lg p-8">
+ <div className="border-2 border-dashed border-white/20 rounded-lg p-8">
  <div className="text-center">
  <UploadIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
  <h3 className="text-lg font-semibold mb-2">Upload de Planilha</h3>
- <p className="text-sm text-gray-600 mb-4">
+ <p className="text-sm text-gray-400 mb-4">
  Arraste e solte seu arquivo aqui ou clique para selecionar
  </p>
  <Button onClick={() => setShowUploadModal(true)}>
@@ -415,14 +415,14 @@ export default function GenerateReport() {
  {reports.map((report: any) => (
  <div
  key={report.id}
- className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50 cursor-pointer"
+ className="flex items-center justify-between p-4 border rounded-lg hover:bg-[#000020] cursor-pointer"
  onClick={() => navigate(`/reports/${report.id}/review`)}
  >
  <div className="flex items-center gap-3">
  <FileText className="h-5 w-5 text-blue-600" />
  <div>
  <h3 className="font-medium">{report.title}</h3>
- <p className="text-sm text-gray-600">
+ <p className="text-sm text-gray-400">
  {report.standard} • {new Date(report.createdAt).toLocaleDateString('pt-BR')}
  </p>
  </div>

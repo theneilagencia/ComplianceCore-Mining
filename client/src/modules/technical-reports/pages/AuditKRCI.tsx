@@ -105,7 +105,7 @@ export default function AuditKRCI() {
       case "medium":
         return "bg-yellow-600";
       case "low":
-        return "bg-blue-600";
+        return "bg-[#2f2c79]";
       default:
         return "bg-gray-600";
     }
@@ -116,7 +116,7 @@ export default function AuditKRCI() {
       <div className="space-y-6">
         <div>
           <h1 className="text-3xl font-bold">Auditoria & KRCI</h1>
-          <p className="text-gray-600 mt-2">
+          <p className="text-gray-400 mt-2">
             Verifique a conformidade dos relatórios com 22 regras de auditoria KRCI
           </p>
         </div>
@@ -129,7 +129,7 @@ export default function AuditKRCI() {
                 <CheckCircle className="h-5 w-5 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Auditorias Completas</p>
+                <p className="text-sm text-gray-400">Auditorias Completas</p>
                 <p className="text-2xl font-bold">{audits?.length || 0}</p>
               </div>
             </div>
@@ -141,7 +141,7 @@ export default function AuditKRCI() {
                 <AlertTriangle className="h-5 w-5 text-yellow-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Score Médio</p>
+                <p className="text-sm text-gray-400">Score Médio</p>
                 <p className="text-2xl font-bold">
                   {audits && audits.length > 0
                     ? Math.round(audits.reduce((sum, a) => sum + a.score, 0) / audits.length)
@@ -158,7 +158,7 @@ export default function AuditKRCI() {
                 <FileSearch className="h-5 w-5 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Relatórios Prontos</p>
+                <p className="text-sm text-gray-400">Relatórios Prontos</p>
                 <p className="text-2xl font-bold">
                   {reports?.filter((r) => r.status === "ready_for_audit").length || 0}
                 </p>
@@ -175,7 +175,7 @@ export default function AuditKRCI() {
             </div>
             <div>
               <h2 className="text-xl font-semibold">Nova Auditoria</h2>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 Selecione um relatório existente ou faça upload de um documento para validação
               </p>
             </div>
@@ -188,7 +188,7 @@ export default function AuditKRCI() {
               className={`px-4 py-2 font-medium transition-colors ${
                 activeTab === 'select'
                   ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               Selecionar Relatório
@@ -198,7 +198,7 @@ export default function AuditKRCI() {
               className={`px-4 py-2 font-medium transition-colors ${
                 activeTab === 'upload'
                   ? 'text-blue-600 border-b-2 border-blue-600'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               Upload de Documento
@@ -207,7 +207,7 @@ export default function AuditKRCI() {
 
           {activeTab === 'select' ? (
             <div>
-              <p className="text-sm text-gray-600 mb-4">
+              <p className="text-sm text-gray-400 mb-4">
                 Selecione um relatório para executar auditoria KRCI completa (22 regras)
               </p>
 
@@ -286,7 +286,7 @@ export default function AuditKRCI() {
                   {auditResult.krcis.map((krci: any, idx: number) => (
                     <div
                       key={idx}
-                      className="flex items-start justify-between p-4 border rounded-lg hover:bg-gray-50"
+                      className="flex items-start justify-between p-4 border rounded-lg hover:bg-[#000020]"
                     >
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
@@ -295,7 +295,7 @@ export default function AuditKRCI() {
                             {krci.severity}
                           </Badge>
                         </div>
-                        <p className="text-sm text-gray-600 mb-1">
+                        <p className="text-sm text-gray-400 mb-1">
                           <strong>Seção:</strong> {krci.section}
                         </p>
                         <p className="text-sm">{krci.message}</p>
@@ -361,11 +361,11 @@ export default function AuditKRCI() {
               {audits.map((audit) => (
                 <div
                   key={audit.id}
-                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-gray-50"
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-[#000020]"
                 >
                   <div className="flex-1">
                     <p className="font-medium">Relatório ID: {audit.reportId}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-400">
                       {audit.id} • {new Date(audit.createdAt || "").toLocaleDateString("pt-BR")}
                     </p>
                   </div>
@@ -374,7 +374,7 @@ export default function AuditKRCI() {
                       <p className={`text-2xl font-bold ${getScoreColor(audit.score)}`}>
                         {audit.score}%
                       </p>
-                      <p className="text-xs text-gray-600">
+                      <p className="text-xs text-gray-400">
                         {audit.passedRules}/{audit.totalRules} aprovadas
                       </p>
                     </div>

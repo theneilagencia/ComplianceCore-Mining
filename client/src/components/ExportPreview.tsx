@@ -77,7 +77,7 @@ export default function ExportPreview({
 
  return (
  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
- <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+ <div className="bg-white/5 rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
  {/* Header */}
  <div className="border-b bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6">
  <div className="flex items-start justify-between">
@@ -103,49 +103,49 @@ export default function ExportPreview({
  <div className="flex-1 overflow-y-auto p-6">
  {/* Document Info */}
  <div className="bg-blue-50 rounded-lg p-6 mb-6">
- <h3 className="font-semibold text-lg mb-4 text-gray-900">
+ <h3 className="font-semibold text-lg mb-4 text-white">
  Informações do Documento
  </h3>
  <div className="grid grid-cols-2 gap-4">
  <div>
- <p className="text-sm text-gray-600 mb-1">Título</p>
- <p className="font-medium text-gray-900">{reportTitle}</p>
+ <p className="text-sm text-gray-400 mb-1">Título</p>
+ <p className="font-medium text-white">{reportTitle}</p>
  </div>
  <div>
- <p className="text-sm text-gray-600 mb-1">Padrão</p>
- <p className="font-medium text-gray-900">{standard}</p>
+ <p className="text-sm text-gray-400 mb-1">Padrão</p>
+ <p className="font-medium text-white">{standard}</p>
  </div>
  <div>
- <p className="text-sm text-gray-600 mb-1">Formato</p>
- <p className="font-medium text-gray-900 flex items-center gap-2">
+ <p className="text-sm text-gray-400 mb-1">Formato</p>
+ <p className="font-medium text-white flex items-center gap-2">
  <span>{getFormatIcon()}</span>
  {format}
  </p>
  </div>
  <div>
- <p className="text-sm text-gray-600 mb-1">Tempo Estimado</p>
- <p className="font-medium text-gray-900">{getEstimatedTime()}</p>
+ <p className="text-sm text-gray-400 mb-1">Tempo Estimado</p>
+ <p className="font-medium text-white">{getEstimatedTime()}</p>
  </div>
  </div>
  </div>
 
  {/* Sections Preview */}
  <div className="mb-6">
- <h3 className="font-semibold text-lg mb-4 text-gray-900">
+ <h3 className="font-semibold text-lg mb-4 text-white">
  Seções Incluídas ({getSections().length})
  </h3>
  <div className="grid grid-cols-2 gap-3">
  {getSections().map((section, index) => (
  <div
  key={index}
- className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg"
+ className="flex items-center gap-3 p-3 bg-[#000020] rounded-lg"
  >
  <div className="h-6 w-6 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
  <span className="text-green-600 text-xs font-semibold">
  {index + 1}
  </span>
  </div>
- <span className="text-sm text-gray-700">{section}</span>
+ <span className="text-sm text-gray-300">{section}</span>
  </div>
  ))}
  </div>
@@ -169,11 +169,11 @@ export default function ExportPreview({
  )}
 
  {/* Important Notes */}
- <div className="bg-gray-50 rounded-lg p-4">
- <h4 className="font-semibold text-gray-900 mb-2">
+ <div className="bg-[#000020] rounded-lg p-4">
+ <h4 className="font-semibold text-white mb-2">
  ℹ Informações Importantes
  </h4>
- <ul className="text-sm text-gray-600 space-y-1">
+ <ul className="text-sm text-gray-400 space-y-1">
  <li>• O documento será gerado com formatação profissional</li>
  <li>• Todas as seções obrigatórias estão incluídas</li>
  <li>• Você poderá baixar o arquivo assim que estiver pronto</li>
@@ -183,7 +183,7 @@ export default function ExportPreview({
  </div>
 
  {/* Footer */}
- <div className="border-t bg-gray-50 p-6">
+ <div className="border-t bg-[#000020] p-6">
  <div className="flex items-center justify-between">
  <Button variant="outline" onClick={onCancel} disabled={loading}>
  Cancelar

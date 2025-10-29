@@ -61,7 +61,7 @@ export default function ReportEdit() {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="h-16 w-16 text-blue-600 animate-spin mx-auto" />
-          <p className="mt-6 text-lg font-medium text-gray-700">
+          <p className="mt-6 text-lg font-medium text-gray-300">
             Carregando relatório...
           </p>
         </div>
@@ -91,10 +91,10 @@ export default function ReportEdit() {
           <h2 className="text-2xl font-bold text-white mb-2">
             Erro ao carregar relatório
           </h2>
-          <p className="text-gray-600 mb-6">{error || 'Relatório não encontrado'}</p>
+          <p className="text-gray-400 mb-6">{error || 'Relatório não encontrado'}</p>
           <button
             onClick={() => setLocation('/reports')}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="px-6 py-2 bg-[#2f2c79] text-white rounded-lg hover:bg-[#b96e48] transition-colors"
           >
             Voltar para Relatórios
           </button>
@@ -106,21 +106,21 @@ export default function ReportEdit() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-white/5 shadow-sm border-b border-white/20">
+      <div className="bg-white/5/5 shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center gap-4">
             <button
               onClick={() => setLocation('/reports')}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-2 hover:bg-[#171a4a] rounded-lg transition-colors"
               aria-label="Voltar"
             >
-              <ArrowLeft className="h-5 w-5 text-gray-600" />
+              <ArrowLeft className="h-5 w-5 text-gray-400" />
             </button>
             <div>
               <h1 className="text-2xl font-bold text-white">
                 Editar Relatório
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 ID: {reportId}
               </p>
             </div>

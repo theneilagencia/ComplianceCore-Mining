@@ -65,7 +65,7 @@ export default function AccountPage() {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Carregando...</p>
+          <p className="text-gray-400">Carregando...</p>
         </div>
       </div>
     );
@@ -89,10 +89,10 @@ export default function AccountPage() {
 
   const getPlanColor = (plan: string) => {
     switch (plan) {
-      case 'START': return 'bg-gray-100 text-gray-800';
+      case 'START': return 'bg-[#171a4a] text-gray-800';
       case 'PRO': return 'bg-blue-100 text-blue-800';
       case 'ENTERPRISE': return 'bg-purple-100 text-purple-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-[#171a4a] text-gray-800';
     }
   };
 
@@ -102,17 +102,17 @@ export default function AccountPage() {
       case 'expired': return 'bg-red-100 text-red-800';
       case 'cancelled': return 'bg-orange-100 text-orange-800';
       case 'suspended': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      default: return 'bg-[#171a4a] text-gray-800';
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[#000020]">
       {/* Header */}
-      <header className="bg-white/5 border-b">
+      <header className="bg-white/5/5 border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
+            <div className="w-10 h-10 bg-[#2f2c79] rounded-lg flex items-center justify-center text-white font-bold">
               JI
             </div>
             <div>
@@ -122,7 +122,7 @@ export default function AccountPage() {
           </div>
           <button
             onClick={() => setLocation('/account')}
-            className="text-gray-600 hover:text-white"
+            className="text-gray-400 hover:text-white"
           >
             Dashboard
           </button>
@@ -131,7 +131,7 @@ export default function AccountPage() {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Plan Overview */}
-        <div className="bg-white/5 rounded-lg shadow-lg p-6 mb-6">
+        <div className="bg-white/5/5 rounded-lg shadow-lg p-6 mb-6">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Plano Atual</h2>
@@ -148,7 +148,7 @@ export default function AccountPage() {
             {stats.plan !== 'ENTERPRISE' && (
               <button
                 onClick={handleUpgrade}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all"
+                className="bg-[#2f2c79] text-white px-4 py-2 rounded-lg hover:bg-[#b96e48] transition-all"
               >
                 Fazer Upgrade
               </button>
@@ -158,7 +158,7 @@ export default function AccountPage() {
           {/* Usage Stats */}
           <div className="grid md:grid-cols-2 gap-6">
             <div>
-              <h3 className="text-sm font-semibold text-gray-600 mb-2">
+              <h3 className="text-sm font-semibold text-gray-400 mb-2">
                 Relatórios Este Mês
               </h3>
               <div className="mb-2">
@@ -177,19 +177,19 @@ export default function AccountPage() {
                   />
                 </div>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 {stats.reportsRemaining} relatórios restantes
               </p>
             </div>
 
             <div>
-              <h3 className="text-sm font-semibold text-gray-600 mb-2">
+              <h3 className="text-sm font-semibold text-gray-400 mb-2">
                 Projetos Ativos
               </h3>
               <p className="text-3xl font-bold">
                 {stats.projectsLimit === -1 ? '∞' : stats.projectsLimit}
               </p>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm text-gray-400">
                 {stats.projectsLimit === -1 ? 'Ilimitados' : `Limite: ${stats.projectsLimit} projetos`}
               </p>
             </div>
@@ -198,12 +198,12 @@ export default function AccountPage() {
 
         {/* Billing Info */}
         {stats.plan !== 'START' && (
-          <div className="bg-white/5 rounded-lg shadow-lg p-6 mb-6">
+          <div className="bg-white/5/5 rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-bold mb-4">Informações de Cobrança</h2>
             
             <div className="space-y-3">
               <div className="flex justify-between">
-                <span className="text-gray-600">Período de Cobrança:</span>
+                <span className="text-gray-400">Período de Cobrança:</span>
                 <span className="font-semibold">
                   {stats.billingPeriod === 'annual' ? 'Anual' : 'Mensal'}
                 </span>
@@ -211,7 +211,7 @@ export default function AccountPage() {
 
               {stats.validUntil && (
                 <div className="flex justify-between">
-                  <span className="text-gray-600">Próxima Renovação:</span>
+                  <span className="text-gray-400">Próxima Renovação:</span>
                   <span className="font-semibold">
                     {new Date(stats.validUntil).toLocaleDateString('pt-BR')}
                     {stats.daysRemaining !== null && (
@@ -226,7 +226,7 @@ export default function AccountPage() {
               <div className="pt-4 border-t">
                 <button
                   onClick={handleManageSubscription}
-                  className="w-full bg-gray-100 text-gray-700 py-2 rounded-lg hover:bg-gray-200 transition-all"
+                  className="w-full bg-[#171a4a] text-gray-300 py-2 rounded-lg hover:bg-gray-200 transition-all"
                 >
                   Gerenciar Assinatura
                 </button>
@@ -239,7 +239,7 @@ export default function AccountPage() {
         )}
 
         {/* Plan Features */}
-        <div className="bg-white/5 rounded-lg shadow-lg p-6">
+        <div className="bg-white/5/5 rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-bold mb-4">Recursos do Seu Plano</h2>
           
           <ul className="space-y-2">

@@ -50,11 +50,11 @@ export default function Dashboard() {
  {/* Main Content */}
  <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
  {/* Welcome Section */}
- <div className="bg-white/5 rounded-2xl shadow-lg p-8 mb-8">
- <h2 className="text-3xl font-bold text-slate-900 mb-2">
+ <div className="bg-white/5/5 rounded-2xl shadow-lg p-8 mb-8">
+ <h2 className="text-3xl font-bold text-white mb-2">
  Bem-vindo ao QIVO Mining! 
  </h2>
- <p className="text-slate-600 text-lg">
+ <p className="text-gray-400 text-lg">
  Plataforma de Geração de Relatórios Técnicos de Mineração
  </p>
  </div>
@@ -70,7 +70,7 @@ export default function Dashboard() {
  </div>
  <button
  onClick={() => setLocation('/pricing')}
- className="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
+ className="px-6 py-3 bg-white/5 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-colors"
  >
  Fazer Upgrade
  </button>
@@ -91,8 +91,8 @@ export default function Dashboard() {
  disabled={!canCreateReport}
  className={`p-6 rounded-xl shadow-lg text-left transition-all ${
  canCreateReport
- ? 'bg-white hover:shadow-xl hover:-translate-y-1 cursor-pointer'
- : 'bg-slate-100 cursor-not-allowed opacity-60'
+ ? 'bg-white/5 hover:shadow-xl hover:-translate-y-1 cursor-pointer'
+ : 'bg-[#171a4a] cursor-not-allowed opacity-60'
  }`}
  >
  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
@@ -100,8 +100,8 @@ export default function Dashboard() {
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
  </svg>
  </div>
- <h3 className="text-lg font-semibold text-slate-900 mb-2">Gerar Relatório</h3>
- <p className="text-slate-600 text-sm">
+ <h3 className="text-lg font-semibold text-white mb-2">Gerar Relatório</h3>
+ <p className="text-gray-400 text-sm">
  Crie um novo relatório técnico JORC/NI 43-101
  </p>
  {!canCreateReport && (
@@ -114,15 +114,15 @@ export default function Dashboard() {
  {/* Audit KRCI */}
  <button
  onClick={() => setLocation('/reports/audit')}
- className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
+ className="p-6 bg-white/5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
  >
  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
  </svg>
  </div>
- <h3 className="text-lg font-semibold text-slate-900 mb-2">Auditoria KRCI</h3>
- <p className="text-slate-600 text-sm">
+ <h3 className="text-lg font-semibold text-white mb-2">Auditoria KRCI</h3>
+ <p className="text-gray-400 text-sm">
  Audite critérios de Key Risk and Critical Information
  </p>
  </button>
@@ -132,15 +132,15 @@ export default function Dashboard() {
  {/* Export Standards */}
  <button
  onClick={() => setLocation('/reports/export')}
- className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
+ className="p-6 bg-white/5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
  >
  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
  <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
  </svg>
  </div>
- <h3 className="text-lg font-semibold text-slate-900 mb-2">Exportar Padrões</h3>
- <p className="text-slate-600 text-sm">
+ <h3 className="text-lg font-semibold text-white mb-2">Exportar Padrões</h3>
+ <p className="text-gray-400 text-sm">
  Exporte relatórios em diferentes formatos
  </p>
  </button>
@@ -152,15 +152,15 @@ export default function Dashboard() {
  {/* Radar Regulatório */}
  <button
   onClick={() => setLocation('/radar')}
- className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
+ className="p-6 bg-white/5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
  >
  <div className="w-12 h-12 bg-rose-100 rounded-lg flex items-center justify-center mb-4">
  <svg className="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
  </svg>
  </div>
- <h3 className="text-lg font-semibold text-slate-900 mb-2">Radar Regulatório</h3>
- <p className="text-slate-600 text-sm">
+ <h3 className="text-lg font-semibold text-white mb-2">Radar Regulatório</h3>
+ <p className="text-gray-400 text-sm">
  Monitoramento de mudanças regulatórias
  </p>
  </button>
@@ -170,15 +170,15 @@ export default function Dashboard() {
  {/* Subscription */}
  <button
  onClick={() => setLocation('/subscription')}
- className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
+ className="p-6 bg-white/5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
  >
  <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
  <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
  </svg>
  </div>
- <h3 className="text-lg font-semibold text-slate-900 mb-2">Gerenciar Assinatura</h3>
- <p className="text-slate-600 text-sm">
+ <h3 className="text-lg font-semibold text-white mb-2">Gerenciar Assinatura</h3>
+ <p className="text-gray-400 text-sm">
  Veja seu plano, faturas e configurações
  </p>
  </button>
@@ -186,35 +186,35 @@ export default function Dashboard() {
  {/* Help/Support */}
  <button
  onClick={() => setLocation('/help')}
- className="p-6 bg-white rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
+ className="p-6 bg-white/5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
  >
  <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
  <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
  </svg>
  </div>
- <h3 className="text-lg font-semibold text-slate-900 mb-2">Ajuda & Suporte</h3>
- <p className="text-slate-600 text-sm">
+ <h3 className="text-lg font-semibold text-white mb-2">Ajuda & Suporte</h3>
+ <p className="text-gray-400 text-sm">
  Documentação e suporte técnico
  </p>
  </button>
  </div>
 
  {/* Usage Stats */}
- <div className="bg-white/5 rounded-2xl shadow-lg p-8">
- <h3 className="text-xl font-bold text-slate-900 mb-6">Uso do Plano</h3>
+ <div className="bg-white/5/5 rounded-2xl shadow-lg p-8">
+ <h3 className="text-xl font-bold text-white mb-6">Uso do Plano</h3>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  {/* Reports Usage */}
  <div>
  <div className="flex items-center justify-between mb-2">
- <span className="text-slate-700 font-medium">Relatórios Este Mês</span>
- <span className="text-slate-900 font-bold">
+ <span className="text-gray-300 font-medium">Relatórios Este Mês</span>
+ <span className="text-white font-bold">
  {license?.stats?.reportsUsed || 0} / {license?.stats?.reportsLimit || 1}
  </span>
  </div>
  <div className="w-full bg-slate-200 rounded-full h-3">
  <div
- className="bg-blue-600 h-3 rounded-full transition-all"
+ className="bg-[#2f2c79] h-3 rounded-full transition-all"
  style={{
  width: `${((license?.stats?.reportsUsed || 0) / (license?.stats?.reportsLimit || 1)) * 100}%`,
  }}
@@ -225,8 +225,8 @@ export default function Dashboard() {
  {/* Projects Usage */}
  <div>
  <div className="flex items-center justify-between mb-2">
- <span className="text-slate-700 font-medium">Projetos Ativos</span>
- <span className="text-slate-900 font-bold">
+ <span className="text-gray-300 font-medium">Projetos Ativos</span>
+ <span className="text-white font-bold">
  {license?.stats?.projectsActive || 0} / {license?.stats?.projectsLimit === 999999 || license?.stats?.projectsLimit === -1 ? 'Ilimitado' : license?.stats?.projectsLimit || 1}
  </span>
  </div>

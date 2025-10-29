@@ -63,10 +63,10 @@ export const StandardSelector: React.FC = () => {
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold text-slate-900 mb-4">
+          <h1 className="text-4xl font-bold text-white mb-4">
             Criar Relatório Técnico
           </h1>
-          <p className="text-lg text-slate-600 max-w-2xl mx-auto">
+          <p className="text-lg text-gray-400 max-w-2xl mx-auto">
             Selecione o padrão regulatório internacional para o seu relatório técnico.
             Cada padrão possui requisitos específicos de divulgação e conformidade.
           </p>
@@ -78,7 +78,7 @@ export const StandardSelector: React.FC = () => {
             <button
               key={standard.id}
               onClick={() => handleSelectStandard(standard.id)}
-              className="group relative bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 text-left border-2 border-transparent hover:border-slate-200 transform hover:-translate-y-1"
+              className="group relative bg-white/5 rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 p-8 text-left border-2 border-transparent hover:border-white/20 transform hover:-translate-y-1"
             >
               {/* Gradient Background */}
               <div className={`absolute top-0 left-0 w-full h-2 bg-gradient-to-r ${standard.color} rounded-t-2xl`} />
@@ -90,22 +90,22 @@ export const StandardSelector: React.FC = () => {
 
               {/* Content */}
               <div className="mb-4">
-                <h2 className="text-2xl font-bold text-slate-900 mb-1">
+                <h2 className="text-2xl font-bold text-white mb-1">
                   {standard.name}
                 </h2>
                 <p className="text-sm font-medium text-slate-500 mb-2">
                   {standard.region}
                 </p>
-                <p className="text-xs text-slate-600 italic mb-3">
+                <p className="text-xs text-gray-400 italic mb-3">
                   {standard.fullName}
                 </p>
-                <p className="text-sm text-slate-700 leading-relaxed">
+                <p className="text-sm text-gray-300 leading-relaxed">
                   {standard.description}
                 </p>
               </div>
 
               {/* CTA */}
-              <div className="flex items-center text-sm font-semibold text-slate-900 group-hover:text-blue-600 transition-colors">
+              <div className="flex items-center text-sm font-semibold text-white group-hover:text-blue-600 transition-colors">
                 Selecionar este padrão
                 <svg className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
@@ -140,7 +140,7 @@ export const StandardSelector: React.FC = () => {
         <div className="mt-8 text-center">
           <button
             onClick={() => setLocation('/reports')}
-            className="text-slate-600 hover:text-slate-900 font-medium transition-colors"
+            className="text-gray-400 hover:text-white font-medium transition-colors"
           >
             ← Voltar para Relatórios
           </button>

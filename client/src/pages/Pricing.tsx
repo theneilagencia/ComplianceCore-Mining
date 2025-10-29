@@ -141,7 +141,7 @@ export default function PricingPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       {/* Header */}
-      <header className="border-b bg-white/80 backdrop-blur-sm sticky top-0 z-50">
+      <header className="border-b bg-white/5/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <img src="/qivo-logo.png" alt="QIVO Mining" className="w-10 h-10 rounded-lg" />
@@ -152,7 +152,7 @@ export default function PricingPage() {
           </div>
           <button
             onClick={() => setLocation('/')}
-            className="text-gray-600 hover:text-white"
+            className="text-gray-400 hover:text-white"
           >
             Voltar
           </button>
@@ -164,19 +164,19 @@ export default function PricingPage() {
         <h1 className="text-5xl font-bold mb-4">
           Escolha o Plano Ideal para Seu Negócio
         </h1>
-        <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
+        <p className="text-xl text-gray-400 mb-8 max-w-2xl mx-auto">
           Relatórios técnicos de mineração conformes aos padrões internacionais.
           Comece grátis ou escolha um plano profissional.
         </p>
 
         {/* Billing Toggle */}
-        <div className="inline-flex items-center gap-4 bg-white rounded-full p-2 shadow-lg mb-12">
+        <div className="inline-flex items-center gap-4 bg-white/5 rounded-full p-2 shadow-lg mb-12">
           <button
             onClick={() => setBillingPeriod('monthly')}
             className={`px-6 py-2 rounded-full transition-all ${
               billingPeriod === 'monthly'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-600 hover:text-white'
+                ? 'bg-[#2f2c79] text-white'
+                : 'text-gray-400 hover:text-white'
             }`}
           >
             Mensal
@@ -185,8 +185,8 @@ export default function PricingPage() {
             onClick={() => setBillingPeriod('annual')}
             className={`px-6 py-2 rounded-full transition-all ${
               billingPeriod === 'annual'
-                ? 'bg-blue-600 text-white'
-                : 'text-gray-600 hover:text-white'
+                ? 'bg-[#2f2c79] text-white'
+                : 'text-gray-400 hover:text-white'
             }`}
           >
             Anual
@@ -201,19 +201,19 @@ export default function PricingPage() {
           {plans.map((plan) => (
             <div
               key={plan.name}
-              className={`relative bg-white rounded-2xl shadow-xl p-8 ${
+              className={`relative bg-white/5 rounded-2xl shadow-xl p-8 ${
                 plan.popular ? 'ring-4 ring-blue-600 scale-105' : ''
               }`}
             >
               {plan.popular && (
-                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-[#2f2c79] text-white px-4 py-1 rounded-full text-sm font-semibold">
                   Mais Popular
                 </div>
               )}
 
               <div className="mb-6">
                 <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
-                <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
+                <p className="text-gray-400 text-sm mb-4">{plan.description}</p>
                 
                 <div className="mb-2">
                   <span className="text-4xl font-bold">{getPrice(plan)}</span>
@@ -231,8 +231,8 @@ export default function PricingPage() {
                 disabled={loading === plan.name}
                 className={`w-full py-3 rounded-lg font-semibold mb-2 transition-all ${
                   plan.popular
-                    ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-100 text-white hover:bg-gray-200'
+                    ? 'bg-[#2f2c79] text-white hover:bg-[#b96e48]'
+                    : 'bg-[#171a4a] text-white hover:bg-gray-200'
                 } disabled:opacity-50`}
               >
                 {loading === plan.name ? 'Processando...' : plan.cta}
@@ -277,7 +277,7 @@ export default function PricingPage() {
                     )}
                     <span
                       className={
-                        feature.included ? 'text-gray-700' : 'text-gray-400'
+                        feature.included ? 'text-gray-300' : 'text-gray-400'
                       }
                     >
                       {feature.text}
@@ -295,7 +295,7 @@ export default function PricingPage() {
             Comparação Detalhada de Planos
           </h2>
           
-          <div className="bg-white/5 rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-white/5/5 rounded-2xl shadow-xl overflow-hidden">
             <table className="w-full">
               <thead className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                 <tr>
@@ -306,61 +306,61 @@ export default function PricingPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200">
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">Relatórios por mês</td>
                   <td className="px-6 py-4 text-center">1</td>
                   <td className="px-6 py-4 text-center bg-blue-50 font-semibold">5</td>
                   <td className="px-6 py-4 text-center">15</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">Projetos ativos</td>
                   <td className="px-6 py-4 text-center">1</td>
                   <td className="px-6 py-4 text-center bg-blue-50 font-semibold">3</td>
                   <td className="px-6 py-4 text-center">Ilimitados</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">Padrões suportados</td>
                   <td className="px-6 py-4 text-center">JORC, CBRR</td>
                   <td className="px-6 py-4 text-center bg-blue-50 font-semibold">Todos (6)</td>
                   <td className="px-6 py-4 text-center">Todos (6)</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">Auditoria KRCI</td>
                   <td className="px-6 py-4 text-center">Básica</td>
                   <td className="px-6 py-4 text-center bg-blue-50 font-semibold">Completa (22 regras)</td>
                   <td className="px-6 py-4 text-center">Completa (22 regras)</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">Pré-certificação</td>
                   <td className="px-6 py-4 text-center text-gray-400">✗</td>
                   <td className="px-6 py-4 text-center bg-blue-50 text-green-600">✓ ASX, TSX, JSE, ANM</td>
                   <td className="px-6 py-4 text-center text-green-600">✓ Todos + CRIRSCO</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">Conversão de padrões</td>
                   <td className="px-6 py-4 text-center text-gray-400">✗</td>
                   <td className="px-6 py-4 text-center bg-blue-50 text-green-600">✓</td>
                   <td className="px-6 py-4 text-center text-green-600">✓</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">Exportação</td>
                   <td className="px-6 py-4 text-center">PDF</td>
                   <td className="px-6 py-4 text-center bg-blue-50 font-semibold">PDF, DOCX, XLSX</td>
                   <td className="px-6 py-4 text-center">PDF, DOCX, XLSX</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">API Access</td>
                   <td className="px-6 py-4 text-center text-gray-400">✗</td>
                   <td className="px-6 py-4 text-center bg-blue-50 text-gray-400">✗</td>
                   <td className="px-6 py-4 text-center text-green-600">✓ Completo</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">White-label</td>
                   <td className="px-6 py-4 text-center text-gray-400">✗</td>
                   <td className="px-6 py-4 text-center bg-blue-50 text-gray-400">✗</td>
                   <td className="px-6 py-4 text-center text-green-600">✓</td>
                 </tr>
-                <tr className="hover:bg-gray-50">
+                <tr className="hover:bg-[#000020]">
                   <td className="px-6 py-4 font-medium">Suporte</td>
                   <td className="px-6 py-4 text-center">Email</td>
                   <td className="px-6 py-4 text-center bg-blue-50 font-semibold">Prioritário</td>
@@ -378,41 +378,41 @@ export default function PricingPage() {
           </h2>
           
           <div className="space-y-6">
-            <div className="bg-white/5 rounded-lg p-6 shadow">
+            <div className="bg-white/5/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 Posso mudar de plano depois?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Sim! Você pode fazer upgrade ou downgrade a qualquer momento.
                 O valor será ajustado proporcionalmente.
               </p>
             </div>
 
-            <div className="bg-white/5 rounded-lg p-6 shadow">
+            <div className="bg-white/5/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 O que acontece se eu exceder o limite de relatórios?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Você será notificado e poderá fazer upgrade para um plano superior
                 ou aguardar a renovação mensal do seu limite.
               </p>
             </div>
 
-            <div className="bg-white/5 rounded-lg p-6 shadow">
+            <div className="bg-white/5/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 Há garantia de reembolso?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Sim! Oferecemos garantia de 30 dias. Se não ficar satisfeito,
                 devolvemos seu dinheiro sem perguntas.
               </p>
             </div>
 
-            <div className="bg-white/5 rounded-lg p-6 shadow">
+            <div className="bg-white/5/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 Quais métodos de pagamento são aceitos?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Aceitamos cartões de crédito (Visa, Mastercard, Amex) e débito
                 através do Stripe, nossa plataforma de pagamentos segura.
               </p>
@@ -422,8 +422,8 @@ export default function PricingPage() {
       </div>
 
       {/* Footer */}
-      <footer className="border-t bg-white mt-24 py-8">
-        <div className="container mx-auto px-4 text-center text-gray-600">
+      <footer className="border-t bg-white/5 mt-24 py-8">
+        <div className="container mx-auto px-4 text-center text-gray-400">
           <p>© 2025 QIVO Mining</p>
           <p className="text-sm mt-2">
             Infraestrutura de Governança Minerária Digital

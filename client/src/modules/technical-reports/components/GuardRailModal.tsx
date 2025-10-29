@@ -48,8 +48,8 @@ export default function GuardRailModal({
         </DialogHeader>
 
         <div className="space-y-4">
-          <p className="text-sm text-gray-700">
-            O relatório <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">{reportId}</span> possui
+          <p className="text-sm text-gray-300">
+            O relatório <span className="font-mono text-xs bg-[#171a4a] px-2 py-1 rounded">{reportId}</span> possui
             campos que precisam de validação humana antes de prosseguir para <strong>{action}</strong>.
           </p>
 

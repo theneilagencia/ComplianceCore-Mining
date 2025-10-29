@@ -74,15 +74,15 @@ export default function ExportStandards() {
 
   const getFormatColor = (fmt: string) => {
     const format = formats.find(f => f.id === fmt);
-    return format?.color || 'text-gray-600';
+    return format?.color || 'text-gray-400';
   };
 
   return (
     <DashboardLayout>
       <div className="p-8 max-w-7xl mx-auto">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Exportar Padrões</h1>
-          <p className="text-gray-600">Converta relatórios entre padrões internacionais em múltiplos formatos</p>
+          <h1 className="text-3xl font-bold text-white mb-2">Exportar Padrões</h1>
+          <p className="text-gray-400">Converta relatórios entre padrões internacionais em múltiplos formatos</p>
         </div>
 
         {/* Standards Cards */}
@@ -90,37 +90,37 @@ export default function ExportStandards() {
           {standards.map((std) => (
             <div
               key={std.id}
-              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center hover:shadow-md transition-shadow"
+              className="bg-white/5 rounded-lg shadow-sm border border-white/20 p-6 text-center hover:shadow-md transition-shadow"
             >
               <div className="text-4xl mb-3">{std.icon}</div>
-              <h3 className="font-semibold text-gray-900 mb-1">{std.name}</h3>
-              <p className="text-sm text-gray-600">{std.description}</p>
+              <h3 className="font-semibold text-white mb-1">{std.name}</h3>
+              <p className="text-sm text-gray-400">{std.description}</p>
             </div>
           ))}
         </div>
 
         {/* Export Form */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+        <div className="bg-white/5 rounded-lg shadow-sm border border-white/20 p-6 mb-8">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-3 bg-purple-100 rounded-lg">
               <ArrowRight className="w-6 h-6 text-purple-600" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Nova Exportação</h2>
-              <p className="text-sm text-gray-600">Selecione o relatório e configure a exportação</p>
+              <h2 className="text-xl font-semibold text-white">Nova Exportação</h2>
+              <p className="text-sm text-gray-400">Selecione o relatório e configure a exportação</p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             {/* Report Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Relatório de Origem
               </label>
               <select
                 value={selectedReportId}
                 onChange={(e) => setSelectedReportId(e.target.value)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 <option value="">Selecione um relatório...</option>
                 {reportsQuery.data?.map((report: any) => (
@@ -133,13 +133,13 @@ export default function ExportStandards() {
 
             {/* Target Standard */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Padrão de Destino
               </label>
               <select
                 value={toStandard}
                 onChange={(e) => setToStandard(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 {standards.map((std) => (
                   <option key={std.id} value={std.id}>
@@ -151,13 +151,13 @@ export default function ExportStandards() {
 
             {/* Format Selection */}
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-300 mb-2">
                 Formato de Exportação
               </label>
               <select
                 value={format}
                 onChange={(e) => setFormat(e.target.value as any)}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 {formats.map((fmt) => (
                   <option key={fmt.id} value={fmt.id}>
@@ -194,8 +194,8 @@ export default function ExportStandards() {
         </div>
 
         {/* Exports History */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 className="text-xl font-semibold text-gray-900 mb-4">Exportações Recentes</h2>
+        <div className="bg-white/5 rounded-lg shadow-sm border border-white/20 p-6">
+          <h2 className="text-xl font-semibold text-white mb-4">Exportações Recentes</h2>
           
           {exportsQuery.isLoading ? (
             <div className="flex items-center justify-center py-12">
@@ -208,17 +208,17 @@ export default function ExportStandards() {
                 return (
                   <div
                     key={exp.id}
-                    className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center justify-between p-4 border border-white/20 rounded-lg hover:bg-[#000020] transition-colors"
                   >
                     <div className="flex items-center gap-4">
-                      <div className={`p-2 bg-gray-100 rounded-lg ${getFormatColor(exp.format)}`}>
+                      <div className={`p-2 bg-[#171a4a] rounded-lg ${getFormatColor(exp.format)}`}>
                         <FormatIcon className="w-5 h-5" />
                       </div>
                       <div>
-                        <div className="font-medium text-gray-900">
+                        <div className="font-medium text-white">
                           {exp.fromStandard} → {exp.toStandard}
                         </div>
-                        <div className="text-sm text-gray-600">
+                        <div className="text-sm text-gray-400">
                           {new Date(exp.createdAt!).toLocaleString('pt-BR')}
                         </div>
                       </div>
@@ -245,7 +245,7 @@ export default function ExportStandards() {
           ) : (
             <div className="text-center py-12">
               <Clock className="w-12 h-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-600">Nenhuma exportação realizada ainda</p>
+              <p className="text-gray-400">Nenhuma exportação realizada ainda</p>
             </div>
           )}
         </div>

@@ -49,9 +49,9 @@ export function FormField({
       ? 'border-red-300 bg-red-50 focus:border-red-500 focus:ring-2 focus:ring-red-200'
       : hasValue
       ? 'border-green-300 bg-green-50 focus:border-green-500 focus:ring-2 focus:ring-green-200'
-      : 'border-gray-300 bg-white focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
+      : 'border-white/20 bg-white/5 focus:border-blue-500 focus:ring-2 focus:ring-blue-200'
     }
-    disabled:bg-gray-100 disabled:cursor-not-allowed
+    disabled:bg-[#171a4a] disabled:cursor-not-allowed
     placeholder:text-gray-400
   `;
 
@@ -97,7 +97,7 @@ export function FormField({
       <div className="flex items-center gap-2">
         <label
           htmlFor={name}
-          className="block text-sm font-medium text-gray-700"
+          className="block text-sm font-medium text-gray-300"
         >
           {label}
           {required && <span className="text-red-500 ml-1">*</span>}
@@ -109,7 +109,7 @@ export function FormField({
               <TooltipTrigger asChild>
                 <button
                   type="button"
-                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                  className="text-gray-400 hover:text-gray-400 transition-colors"
                   aria-label="Ajuda"
                 >
                   <HelpCircle className="h-4 w-4" />

@@ -256,13 +256,13 @@ export function TechnicalReportForm({
   return (
     <div className="max-w-5xl mx-auto p-6 space-y-8">
       {/* Header com status de salvamento */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+      <div className="bg-white/5 rounded-lg shadow-sm border border-white/20 p-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-gray-900">
+            <h2 className="text-2xl font-bold text-white">
               {reportId ? 'Editar Relatório' : 'Novo Relatório Técnico'}
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-400 mt-1">
               Preencha os campos abaixo. O formulário é salvo automaticamente a
               cada 30 segundos.
             </p>
@@ -293,7 +293,7 @@ export function TechnicalReportForm({
             <button
               onClick={handleSave}
               disabled={isSaving || hasErrors}
-              className="px-6 py-2.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
+              className="px-6 py-2.5 bg-[#2f2c79] text-white rounded-lg hover:bg-[#b96e48] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 font-medium"
             >
               <Save className="h-4 w-4" />
               Salvar Agora
@@ -305,8 +305,8 @@ export function TechnicalReportForm({
       {/* Formulário */}
       <form className="space-y-8">
         {/* Seção 1: Informações Básicas */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-white/5 rounded-lg shadow-sm border border-white/20 p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <span className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-bold">
               1
             </span>
@@ -390,8 +390,8 @@ export function TechnicalReportForm({
         </div>
 
         {/* Seção 2: Pessoa Competente */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-white/5 rounded-lg shadow-sm border border-white/20 p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <span className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-bold">
               2
             </span>
@@ -446,8 +446,8 @@ export function TechnicalReportForm({
         </div>
 
         {/* Seção 3: Executive Summary */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-white/5 rounded-lg shadow-sm border border-white/20 p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <span className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-bold">
               3
             </span>
@@ -512,8 +512,8 @@ export function TechnicalReportForm({
         </div>
 
         {/* Seção 4: Estimativa de Recursos */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-white/5 rounded-lg shadow-sm border border-white/20 p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <span className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-bold">
               4
             </span>
@@ -588,8 +588,8 @@ export function TechnicalReportForm({
         </div>
 
         {/* Seção 5: QA/QC */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+        <div className="bg-white/5 rounded-lg shadow-sm border border-white/20 p-6">
+          <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
             <span className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full text-sm font-bold">
               5
             </span>
@@ -652,8 +652,8 @@ export function TechnicalReportForm({
         </div>
 
         {/* Botões de ação */}
-        <div className="flex items-center justify-between bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <div className="text-sm text-gray-600">
+        <div className="flex items-center justify-between bg-white/5 rounded-lg shadow-sm border border-white/20 p-6">
+          <div className="text-sm text-gray-400">
             {hasErrors ? (
               <span className="text-red-600 flex items-center gap-2">
                 <AlertTriangle className="h-4 w-4" />
@@ -671,7 +671,7 @@ export function TechnicalReportForm({
             <button
               type="button"
               onClick={() => window.history.back()}
-              className="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+              className="px-6 py-2.5 border border-white/20 text-gray-300 rounded-lg hover:bg-[#000020] transition-colors font-medium"
             >
               Cancelar
             </button>

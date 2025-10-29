@@ -151,7 +151,7 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
             <div
               onDrop={handleDrop}
               onDragOver={(e) => e.preventDefault()}
-              className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center hover:border-blue-500 transition-colors cursor-pointer"
+              className="border-2 border-dashed border-white/20 rounded-lg p-12 text-center hover:border-blue-500 transition-colors cursor-pointer"
             >
               <input
                 type="file"
@@ -178,7 +178,7 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
                   <FileText className="h-8 w-8 text-blue-600" />
                   <div>
                     <p className="font-medium">{file.name}</p>
-                    <p className="text-sm text-gray-600">
+                    <p className="text-sm text-gray-400">
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
@@ -199,17 +199,17 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
                   <div className="flex items-center gap-2 mb-2">
                     <div className="flex-1 bg-gray-200 rounded-full h-2">
                       <div
-                        className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                        className="bg-[#2f2c79] h-2 rounded-full transition-all duration-300"
                         style={{
                           width: uploading ? "50%" : parsing ? "75%" : "100%",
                         }}
                       />
                     </div>
-                    <span className="text-sm text-gray-600">
+                    <span className="text-sm text-gray-400">
                       {uploading ? "50%" : parsing ? "75%" : "100%"}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-gray-400">
                     {uploading
                       ? "Enviando arquivo..."
                       : parsing

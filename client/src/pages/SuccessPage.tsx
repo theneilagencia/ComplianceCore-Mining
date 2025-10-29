@@ -24,7 +24,7 @@ export default function SuccessPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-blue-50 to-indigo-50 flex items-center justify-center p-4">
-      <div className="max-w-2xl w-full bg-white rounded-2xl shadow-2xl p-12 text-center">
+      <div className="max-w-2xl w-full bg-white/5 rounded-2xl shadow-2xl p-12 text-center">
         {/* Success Icon */}
         <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-8 animate-bounce">
           <CheckCircle className="w-16 h-16 text-green-600" />
@@ -36,7 +36,7 @@ export default function SuccessPage() {
         </h1>
 
         {/* Description */}
-        <p className="text-xl text-gray-600 mb-8">
+        <p className="text-xl text-gray-400 mb-8">
           Sua assinatura foi ativada com sucesso. Bem-vindo ao ComplianceCore Mining!
         </p>
 
@@ -45,7 +45,7 @@ export default function SuccessPage() {
           <h2 className="text-lg font-semibold text-white mb-4">
             ✨ Recursos Desbloqueados
           </h2>
-          <ul className="text-left space-y-2 text-gray-700">
+          <ul className="text-left space-y-2 text-gray-300">
             <li className="flex items-center">
               <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
               Relatórios técnicos ilimitados
@@ -68,7 +68,7 @@ export default function SuccessPage() {
 
         {/* Next Steps */}
         <div className="mb-8">
-          <p className="text-gray-600 mb-4">
+          <p className="text-gray-400 mb-4">
             Você receberá um email de confirmação em instantes.
           </p>
           <p className="text-sm text-gray-500">

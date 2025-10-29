@@ -56,7 +56,7 @@ export default function RegisterPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#000020] via-[#171a4a] to-[#2f2c79] flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8">
+      <div className="max-w-md w-full bg-white/5/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src="/assets/logo-Qivo.png" alt="QIVO Mining" className="h-12 w-auto" />
@@ -76,7 +76,7 @@ export default function RegisterPage() {
         {/* Google Signup Button */}
         <button
           onClick={handleGoogleSignup}
-          className="w-full flex items-center justify-center gap-3 bg-white/10 border-2 border-white/20 text-white py-3 rounded-lg font-semibold hover:bg-white/20 transition-all mb-6"
+          className="w-full flex items-center justify-center gap-3 bg-white/5/10 border-2 border-white/20 text-white py-3 rounded-lg font-semibold hover:bg-white/5/20 transition-all mb-6"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -120,7 +120,7 @@ export default function RegisterPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
+              className="w-full px-4 py-3 bg-white/5/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="Seu nome"
             />
           </div>
@@ -135,7 +135,7 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
+              className="w-full px-4 py-3 bg-white/5/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="seu@email.com"
             />
           </div>
@@ -150,7 +150,7 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
+              className="w-full px-4 py-3 bg-white/5/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="Mínimo 8 caracteres"
             />
           </div>
@@ -165,7 +165,7 @@ export default function RegisterPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
+              className="w-full px-4 py-3 bg-white/5/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="Repita sua senha"
             />
           </div>

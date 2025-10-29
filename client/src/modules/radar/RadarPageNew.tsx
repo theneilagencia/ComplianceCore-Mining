@@ -127,11 +127,11 @@ export default function RadarPageNew() {
         className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${
           isActive
             ? darkMode
-              ? 'bg-blue-600 text-white'
-              : 'bg-blue-500 text-white'
+              ? 'bg-[#2f2c79] text-white'
+              : 'bg-[#2f2c79] text-white'
             : darkMode
             ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+            : 'bg-[#171a4a] hover:bg-gray-200 text-gray-300'
         }`}
       >
         <Icon className="w-5 h-5" />
@@ -142,16 +142,16 @@ export default function RadarPageNew() {
 
   return (
     <DashboardLayout>
-      <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+      <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-[#000020] text-white'}`}>
         {/* Header */}
-        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white/5'} shadow-sm border-b ${darkMode ? 'border-gray-700' : 'border-white/20'}`}>
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Globe className="w-8 h-8 text-blue-600" />
                 <div>
                   <h1 className="text-2xl font-bold">Radar Regulatória Global</h1>
-                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                     Monitoramento de atividade minerária e mudanças regulatórias
                   </p>
                 </div>
@@ -163,7 +163,7 @@ export default function RadarPageNew() {
                 
                 <button
                   onClick={() => setDarkMode(!darkMode)}
-                  className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+                  className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-[#171a4a] hover:bg-gray-200'}`}
                 >
                   {darkMode ? '☀️' : '🌙'}
                 </button>
@@ -174,7 +174,7 @@ export default function RadarPageNew() {
             <div className="mt-4 flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className={`w-2 h-2 rounded-full ${dataSource === 'real' ? 'bg-green-500' : 'bg-yellow-500'}`} />
-                <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+                <span className={darkMode ? 'text-gray-400' : 'text-gray-400'}>
                   Fonte de dados: {dataSource === 'real' ? 'APIs reais' : 'Dados mock'}
                 </span>
               </div>
@@ -185,7 +185,7 @@ export default function RadarPageNew() {
                     diagnosticStatus.overall_status === 'healthy' ? 'bg-green-500' :
                     diagnosticStatus.overall_status === 'degraded' ? 'bg-red-500' : 'bg-yellow-500'
                   }`} />
-                  <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+                  <span className={darkMode ? 'text-gray-400' : 'text-gray-400'}>
                     Status: {diagnosticStatus.overall_status} ({diagnosticStatus.summary?.active || 0}/{diagnosticStatus.summary?.total_sources || 0} fontes ativas)
                   </span>
                 </div>
@@ -193,7 +193,7 @@ export default function RadarPageNew() {
 
               {sourceDetails.length > 0 && (
                 <div className="flex items-center gap-2">
-                  <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+                  <span className={darkMode ? 'text-gray-400' : 'text-gray-400'}>
                     {sourceDetails.reduce((sum, s) => sum + s.entries_count, 0)} operações carregadas
                   </span>
                 </div>
@@ -229,7 +229,7 @@ export default function RadarPageNew() {
               <div className="text-center">
                 <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
                 <p className="text-lg font-semibold">Erro ao carregar dados</p>
-                <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">{error}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-400 mt-2">{error}</p>
               </div>
             </div>
           ) : (

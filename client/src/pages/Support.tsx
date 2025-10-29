@@ -137,9 +137,9 @@ export default function Support() {
  <DashboardLayout>
  <div className="flex h-screen bg-[#000020]">
  {/* Sidebar - Menu Lateral */}
- <div className="w-80 bg-white border-r border-slate-200 overflow-y-auto">
+ <div className="w-80 bg-white/5 border-r border-white/20 overflow-y-auto">
  {/* Header */}
- <div className="p-6 border-b border-slate-200">
+ <div className="p-6 border-b border-white/20">
  <div className="flex items-center gap-3 mb-4">
  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -147,8 +147,8 @@ export default function Support() {
  </svg>
  </div>
  <div>
- <h1 className="text-xl font-bold text-slate-900">Central de Suporte</h1>
- <p className="text-sm text-slate-600">Manuais e Documentação</p>
+ <h1 className="text-xl font-bold text-white">Central de Suporte</h1>
+ <p className="text-sm text-gray-400">Manuais e Documentação</p>
  </div>
  </div>
 
@@ -174,8 +174,8 @@ export default function Support() {
 
  {/* Resultados de Busca */}
  {searchQuery.length >= 3 && searchResults.length > 0 && (
- <div className="p-4 border-b border-slate-200 bg-yellow-50">
- <p className="text-sm font-semibold text-slate-900 mb-2">
+ <div className="p-4 border-b border-white/20 bg-yellow-50">
+ <p className="text-sm font-semibold text-white mb-2">
  {searchResults.length} resultado{searchResults.length > 1 ? 's' : ''} encontrado{searchResults.length > 1 ? 's' : ''}
  </p>
  <div className="space-y-2">
@@ -183,13 +183,13 @@ export default function Support() {
  <button
  key={index}
  onClick={() => loadManual(result.manual)}
- className="w-full text-left p-2 bg-white rounded hover:bg-[#000020] transition-colors"
+ className="w-full text-left p-2 bg-white/5 rounded hover:bg-[#000020] transition-colors"
  >
  <div className="flex items-center gap-2 mb-1">
  <span className="text-lg">{result.manual.icon}</span>
- <span className="text-sm font-medium text-slate-900">{result.manual.title}</span>
+ <span className="text-sm font-medium text-white">{result.manual.title}</span>
  </div>
- <p className="text-xs text-slate-600 line-clamp-2">
+ <p className="text-xs text-gray-400 line-clamp-2">
  {result.totalMatches} ocorrência{result.totalMatches > 1 ? 's' : ''}
  </p>
  </button>
@@ -199,8 +199,8 @@ export default function Support() {
  )}
 
  {searchQuery.length >= 3 && searchResults.length === 0 && !searching && (
- <div className="p-4 border-b border-slate-200 bg-[#000020]">
- <p className="text-sm text-slate-600 text-center">
+ <div className="p-4 border-b border-white/20 bg-[#000020]">
+ <p className="text-sm text-gray-400 text-center">
  Nenhum resultado encontrado para "{searchQuery}"
  </p>
  </div>
@@ -209,7 +209,7 @@ export default function Support() {
  {/* Lista de Manuais */}
  {searchQuery.length < 3 && (
  <div className="p-4">
- <h2 className="text-sm font-semibold text-slate-700 mb-3 uppercase">Manuais</h2>
+ <h2 className="text-sm font-semibold text-gray-300 mb-3 uppercase">Manuais</h2>
  <div className="space-y-2">
  {manuals.map((manual) => (
  <button
@@ -218,14 +218,14 @@ export default function Support() {
  className={`w-full text-left p-3 rounded-lg transition-colors ${
  selectedManual?.id === manual.id
  ? 'bg-blue-50 border-2 border-blue-500'
- : 'bg-white border-2 border-transparent hover:bg-[#000020]'
+ : 'bg-white/5 border-2 border-transparent hover:bg-[#000020]'
  }`}
  >
  <div className="flex items-center gap-3">
  <span className="text-2xl">{manual.icon}</span>
  <div className="flex-1">
- <h3 className="text-sm font-semibold text-slate-900">{manual.title}</h3>
- <p className="text-xs text-slate-600 line-clamp-2">{manual.description}</p>
+ <h3 className="text-sm font-semibold text-white">{manual.title}</h3>
+ <p className="text-xs text-gray-400 line-clamp-2">{manual.description}</p>
  </div>
  </div>
  </button>
@@ -235,8 +235,8 @@ export default function Support() {
  )}
 
  {/* Links Rápidos */}
- <div className="p-4 border-t border-slate-200">
- <h2 className="text-sm font-semibold text-slate-700 mb-3 uppercase">Links Rápidos</h2>
+ <div className="p-4 border-t border-white/20">
+ <h2 className="text-sm font-semibold text-gray-300 mb-3 uppercase">Links Rápidos</h2>
  <div className="space-y-2">
  <button
  onClick={() => setLocation('/help')}
@@ -244,7 +244,7 @@ export default function Support() {
  >
  <div className="flex items-center gap-2">
  <span className="text-lg"></span>
- <span className="text-sm text-slate-700">Ajuda & FAQs</span>
+ <span className="text-sm text-gray-300">Ajuda & FAQs</span>
  </div>
  </button>
  <a
@@ -253,7 +253,7 @@ export default function Support() {
  >
  <div className="flex items-center gap-2">
  <span className="text-lg"></span>
- <span className="text-sm text-slate-700">Email Suporte</span>
+ <span className="text-sm text-gray-300">Email Suporte</span>
  </div>
  </a>
  <button
@@ -262,7 +262,7 @@ export default function Support() {
  >
  <div className="flex items-center gap-2">
  <span className="text-lg"></span>
- <span className="text-sm text-slate-700">Voltar ao Dashboard</span>
+ <span className="text-sm text-gray-300">Voltar ao Dashboard</span>
  </div>
  </button>
  </div>
@@ -279,21 +279,21 @@ export default function Support() {
  ) : (
  <div
  className="prose prose-slate max-w-none
- prose-headings:text-slate-900 prose-headings:font-bold
+ prose-headings:text-white prose-headings:font-bold
  prose-h1:text-3xl prose-h1:mb-4
  prose-h2:text-2xl prose-h2:mt-8 prose-h2:mb-4
  prose-h3:text-xl prose-h3:mt-6 prose-h3:mb-3
- prose-p:text-slate-700 prose-p:leading-relaxed
+ prose-p:text-gray-300 prose-p:leading-relaxed
  prose-a:text-blue-600 prose-a:no-underline hover:prose-a:underline
- prose-strong:text-slate-900 prose-strong:font-semibold
+ prose-strong:text-white prose-strong:font-semibold
  prose-ul:list-disc prose-ul:pl-6
  prose-ol:list-decimal prose-ol:pl-6
- prose-li:text-slate-700
- prose-code:bg-slate-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
+ prose-li:text-gray-300
+ prose-code:bg-[#171a4a] prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:text-sm
  prose-pre:bg-slate-900 prose-pre:text-slate-100
  prose-blockquote:border-l-4 prose-blockquote:border-blue-500 prose-blockquote:pl-4 prose-blockquote:italic
  prose-table:border prose-table:border-slate-300
- prose-th:bg-slate-100 prose-th:p-2 prose-th:border prose-th:border-slate-300
+ prose-th:bg-[#171a4a] prose-th:p-2 prose-th:border prose-th:border-slate-300
  prose-td:p-2 prose-td:border prose-td:border-slate-300"
  dangerouslySetInnerHTML={{ __html: manualContent }}
  />

@@ -33,7 +33,7 @@ export default function RegulatoryRadar() {
       case "novo": return "bg-red-100 text-red-700";
       case "ativo": return "bg-blue-100 text-blue-700";
       case "consulta": return "bg-yellow-100 text-yellow-700";
-      default: return "bg-slate-100 text-slate-700";
+      default: return "bg-[#171a4a] text-gray-300";
     }
   };
 
@@ -56,8 +56,8 @@ export default function RegulatoryRadar() {
               <Bell className="w-6 h-6 text-rose-600" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold text-slate-900">Radar Regulatório</h1>
-              <p className="text-slate-600">Monitoramento de mudanças regulatórias</p>
+              <h1 className="text-3xl font-bold text-white">Radar Regulatório</h1>
+              <p className="text-gray-400">Monitoramento de mudanças regulatórias</p>
             </div>
           </div>
         </div>
@@ -67,8 +67,8 @@ export default function RegulatoryRadar() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-600">Novas Regulações</p>
-                <p className="text-2xl font-bold text-slate-900">3</p>
+                <p className="text-sm text-gray-400">Novas Regulações</p>
+                <p className="text-2xl font-bold text-white">3</p>
               </div>
               <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
                 <AlertCircle className="w-5 h-5 text-red-600" />
@@ -79,8 +79,8 @@ export default function RegulatoryRadar() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-600">Em Vigência</p>
-                <p className="text-2xl font-bold text-slate-900">12</p>
+                <p className="text-sm text-gray-400">Em Vigência</p>
+                <p className="text-2xl font-bold text-white">12</p>
               </div>
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
                 <CheckCircle className="w-5 h-5 text-blue-600" />
@@ -91,8 +91,8 @@ export default function RegulatoryRadar() {
           <Card className="p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-slate-600">Consultas Públicas</p>
-                <p className="text-2xl font-bold text-slate-900">2</p>
+                <p className="text-sm text-gray-400">Consultas Públicas</p>
+                <p className="text-2xl font-bold text-white">2</p>
               </div>
               <div className="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center">
                 <Clock className="w-5 h-5 text-yellow-600" />
@@ -107,17 +107,17 @@ export default function RegulatoryRadar() {
           
           <div className="space-y-4">
             {updates.map((update) => (
-              <div key={update.id} className="border-b border-slate-200 last:border-0 pb-4 last:pb-0">
+              <div key={update.id} className="border-b border-white/20 last:border-0 pb-4 last:pb-0">
                 <div className="flex items-start justify-between mb-2">
                   <div className="flex items-center gap-2">
                     {getStatusIcon(update.status)}
-                    <h3 className="font-semibold text-slate-900">{update.title}</h3>
+                    <h3 className="font-semibold text-white">{update.title}</h3>
                   </div>
                   <Badge className={getStatusColor(update.status)}>
                     {update.status}
                   </Badge>
                 </div>
-                <p className="text-sm text-slate-600 mb-2">{update.description}</p>
+                <p className="text-sm text-gray-400 mb-2">{update.description}</p>
                 <p className="text-xs text-slate-500">
                   Data: {new Date(update.date).toLocaleDateString('pt-BR')}
                 </p>

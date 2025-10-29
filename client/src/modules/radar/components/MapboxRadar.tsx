@@ -103,11 +103,11 @@ export default function MapboxRadar({ operations, onOperationClick, darkMode = f
 
   if (mapError || !MAPBOX_TOKEN || MAPBOX_TOKEN.includes('example')) {
     return (
-      <div className="w-full h-full flex items-center justify-center bg-gray-100 dark:bg-gray-800">
+      <div className="w-full h-full flex items-center justify-center bg-[#171a4a] dark:bg-gray-800">
         <div className="text-center p-8">
           <AlertCircle className="w-16 h-16 text-yellow-500 mx-auto mb-4" />
           <h3 className="text-lg font-semibold mb-2">Mapbox 3D Indisponível</h3>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
+          <p className="text-sm text-gray-400 dark:text-gray-400 mb-4">
             Configure a variável de ambiente VITE_MAPBOX_TOKEN para habilitar o mapa 3D.
           </p>
           <p className="text-xs text-gray-500">
@@ -211,7 +211,7 @@ export default function MapboxRadar({ operations, onOperationClick, darkMode = f
       </Map>
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-white dark:bg-gray-800 p-3 rounded-lg shadow-lg">
+      <div className="absolute bottom-4 left-4 bg-white/5 dark:bg-gray-800 p-3 rounded-lg shadow-lg">
         <h4 className="text-xs font-semibold mb-2">Status das Operações</h4>
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-xs">
@@ -230,7 +230,7 @@ export default function MapboxRadar({ operations, onOperationClick, darkMode = f
       </div>
 
       {/* Operations Count */}
-      <div className="absolute top-4 left-4 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg">
+      <div className="absolute top-4 left-4 bg-white/5 dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg">
         <p className="text-sm font-semibold">
           {operations.length} operações minerárias
         </p>

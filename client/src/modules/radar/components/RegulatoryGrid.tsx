@@ -46,7 +46,7 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
       case 'safety':
         return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+        return 'bg-[#171a4a] text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
   };
 
@@ -59,7 +59,7 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
       case 'low':
         return 'text-green-600';
       default:
-        return 'text-gray-600';
+        return 'text-gray-400';
     }
   };
 
@@ -93,13 +93,13 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
   };
 
   return (
-    <div className={`w-full h-full ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+    <div className={`w-full h-full ${darkMode ? 'bg-gray-900 text-white' : 'bg-[#000020] text-white'}`}>
       {/* Header with Filters */}
-      <div className={`sticky top-0 z-10 ${darkMode ? 'bg-gray-800' : 'bg-white'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} p-4`}>
+      <div className={`sticky top-0 z-10 ${darkMode ? 'bg-gray-800' : 'bg-white/5'} border-b ${darkMode ? 'border-gray-700' : 'border-white/20'} p-4`}>
         <div className="flex items-center justify-between mb-4">
           <div>
             <h2 className="text-xl font-bold">Mudanças Regulatórias</h2>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
               {filteredChanges.length} mudanças encontradas
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
           <button
             onClick={() => setShowFilters(!showFilters)}
             className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-              darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'
+              darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-[#171a4a] hover:bg-gray-200'
             }`}
           >
             <Filter className="w-5 h-5" />
@@ -126,7 +126,7 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
                 className={`px-3 py-2 rounded-lg border ${
                   darkMode
                     ? 'bg-gray-700 border-gray-600 text-white'
-                    : 'bg-white border-gray-300'
+                    : 'bg-white/5 border-white/20'
                 }`}
               >
                 <option value="all">Todas</option>
@@ -146,7 +146,7 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
                 className={`px-3 py-2 rounded-lg border ${
                   darkMode
                     ? 'bg-gray-700 border-gray-600 text-white'
-                    : 'bg-white border-gray-300'
+                    : 'bg-white/5 border-white/20'
                 }`}
               >
                 <option value="all">Todos</option>
@@ -164,7 +164,7 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
         {filteredChanges.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full">
             <AlertCircle className="w-16 h-16 text-gray-400 mb-4" />
-            <p className={`text-lg ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <p className={`text-lg ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
               Nenhuma mudança regulatória encontrada
             </p>
           </div>
@@ -174,9 +174,9 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
               <div
                 key={change.id}
                 className={`${
-                  darkMode ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white hover:bg-gray-50'
+                  darkMode ? 'bg-gray-800 hover:bg-gray-750' : 'bg-white/5 hover:bg-[#000020]'
                 } rounded-lg shadow-md p-4 cursor-pointer transition-all border ${
-                  darkMode ? 'border-gray-700' : 'border-gray-200'
+                  darkMode ? 'border-gray-700' : 'border-white/20'
                 }`}
                 onClick={() => setSelectedChange(change)}
               >
@@ -228,12 +228,12 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
         >
           <div
             className={`${
-              darkMode ? 'bg-gray-800' : 'bg-white'
+              darkMode ? 'bg-gray-800' : 'bg-white/5'
             } rounded-lg shadow-xl max-w-2xl w-full max-h-[80vh] overflow-y-auto`}
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className={`sticky top-0 ${darkMode ? 'bg-gray-800' : 'bg-white'} border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'} p-6`}>
+            <div className={`sticky top-0 ${darkMode ? 'bg-gray-800' : 'bg-white/5'} border-b ${darkMode ? 'border-gray-700' : 'border-white/20'} p-6`}>
               <div className="flex items-start justify-between">
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -252,7 +252,7 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
                 </div>
                 <button
                   onClick={() => setSelectedChange(null)}
-                  className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                  className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-[#171a4a]'}`}
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -267,7 +267,7 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
               <h4 className="font-semibold mb-2">Detalhes</h4>
               <p className="text-sm mb-4 whitespace-pre-wrap">{selectedChange.fullText}</p>
 
-              <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-50'} mb-4`}>
+              <div className={`p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-[#000020]'} mb-4`}>
                 <p className="text-xs text-gray-500 mb-1">Fonte</p>
                 <p className="text-sm">{selectedChange.source}</p>
               </div>
@@ -277,7 +277,7 @@ export default function RegulatoryGrid({ changes, darkMode = false }: Regulatory
                   href={selectedChange.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-[#2f2c79] text-white rounded-lg hover:bg-[#b96e48] transition-colors"
                 >
                   <ExternalLink className="w-4 h-4" />
                   Ver documento oficial

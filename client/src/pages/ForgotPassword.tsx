@@ -36,7 +36,7 @@ export default function ForgotPassword() {
   if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="bg-white/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
+        <div className="bg-white/5/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -44,11 +44,11 @@ export default function ForgotPassword() {
               </svg>
             </div>
             <h2 className="text-2xl font-bold text-white mb-2">Email Enviado!</h2>
-            <p className="text-gray-600 mb-6">
+            <p className="text-gray-400 mb-6">
               Se o email {email} estiver cadastrado, você receberá um link para redefinir sua senha.
             </p>
             <Link href="/login">
-              <button className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              <button className="w-full py-3 bg-[#2f2c79] text-white rounded-lg hover:bg-[#b96e48] transition-colors">
                 Voltar para Login
               </button>
             </Link>
@@ -60,13 +60,13 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="bg-white/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
+      <div className="bg-white/5/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#2f2c79] rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-2xl">JI</span>
           </div>
           <h1 className="text-3xl font-bold text-white mb-2">Recuperar Senha</h1>
-          <p className="text-gray-600">
+          <p className="text-gray-400">
             Digite seu email para receber um link de recuperação
           </p>
         </div>
@@ -79,7 +79,7 @@ export default function ForgotPassword() {
           )}
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
               Email
             </label>
             <input
@@ -96,7 +96,7 @@ export default function ForgotPassword() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full py-3 bg-[#2f2c79] text-white rounded-lg hover:bg-[#b96e48] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? 'Enviando...' : 'Enviar Link de Recuperação'}
           </button>

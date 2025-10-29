@@ -347,33 +347,33 @@ export default function GovernanceWizard() {
       {/* Progress Bar */}
       <div className="mb-8">
         <div className="flex justify-between items-center mb-2">
-          <span className="text-sm font-medium text-gray-700">
+          <span className="text-sm font-medium text-gray-300">
             Passo {currentStep} de {GOVERNANCE_STEPS.length}
           </span>
-          <span className="text-sm text-gray-600">{Math.round(progress)}% completo</span>
+          <span className="text-sm text-gray-400">{Math.round(progress)}% completo</span>
         </div>
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
-            className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+            className="bg-[#2f2c79] h-2 rounded-full transition-all duration-300"
             style={{ width: `${progress}%` }}
           />
         </div>
       </div>
 
       {/* Step Content */}
-      <div className="bg-white rounded-lg shadow-lg p-8">
+      <div className="bg-white/5 rounded-lg shadow-lg p-8">
         <div className="mb-6">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          <h2 className="text-2xl font-bold text-white mb-2">
             {currentStepData.title}
           </h2>
-          <p className="text-gray-600">{currentStepData.description}</p>
+          <p className="text-gray-400">{currentStepData.description}</p>
         </div>
 
         {currentStep < GOVERNANCE_STEPS.length ? (
           <div className="space-y-6">
             {currentStepData.fields.map(field => (
               <div key={field.name}>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-300 mb-2">
                   {field.label}
                   {field.required && <span className="text-red-500 ml-1">*</span>}
                   <button
@@ -391,7 +391,7 @@ export default function GovernanceWizard() {
                     value={formData[field.name] || ''}
                     onChange={(e) => handleFieldChange(field.name, e.target.value)}
                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                      errors[field.name] ? 'border-red-500' : 'border-gray-300'
+                      errors[field.name] ? 'border-red-500' : 'border-white/20'
                     }`}
                     placeholder={field.tooltip}
                   />
@@ -403,7 +403,7 @@ export default function GovernanceWizard() {
                     value={formData[field.name] || ''}
                     onChange={(e) => handleFieldChange(field.name, parseFloat(e.target.value))}
                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                      errors[field.name] ? 'border-red-500' : 'border-gray-300'
+                      errors[field.name] ? 'border-red-500' : 'border-white/20'
                     }`}
                     placeholder={field.tooltip}
                   />
@@ -414,7 +414,7 @@ export default function GovernanceWizard() {
                     value={formData[field.name] || ''}
                     onChange={(e) => handleFieldChange(field.name, e.target.value)}
                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                      errors[field.name] ? 'border-red-500' : 'border-gray-300'
+                      errors[field.name] ? 'border-red-500' : 'border-white/20'
                     }`}
                   >
                     <option value="">Selecione...</option>
@@ -432,7 +432,7 @@ export default function GovernanceWizard() {
                     onChange={(e) => handleFieldChange(field.name, e.target.value)}
                     rows={3}
                     className={`w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 ${
-                      errors[field.name] ? 'border-red-500' : 'border-gray-300'
+                      errors[field.name] ? 'border-red-500' : 'border-white/20'
                     }`}
                     placeholder={field.tooltip}
                   />
@@ -444,9 +444,9 @@ export default function GovernanceWizard() {
                       type="checkbox"
                       checked={formData[field.name] || false}
                       onChange={(e) => handleFieldChange(field.name, e.target.checked)}
-                      className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                      className="w-4 h-4 text-blue-600 border-white/20 rounded focus:ring-blue-500"
                     />
-                    <span className="ml-2 text-sm text-gray-600">{field.tooltip}</span>
+                    <span className="ml-2 text-sm text-gray-400">{field.tooltip}</span>
                   </div>
                 )}
 
@@ -465,7 +465,7 @@ export default function GovernanceWizard() {
             {isCalculating ? (
               <div className="text-center py-12">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600 mx-auto mb-4" />
-                <p className="text-gray-600">Calculando score de governança...</p>
+                <p className="text-gray-400">Calculando score de governança...</p>
               </div>
             ) : score !== null ? (
               <div>
@@ -480,20 +480,20 @@ export default function GovernanceWizard() {
                   <h3 className="text-lg font-semibold">Resumo da Avaliação</h3>
                   
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Empresa</p>
+                    <div className="bg-[#000020] p-4 rounded-lg">
+                      <p className="text-sm text-gray-400">Empresa</p>
                       <p className="font-semibold">{formData.companyName}</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">País</p>
+                    <div className="bg-[#000020] p-4 rounded-lg">
+                      <p className="text-sm text-gray-400">País</p>
                       <p className="font-semibold">{formData.country}</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Tamanho do Conselho</p>
+                    <div className="bg-[#000020] p-4 rounded-lg">
+                      <p className="text-sm text-gray-400">Tamanho do Conselho</p>
                       <p className="font-semibold">{formData.boardSize} membros</p>
                     </div>
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <p className="text-sm text-gray-600">Conselheiros Independentes</p>
+                    <div className="bg-[#000020] p-4 rounded-lg">
+                      <p className="text-sm text-gray-400">Conselheiros Independentes</p>
                       <p className="font-semibold">
                         {formData.independentDirectors} ({Math.round((formData.independentDirectors / formData.boardSize) * 100)}%)
                       </p>
@@ -533,7 +533,7 @@ export default function GovernanceWizard() {
           <button
             onClick={handlePrevious}
             disabled={currentStep === 1}
-            className="px-6 py-2 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+            className="px-6 py-2 border border-white/20 rounded-lg font-medium text-gray-300 hover:bg-[#000020] disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
           >
             <ChevronLeft className="w-5 h-5" />
             Anterior
@@ -541,7 +541,7 @@ export default function GovernanceWizard() {
 
           <button
             onClick={handleNext}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2"
+            className="px-6 py-3 bg-[#2f2c79] text-white rounded-lg font-medium hover:bg-[#b96e48] flex items-center gap-2"
           >
             {currentStep === GOVERNANCE_STEPS.length - 1 ? 'Calcular Score' : 'Salvar e Continuar'}
             <ChevronRight className="w-5 h-5" />

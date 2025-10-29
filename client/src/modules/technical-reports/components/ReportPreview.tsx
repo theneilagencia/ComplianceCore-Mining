@@ -58,7 +58,7 @@ export default function ReportPreview({
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white dark:bg-gray-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="bg-white/5 dark:bg-gray-900 rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
         <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 text-white">
           <div className="flex items-center justify-between mb-4">
@@ -73,7 +73,7 @@ export default function ReportPreview({
               variant="ghost"
               size="icon"
               onClick={onClose}
-              className="text-white hover:bg-white/20"
+              className="text-white hover:bg-white/5/20"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -85,9 +85,9 @@ export default function ReportPreview({
               <span>Campos preenchidos</span>
               <span className="font-semibold">{filled} de {total} ({completionPercentage}%)</span>
             </div>
-            <div className="w-full bg-white/20 rounded-full h-2">
+            <div className="w-full bg-white/5/20 rounded-full h-2">
               <div
-                className="bg-white h-2 rounded-full transition-all duration-300"
+                className="bg-white/5 h-2 rounded-full transition-all duration-300"
                 style={{ width: `${completionPercentage}%` }}
               />
             </div>
@@ -101,7 +101,7 @@ export default function ReportPreview({
             <Badge className="text-lg px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500">
               {schema.name}
             </Badge>
-            <span className="text-sm text-gray-600 dark:text-gray-400">{schema.description}</span>
+            <span className="text-sm text-gray-400 dark:text-gray-400">{schema.description}</span>
           </div>
 
           {/* Sections */}
@@ -114,11 +114,11 @@ export default function ReportPreview({
               <Card key={sectionIndex} className="p-6">
                 <div className="space-y-4">
                   <div className="border-b pb-3">
-                    <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                    <h3 className="text-lg font-semibold text-white dark:text-gray-100">
                       {section.title}
                     </h3>
                     {section.description && (
-                      <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                      <p className="text-sm text-gray-400 dark:text-gray-400 mt-1">
                         {section.description}
                       </p>
                     )}
@@ -132,14 +132,14 @@ export default function ReportPreview({
                       return (
                         <div key={field.name} className="border-l-2 border-blue-500 pl-4">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className="font-medium text-gray-700 dark:text-gray-300">
+                            <span className="font-medium text-gray-300 dark:text-gray-300">
                               {field.label}
                             </span>
                             {field.required && (
                               <Badge variant="outline" className="text-xs">Obrigatório</Badge>
                             )}
                           </div>
-                          <div className="text-gray-900 dark:text-gray-100">
+                          <div className="text-white dark:text-gray-100">
                             {renderFieldValue(field.name, value)}
                           </div>
                         </div>
@@ -171,7 +171,7 @@ export default function ReportPreview({
         </div>
 
         {/* Footer */}
-        <div className="border-t p-6 bg-gray-50 dark:bg-gray-800">
+        <div className="border-t p-6 bg-[#000020] dark:bg-gray-800">
           <div className="flex items-center justify-between gap-4">
             <Button
               variant="outline"

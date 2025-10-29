@@ -5,7 +5,7 @@ export default function CancelPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-orange-50 via-white to-red-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8 text-center">
+      <div className="max-w-md w-full bg-white/5 rounded-2xl shadow-2xl p-8 text-center">
         {/* Cancel Icon */}
         <div className="w-20 h-20 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <svg
@@ -27,7 +27,7 @@ export default function CancelPage() {
           Pagamento Cancelado
         </h1>
 
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-400 mb-6">
           Você cancelou o processo de pagamento. Nenhuma cobrança foi realizada.
         </p>
 
@@ -41,14 +41,14 @@ export default function CancelPage() {
         <div className="space-y-3">
           <button
             onClick={() => setLocation('/pricing')}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all"
+            className="w-full bg-[#2f2c79] text-white py-3 rounded-lg font-semibold hover:bg-[#b96e48] transition-all"
           >
             Ver Planos Novamente
           </button>
 
           <button
             onClick={() => setLocation('/')}
-            className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all"
+            className="w-full bg-[#171a4a] text-gray-300 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-all"
           >
             Voltar para Início
           </button>

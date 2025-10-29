@@ -66,11 +66,11 @@ export default function Onboarding({ onComplete, onSkip }: OnboardingProps) {
 
  return (
  <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
- <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative animate-in fade-in slide-in-from-bottom-4 duration-300">
+ <div className="bg-white/5 rounded-2xl shadow-2xl max-w-2xl w-full p-8 relative animate-in fade-in slide-in-from-bottom-4 duration-300">
  {/* Close Button */}
  <button
  onClick={handleSkip}
- className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+ className="absolute top-4 right-4 text-gray-400 hover:text-gray-400 transition-colors"
  >
  <X className="h-6 w-6" />
  </button>
@@ -78,7 +78,7 @@ export default function Onboarding({ onComplete, onSkip }: OnboardingProps) {
  {/* Progress Bar */}
  <div className="mb-8">
  <div className="flex items-center justify-between mb-2">
- <span className="text-sm font-medium text-gray-600">
+ <span className="text-sm font-medium text-gray-400">
  Passo {currentStep + 1} de {steps.length}
  </span>
  <span className="text-sm text-gray-500">
@@ -95,10 +95,10 @@ export default function Onboarding({ onComplete, onSkip }: OnboardingProps) {
 
  {/* Content */}
  <div className="mb-8">
- <h2 className="text-3xl font-bold mb-4 text-gray-900">
+ <h2 className="text-3xl font-bold mb-4 text-white">
  {step.title}
  </h2>
- <p className="text-lg text-gray-600 leading-relaxed">
+ <p className="text-lg text-gray-400 leading-relaxed">
  {step.description}
  </p>
  </div>
@@ -106,24 +106,24 @@ export default function Onboarding({ onComplete, onSkip }: OnboardingProps) {
  {/* Checklist (only on welcome step) */}
  {step.id === 'welcome' && (
  <div className="mb-8 bg-blue-50 rounded-lg p-6">
- <h3 className="font-semibold mb-4 text-gray-900">
+ <h3 className="font-semibold mb-4 text-white">
  O que você vai aprender:
  </h3>
  <ul className="space-y-3">
- <li className="flex items-center gap-3 text-gray-700">
- <div className="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+ <li className="flex items-center gap-3 text-gray-300">
+ <div className="h-6 w-6 rounded-full bg-[#2f2c79] flex items-center justify-center flex-shrink-0">
  <Check className="h-4 w-4 text-white" />
  </div>
  <span>Como gerar relatórios conformes em minutos</span>
  </li>
- <li className="flex items-center gap-3 text-gray-700">
- <div className="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+ <li className="flex items-center gap-3 text-gray-300">
+ <div className="h-6 w-6 rounded-full bg-[#2f2c79] flex items-center justify-center flex-shrink-0">
  <Check className="h-4 w-4 text-white" />
  </div>
  <span>Como auditar automaticamente com KRCI</span>
  </li>
- <li className="flex items-center gap-3 text-gray-700">
- <div className="h-6 w-6 rounded-full bg-blue-600 flex items-center justify-center flex-shrink-0">
+ <li className="flex items-center gap-3 text-gray-300">
+ <div className="h-6 w-6 rounded-full bg-[#2f2c79] flex items-center justify-center flex-shrink-0">
  <Check className="h-4 w-4 text-white" />
  </div>
  <span>Como exportar e converter entre padrões</span>
@@ -137,7 +137,7 @@ export default function Onboarding({ onComplete, onSkip }: OnboardingProps) {
  <Button
  variant="ghost"
  onClick={handleSkip}
- className="text-gray-600"
+ className="text-gray-400"
  >
  Pular Tour
  </Button>
@@ -169,7 +169,7 @@ export default function Onboarding({ onComplete, onSkip }: OnboardingProps) {
  onClick={() => setCurrentStep(index)}
  className={`h-2 rounded-full transition-all ${
  index === currentStep
- ? 'w-8 bg-blue-600'
+ ? 'w-8 bg-[#2f2c79]'
  : index < currentStep
  ? 'w-2 bg-blue-400'
  : 'w-2 bg-gray-300'

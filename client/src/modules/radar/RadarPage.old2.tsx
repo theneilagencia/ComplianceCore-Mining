@@ -292,7 +292,7 @@ export default function RadarPage() {
       case 'planned':
         return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
       default:
-        return 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200';
+        return 'bg-[#171a4a] text-gray-800 dark:bg-gray-700 dark:text-gray-200';
     }
   };
 
@@ -307,7 +307,7 @@ export default function RadarPage() {
       case 'safety':
         return 'bg-red-100 text-red-800';
       default:
-        return 'bg-gray-100 text-gray-800';
+        return 'bg-[#171a4a] text-gray-800';
     }
   };
 
@@ -320,7 +320,7 @@ export default function RadarPage() {
       case 'low':
         return 'text-green-600';
       default:
-        return 'text-gray-600';
+        return 'text-gray-400';
     }
   };
 
@@ -334,11 +334,11 @@ export default function RadarPage() {
         className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${
           isActive
             ? darkMode
-              ? 'bg-blue-600 text-white'
-              : 'bg-blue-500 text-white'
+              ? 'bg-[#2f2c79] text-white'
+              : 'bg-[#2f2c79] text-white'
             : darkMode
             ? 'bg-gray-700 hover:bg-gray-600 text-gray-300'
-            : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+            : 'bg-[#171a4a] hover:bg-gray-200 text-gray-300'
         }`}
       >
         <Icon className="w-5 h-5" />
@@ -349,16 +349,16 @@ export default function RadarPage() {
 
   return (
     <DashboardLayout>
-      <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-gray-50 text-gray-900'}`}>
+      <div className={`min-h-screen ${darkMode ? 'bg-gray-900 text-white' : 'bg-[#000020] text-white'}`}>
         {/* Header */}
-        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white'} shadow-sm border-b ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
+        <div className={`${darkMode ? 'bg-gray-800' : 'bg-white/5'} shadow-sm border-b ${darkMode ? 'border-gray-700' : 'border-white/20'}`}>
           <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <Globe className="w-8 h-8 text-blue-600" />
                 <div>
                   <h1 className="text-2xl font-bold">Radar Regulatória Global</h1>
-                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                     Monitoramento de atividade minerária e mudanças regulatórias - 12 fontes integradas
                   </p>
                 </div>
@@ -371,7 +371,7 @@ export default function RadarPage() {
                 
                 <button
                   onClick={() => setDarkMode(!darkMode)}
-                  className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-gray-100 hover:bg-gray-200'}`}
+                  className={`px-4 py-2 rounded-lg ${darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-[#171a4a] hover:bg-gray-200'}`}
                 >
                   {darkMode ? 'Modo Claro' : 'Modo Escuro'}
                 </button>
@@ -394,7 +394,7 @@ export default function RadarPage() {
                   className={`w-full pl-10 pr-4 py-2 rounded-lg border ${
                     darkMode
                       ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                      : 'bg-white border-gray-300 text-gray-900 placeholder-gray-500'
+                      : 'bg-white/5 border-white/20 text-white placeholder-gray-500'
                   } focus:ring-2 focus:ring-blue-500 focus:border-transparent`}
                 />
               </div>
@@ -402,7 +402,7 @@ export default function RadarPage() {
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className={`px-4 py-2 rounded-lg flex items-center gap-2 ${
-                  darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white border border-gray-300 hover:bg-gray-50'
+                  darkMode ? 'bg-gray-700 hover:bg-gray-600' : 'bg-white/5 border border-white/20 hover:bg-[#000020]'
                 }`}
               >
                 <Filter className="w-5 h-5" />
@@ -412,7 +412,7 @@ export default function RadarPage() {
 
             {/* Filters Panel */}
             {showFilters && (
-              <div className={`mt-3 p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+              <div className={`mt-3 p-4 rounded-lg ${darkMode ? 'bg-gray-700' : 'bg-[#171a4a]'}`}>
                 {viewMode === 'regulatory' ? (
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -423,7 +423,7 @@ export default function RadarPage() {
                         className={`w-full px-3 py-2 rounded-lg border ${
                           darkMode
                             ? 'bg-gray-600 border-gray-500 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
+                            : 'bg-white/5 border-white/20 text-white'
                         }`}
                       >
                         {countries.map((country) => (
@@ -442,7 +442,7 @@ export default function RadarPage() {
                         className={`w-full px-3 py-2 rounded-lg border ${
                           darkMode
                             ? 'bg-gray-600 border-gray-500 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
+                            : 'bg-white/5 border-white/20 text-white'
                         }`}
                       >
                         {categories.map((category) => (
@@ -463,7 +463,7 @@ export default function RadarPage() {
                         className={`w-full px-3 py-2 rounded-lg border ${
                           darkMode
                             ? 'bg-gray-600 border-gray-500 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
+                            : 'bg-white/5 border-white/20 text-white'
                         }`}
                       >
                         {continents.map((continent) => (
@@ -482,7 +482,7 @@ export default function RadarPage() {
                         className={`w-full px-3 py-2 rounded-lg border ${
                           darkMode
                             ? 'bg-gray-600 border-gray-500 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
+                            : 'bg-white/5 border-white/20 text-white'
                         }`}
                       >
                         {minerals.map((mineral) => (
@@ -501,7 +501,7 @@ export default function RadarPage() {
                         className={`w-full px-3 py-2 rounded-lg border ${
                           darkMode
                             ? 'bg-gray-600 border-gray-500 text-white'
-                            : 'bg-white border-gray-300 text-gray-900'
+                            : 'bg-white/5 border-white/20 text-white'
                         }`}
                       >
                         {statuses.map((status) => (
@@ -526,7 +526,7 @@ export default function RadarPage() {
               <div className="absolute inset-0 flex items-center justify-center">
                 <div className="text-center">
                   <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-                  <p className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+                  <p className={darkMode ? 'text-gray-400' : 'text-gray-400'}>
                     Carregando dados de 12 fontes globais...
                   </p>
                 </div>
@@ -556,7 +556,7 @@ export default function RadarPage() {
                   <h2 className="text-xl font-bold mb-2">
                     {filteredChanges.length} Mudanças Regulatórias Encontradas
                   </h2>
-                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                     Monitoramento contínuo de legislação minerária global
                   </p>
                 </div>
@@ -568,7 +568,7 @@ export default function RadarPage() {
                       className={`p-4 rounded-lg border ${
                         darkMode
                           ? 'bg-gray-800 border-gray-700'
-                          : 'bg-white border-gray-200'
+                          : 'bg-white/5 border-white/20'
                       }`}
                     >
                       <div className="flex items-start justify-between mb-3">
@@ -578,7 +578,7 @@ export default function RadarPage() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Calendar className="w-4 h-4 text-gray-400" />
-                          <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                          <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                             {new Date(change.date).toLocaleDateString('pt-BR')}
                           </span>
                         </div>
@@ -598,7 +598,7 @@ export default function RadarPage() {
 
                         <button
                           onClick={() => setSelectedChange(change)}
-                          className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
+                          className="px-4 py-2 bg-[#2f2c79] text-white rounded-lg hover:bg-[#b96e48] flex items-center gap-2 text-sm"
                         >
                           Ver mais
                           <ExternalLink className="w-4 h-4" />
@@ -612,7 +612,7 @@ export default function RadarPage() {
                   ))}
 
                   {filteredChanges.length === 0 && (
-                    <div className={`text-center py-12 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className={`text-center py-12 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                       <p>Nenhuma mudança regulatória encontrada com os filtros selecionados.</p>
                     </div>
                   )}
@@ -625,7 +625,7 @@ export default function RadarPage() {
                   <h2 className="text-xl font-bold mb-2">
                     {filteredOperations.length} Operações Encontradas
                   </h2>
-                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                     Dados de 12 fontes globais
                   </p>
                 </div>
@@ -638,23 +638,23 @@ export default function RadarPage() {
                       className={`p-4 rounded-lg border cursor-pointer transition-all ${
                         darkMode
                           ? 'bg-gray-800 border-gray-700 hover:border-blue-500'
-                          : 'bg-white border-gray-200 hover:border-blue-400 hover:shadow-md'
+                          : 'bg-white/5 border-white/20 hover:border-blue-400 hover:shadow-md'
                       }`}
                     >
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
                           <h3 className="font-semibold text-lg mb-1">{operation.name}</h3>
-                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>
+                          <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'} mb-2`}>
                             {operation.country} • {operation.continent}
                           </p>
                           <div className="flex items-center gap-2 flex-wrap">
                             <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(operation.status)}`}>
                               {operation.status === 'active' ? 'Ativo' : operation.status === 'inactive' ? 'Inativo' : 'Planejado'}
                             </span>
-                            <span className={`px-2 py-1 rounded text-xs ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                            <span className={`px-2 py-1 rounded text-xs ${darkMode ? 'bg-gray-700' : 'bg-[#171a4a]'}`}>
                               {operation.mineral}
                             </span>
-                            <span className={`px-2 py-1 rounded text-xs ${darkMode ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                            <span className={`px-2 py-1 rounded text-xs ${darkMode ? 'bg-gray-700' : 'bg-[#171a4a]'}`}>
                               {operation.operator}
                             </span>
                           </div>
@@ -663,7 +663,7 @@ export default function RadarPage() {
                           <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
                             Fonte: {operation.source}
                           </p>
-                          <p className={`text-xs ${darkMode ? 'text-gray-600' : 'text-gray-400'} mt-1`}>
+                          <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-400'} mt-1`}>
                             {new Date(operation.lastUpdate).toLocaleDateString('pt-BR')}
                           </p>
                         </div>
@@ -672,7 +672,7 @@ export default function RadarPage() {
                   ))}
 
                   {filteredOperations.length === 0 && (
-                    <div className={`text-center py-12 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className={`text-center py-12 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                       <p>Nenhuma operação encontrada com os filtros selecionados.</p>
                     </div>
                   )}
@@ -683,13 +683,13 @@ export default function RadarPage() {
 
           {/* Side Panel - Operation Details */}
           {selectedOperation && viewMode !== 'regulatory' && (
-            <div className={`w-96 ${darkMode ? 'bg-gray-800 border-l border-gray-700' : 'bg-white border-l border-gray-200'} overflow-y-auto`}>
+            <div className={`w-96 ${darkMode ? 'bg-gray-800 border-l border-gray-700' : 'bg-white/5 border-l border-white/20'} overflow-y-auto`}>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-xl font-bold">Detalhes da Operação</h2>
                   <button
                     onClick={() => setSelectedOperation(null)}
-                    className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                    className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-[#171a4a]'}`}
                   >
                     <X className="w-5 h-5" />
                   </button>
@@ -705,37 +705,37 @@ export default function RadarPage() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>País</p>
+                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>País</p>
                       <p className="font-medium">{selectedOperation.country}</p>
                     </div>
                     <div>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Continente</p>
+                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>Continente</p>
                       <p className="font-medium">{selectedOperation.continent}</p>
                     </div>
                     <div>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Minério</p>
+                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>Minério</p>
                       <p className="font-medium">{selectedOperation.mineral}</p>
                     </div>
                     <div>
-                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>Operador</p>
+                      <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>Operador</p>
                       <p className="font-medium">{selectedOperation.operator}</p>
                     </div>
                   </div>
 
                   <div>
-                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Coordenadas</p>
+                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'} mb-1`}>Coordenadas</p>
                     <p className="font-mono text-sm">
                       {selectedOperation.latitude.toFixed(6)}, {selectedOperation.longitude.toFixed(6)}
                     </p>
                   </div>
 
                   <div>
-                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Fonte de Dados</p>
+                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'} mb-1`}>Fonte de Dados</p>
                     <p className="text-sm">{selectedOperation.source}</p>
                   </div>
 
                   <div>
-                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-1`}>Última Atualização</p>
+                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'} mb-1`}>Última Atualização</p>
                     <p className="text-sm">{new Date(selectedOperation.lastUpdate).toLocaleString('pt-BR')}</p>
                   </div>
                 </div>
@@ -747,13 +747,13 @@ export default function RadarPage() {
         {/* Modal - Regulatory Change Details */}
         {selectedChange && (
           <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <div className={`max-w-2xl w-full ${darkMode ? 'bg-gray-800' : 'bg-white'} rounded-lg shadow-xl max-h-[80vh] overflow-y-auto`}>
+            <div className={`max-w-2xl w-full ${darkMode ? 'bg-gray-800' : 'bg-white/5'} rounded-lg shadow-xl max-h-[80vh] overflow-y-auto`}>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-4">
                   <h2 className="text-2xl font-bold">Detalhes da Mudança Regulatória</h2>
                   <button
                     onClick={() => setSelectedChange(null)}
-                    className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-gray-100'}`}
+                    className={`p-2 rounded-lg ${darkMode ? 'hover:bg-gray-700' : 'hover:bg-[#171a4a]'}`}
                   >
                     <X className="w-6 h-6" />
                   </button>
@@ -767,7 +767,7 @@ export default function RadarPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4 text-gray-400" />
-                      <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                      <span className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
                         {new Date(selectedChange.date).toLocaleDateString('pt-BR', {
                           year: 'numeric',
                           month: 'long',
@@ -788,20 +788,20 @@ export default function RadarPage() {
 
                   <div>
                     <h3 className="font-semibold mb-2">Resumo</h3>
-                    <p className={darkMode ? 'text-gray-300' : 'text-gray-700'}>
+                    <p className={darkMode ? 'text-gray-300' : 'text-gray-300'}>
                       {selectedChange.summary}
                     </p>
                   </div>
 
                   <div>
                     <h3 className="font-semibold mb-2">Detalhes Completos</h3>
-                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-700'} whitespace-pre-wrap`}>
+                    <p className={`${darkMode ? 'text-gray-300' : 'text-gray-300'} whitespace-pre-wrap`}>
                       {selectedChange.fullText}
                     </p>
                   </div>
 
-                  <div className={`pt-4 border-t ${darkMode ? 'border-gray-700' : 'border-gray-200'}`}>
-                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-600'} mb-2`}>
+                  <div className={`pt-4 border-t ${darkMode ? 'border-gray-700' : 'border-white/20'}`}>
+                    <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-400'} mb-2`}>
                       Fonte: {selectedChange.source}
                     </p>
                     {selectedChange.url && (
@@ -823,16 +823,16 @@ export default function RadarPage() {
         )}
 
         {/* Footer */}
-        <div className={`${darkMode ? 'bg-gray-800 border-t border-gray-700' : 'bg-white border-t border-gray-200'} px-4 py-3`}>
+        <div className={`${darkMode ? 'bg-gray-800 border-t border-gray-700' : 'bg-white/5 border-t border-white/20'} px-4 py-3`}>
           <div className="max-w-7xl mx-auto flex items-center justify-between text-sm">
-            <div className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+            <div className={darkMode ? 'text-gray-400' : 'text-gray-400'}>
               {viewMode === 'regulatory' ? (
                 <>Total: {regulatoryChanges.length} mudanças | Filtradas: {filteredChanges.length}</>
               ) : (
                 <>Total: {operations.length} operações | Filtradas: {filteredOperations.length}</>
               )}
             </div>
-            <div className={darkMode ? 'text-gray-400' : 'text-gray-600'}>
+            <div className={darkMode ? 'text-gray-400' : 'text-gray-400'}>
               Dados de 12 fontes globais
             </div>
           </div>

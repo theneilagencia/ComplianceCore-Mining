@@ -100,18 +100,18 @@ export default function PricingPage() {
           <h1 className="text-5xl font-bold text-white mb-4">
             Planos e Preços
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-400 mb-8">
             Escolha o plano ideal para sua empresa
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center bg-white rounded-full p-1 shadow-md">
+          <div className="inline-flex items-center bg-white/5 rounded-full p-1 shadow-md">
             <button
               onClick={() => setBillingPeriod('monthly')}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 billingPeriod === 'monthly'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:text-white'
+                  ? 'bg-[#2f2c79] text-white'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               Mensal
@@ -120,8 +120,8 @@ export default function PricingPage() {
               onClick={() => setBillingPeriod('annual')}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 billingPeriod === 'annual'
-                  ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:text-white'
+                  ? 'bg-[#2f2c79] text-white'
+                  : 'text-gray-400 hover:text-white'
               }`}
             >
               Anual
@@ -148,12 +148,12 @@ export default function PricingPage() {
             return (
               <div
                 key={plan.name}
-                className={`relative bg-white rounded-2xl shadow-xl overflow-hidden transition-transform hover:scale-105 ${
+                className={`relative bg-white/5 rounded-2xl shadow-xl overflow-hidden transition-transform hover:scale-105 ${
                   plan.popular ? 'ring-4 ring-blue-500' : ''
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-blue-500 text-white px-4 py-1 text-sm font-bold rounded-bl-lg">
+                  <div className="absolute top-0 right-0 bg-[#2f2c79] text-white px-4 py-1 text-sm font-bold rounded-bl-lg">
                     MAIS POPULAR
                   </div>
                 )}
@@ -168,7 +168,7 @@ export default function PricingPage() {
                   <h3 className="text-2xl font-bold text-white mb-2">
                     {plan.name}
                   </h3>
-                  <p className="text-gray-600 mb-6">{plan.description}</p>
+                  <p className="text-gray-400 mb-6">{plan.description}</p>
 
                   {/* Price */}
                   <div className="mb-6">
@@ -177,7 +177,7 @@ export default function PricingPage() {
                         {plan.price === 0 ? 'Grátis' : `$${plan.price.toLocaleString()}`}
                       </span>
                       {plan.price > 0 && (
-                        <span className="text-gray-600 ml-2">{plan.period}</span>
+                        <span className="text-gray-400 ml-2">{plan.period}</span>
                       )}
                     </div>
                     {plan.savings && (
@@ -193,8 +193,8 @@ export default function PricingPage() {
                     disabled={isLoading}
                     className={`w-full py-3 px-6 rounded-lg font-semibold transition-all ${
                       plan.popular
-                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-gray-100 text-white hover:bg-gray-200'
+                        ? 'bg-[#2f2c79] text-white hover:bg-[#b96e48]'
+                        : 'bg-[#171a4a] text-white hover:bg-gray-200'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {isLoading ? 'Processando...' : plan.cta}
@@ -205,7 +205,7 @@ export default function PricingPage() {
                     {plan.features.map((feature, index) => (
                       <li key={index} className="flex items-start">
                         <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-700">{feature}</span>
+                        <span className="text-gray-300">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -221,27 +221,27 @@ export default function PricingPage() {
             Perguntas Frequentes
           </h2>
           <div className="space-y-6">
-            <div className="bg-white/5 rounded-lg p-6 shadow-md">
+            <div className="bg-white/5/5 rounded-lg p-6 shadow-md">
               <h3 className="font-semibold text-lg text-white mb-2">
                 Posso cancelar a qualquer momento?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Sim! Você pode cancelar sua assinatura a qualquer momento através do portal de gerenciamento. Não há taxas de cancelamento.
               </p>
             </div>
-            <div className="bg-white/5 rounded-lg p-6 shadow-md">
+            <div className="bg-white/5/5 rounded-lg p-6 shadow-md">
               <h3 className="font-semibold text-lg text-white mb-2">
                 Como funciona o período de teste?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 O plano START é completamente gratuito e não requer cartão de crédito. Você pode testar a plataforma sem compromisso.
               </p>
             </div>
-            <div className="bg-white/5 rounded-lg p-6 shadow-md">
+            <div className="bg-white/5/5 rounded-lg p-6 shadow-md">
               <h3 className="font-semibold text-lg text-white mb-2">
                 Posso fazer upgrade ou downgrade?
               </h3>
-              <p className="text-gray-600">
+              <p className="text-gray-400">
                 Sim! Você pode alterar seu plano a qualquer momento. O valor será ajustado proporcionalmente.
               </p>
             </div>
