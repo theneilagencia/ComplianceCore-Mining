@@ -11,6 +11,7 @@ import licenseRouter from "../modules/licenses/router";
 import authRouter from "../modules/auth/router";
 import googleHealthRouter from "../modules/auth/google-health-router";
 import adminRouter from "../modules/admin/router";
+import debugRouter from "../modules/admin/debug-router";
 import createAdminRouter from "../modules/admin/create-admin-router";
 import fixAdminLicenseRouter from "../modules/admin/fix-admin-license";
 import reportsRouter from "../modules/reports/router";
@@ -131,6 +132,7 @@ async function startServer() {
   
   // Admin routes
   app.use("/api/admin", adminRouter);
+  app.use("/api/admin", debugRouter); // Debug endpoint
   app.use("/api/create-admin", createAdminRouter);
   app.use("/api/fix-admin-license", fixAdminLicenseRouter);
   
