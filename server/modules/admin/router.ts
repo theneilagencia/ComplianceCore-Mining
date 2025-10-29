@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { getDb } from '../../db';
 import { users, licenses } from '../../../drizzle/schema';
-import { eq, desc, sql, and, gte } from 'drizzle-orm';
+import { eq, desc, sql, and, gte, inArray } from 'drizzle-orm';
 import { authenticateFromCookie } from '../payment/auth-helper';
 import * as costsService from './costs';
 import bcrypt from 'bcrypt';
@@ -137,7 +137,7 @@ router.get('/users', requireAdmin, async (req, res) => {
       .select()
       .from(licenses)
       .where(and(
-        sql`${licenses.userId} = ANY(${userIds})`,
+        inArray(licenses.userId, userIds),
         eq(licenses.status, 'active')
       )) : [];
 
