@@ -1,0 +1,3 @@
+# Don't ignore production env file
+!client/.env.production
+
