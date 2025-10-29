@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
 interface Stats {
   totalUsers: number;
   recentUsers: number;
@@ -79,7 +81,7 @@ export default function Admin() {
   const checkAdminAccess = async () => {
     // Check if user is admin by trying to fetch stats
     try {
-      const response = await fetch('/api/admin/stats', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/stats', {
         credentials: 'include',
       });
 
@@ -103,7 +105,7 @@ export default function Admin() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/stats', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/stats', {
         credentials: 'include',
       });
 
@@ -121,7 +123,7 @@ export default function Admin() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/users?limit=100', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users?limit=100', {
         credentials: 'include',
       });
 
@@ -139,7 +141,7 @@ export default function Admin() {
   const fetchSubscriptions = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/subscriptions', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions', {
         credentials: 'include',
       });
 
@@ -157,7 +159,7 @@ export default function Admin() {
   const fetchRevenue = async () => {
     setLoading(true);
     try {
-      const response = await fetch('/api/admin/revenue', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/revenue', {
         credentials: 'include',
       });
 
