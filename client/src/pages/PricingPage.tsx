@@ -97,7 +97,7 @@ export default function PricingPage() {
       {/* Header */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-gray-900 mb-4">
+          <h1 className="text-5xl font-bold text-white mb-4">
             Planos e Preços
           </h1>
           <p className="text-xl text-gray-600 mb-8">
@@ -111,7 +111,7 @@ export default function PricingPage() {
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 billingPeriod === 'monthly'
                   ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-white'
               }`}
             >
               Mensal
@@ -121,7 +121,7 @@ export default function PricingPage() {
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 billingPeriod === 'annual'
                   ? 'bg-blue-600 text-white'
-                  : 'text-gray-600 hover:text-gray-900'
+                  : 'text-gray-600 hover:text-white'
               }`}
             >
               Anual
@@ -165,7 +165,7 @@ export default function PricingPage() {
                   </div>
 
                   {/* Plan Name */}
-                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h3 className="text-2xl font-bold text-white mb-2">
                     {plan.name}
                   </h3>
                   <p className="text-gray-600 mb-6">{plan.description}</p>
@@ -173,7 +173,7 @@ export default function PricingPage() {
                   {/* Price */}
                   <div className="mb-6">
                     <div className="flex items-baseline">
-                      <span className="text-5xl font-bold text-gray-900">
+                      <span className="text-5xl font-bold text-white">
                         {plan.price === 0 ? 'Grátis' : `$${plan.price.toLocaleString()}`}
                       </span>
                       {plan.price > 0 && (
@@ -194,7 +194,7 @@ export default function PricingPage() {
                     className={`w-full py-3 px-6 rounded-lg font-semibold transition-all ${
                       plan.popular
                         ? 'bg-blue-600 text-white hover:bg-blue-700'
-                        : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                        : 'bg-gray-100 text-white hover:bg-gray-200'
                     } disabled:opacity-50 disabled:cursor-not-allowed`}
                   >
                     {isLoading ? 'Processando...' : plan.cta}
@@ -217,28 +217,28 @@ export default function PricingPage() {
 
         {/* FAQ Section */}
         <div className="mt-20 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
+          <h2 className="text-3xl font-bold text-center text-white mb-8">
             Perguntas Frequentes
           </h2>
           <div className="space-y-6">
-            <div className="bg-white rounded-lg p-6 shadow-md">
-              <h3 className="font-semibold text-lg text-gray-900 mb-2">
+            <div className="bg-white/5 rounded-lg p-6 shadow-md">
+              <h3 className="font-semibold text-lg text-white mb-2">
                 Posso cancelar a qualquer momento?
               </h3>
               <p className="text-gray-600">
                 Sim! Você pode cancelar sua assinatura a qualquer momento através do portal de gerenciamento. Não há taxas de cancelamento.
               </p>
             </div>
-            <div className="bg-white rounded-lg p-6 shadow-md">
-              <h3 className="font-semibold text-lg text-gray-900 mb-2">
+            <div className="bg-white/5 rounded-lg p-6 shadow-md">
+              <h3 className="font-semibold text-lg text-white mb-2">
                 Como funciona o período de teste?
               </h3>
               <p className="text-gray-600">
                 O plano START é completamente gratuito e não requer cartão de crédito. Você pode testar a plataforma sem compromisso.
               </p>
             </div>
-            <div className="bg-white rounded-lg p-6 shadow-md">
-              <h3 className="font-semibold text-lg text-gray-900 mb-2">
+            <div className="bg-white/5 rounded-lg p-6 shadow-md">
+              <h3 className="font-semibold text-lg text-white mb-2">
                 Posso fazer upgrade ou downgrade?
               </h3>
               <p className="text-gray-600">

@@ -135,7 +135,7 @@ export default function Support() {
 
  return (
  <DashboardLayout>
- <div className="flex h-screen bg-slate-50">
+ <div className="flex h-screen bg-[#000020]">
  {/* Sidebar - Menu Lateral */}
  <div className="w-80 bg-white border-r border-slate-200 overflow-y-auto">
  {/* Header */}
@@ -183,7 +183,7 @@ export default function Support() {
  <button
  key={index}
  onClick={() => loadManual(result.manual)}
- className="w-full text-left p-2 bg-white rounded hover:bg-slate-50 transition-colors"
+ className="w-full text-left p-2 bg-white rounded hover:bg-[#000020] transition-colors"
  >
  <div className="flex items-center gap-2 mb-1">
  <span className="text-lg">{result.manual.icon}</span>
@@ -199,7 +199,7 @@ export default function Support() {
  )}
 
  {searchQuery.length >= 3 && searchResults.length === 0 && !searching && (
- <div className="p-4 border-b border-slate-200 bg-slate-50">
+ <div className="p-4 border-b border-slate-200 bg-[#000020]">
  <p className="text-sm text-slate-600 text-center">
  Nenhum resultado encontrado para "{searchQuery}"
  </p>
@@ -218,7 +218,7 @@ export default function Support() {
  className={`w-full text-left p-3 rounded-lg transition-colors ${
  selectedManual?.id === manual.id
  ? 'bg-blue-50 border-2 border-blue-500'
- : 'bg-white border-2 border-transparent hover:bg-slate-50'
+ : 'bg-white border-2 border-transparent hover:bg-[#000020]'
  }`}
  >
  <div className="flex items-center gap-3">
@@ -240,7 +240,7 @@ export default function Support() {
  <div className="space-y-2">
  <button
  onClick={() => setLocation('/help')}
- className="w-full text-left p-2 rounded hover:bg-slate-50 transition-colors"
+ className="w-full text-left p-2 rounded hover:bg-[#000020] transition-colors"
  >
  <div className="flex items-center gap-2">
  <span className="text-lg"></span>
@@ -249,7 +249,7 @@ export default function Support() {
  </button>
  <a
  href="mailto:suporte@qivo-mining.com"
- className="block w-full text-left p-2 rounded hover:bg-slate-50 transition-colors"
+ className="block w-full text-left p-2 rounded hover:bg-[#000020] transition-colors"
  >
  <div className="flex items-center gap-2">
  <span className="text-lg"></span>
@@ -258,7 +258,7 @@ export default function Support() {
  </a>
  <button
  onClick={() => setLocation('/dashboard')}
- className="w-full text-left p-2 rounded hover:bg-slate-50 transition-colors"
+ className="w-full text-left p-2 rounded hover:bg-[#000020] transition-colors"
  >
  <div className="flex items-center gap-2">
  <span className="text-lg"></span>

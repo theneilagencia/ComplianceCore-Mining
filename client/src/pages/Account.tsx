@@ -109,7 +109,7 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white border-b">
+      <header className="bg-white/5 border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold">
@@ -122,7 +122,7 @@ export default function AccountPage() {
           </div>
           <button
             onClick={() => setLocation('/account')}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-gray-600 hover:text-white"
           >
             Dashboard
           </button>
@@ -131,7 +131,7 @@ export default function AccountPage() {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Plan Overview */}
-        <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+        <div className="bg-white/5 rounded-lg shadow-lg p-6 mb-6">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Plano Atual</h2>
@@ -198,7 +198,7 @@ export default function AccountPage() {
 
         {/* Billing Info */}
         {stats.plan !== 'START' && (
-          <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+          <div className="bg-white/5 rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-bold mb-4">Informações de Cobrança</h2>
             
             <div className="space-y-3">
@@ -239,7 +239,7 @@ export default function AccountPage() {
         )}
 
         {/* Plan Features */}
-        <div className="bg-white rounded-lg shadow-lg p-6">
+        <div className="bg-white/5 rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-bold mb-4">Recursos do Seu Plano</h2>
           
           <ul className="space-y-2">

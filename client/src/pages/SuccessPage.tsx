@@ -31,7 +31,7 @@ export default function SuccessPage() {
         </div>
 
         {/* Title */}
-        <h1 className="text-4xl font-bold text-gray-900 mb-4">
+        <h1 className="text-4xl font-bold text-white mb-4">
           Pagamento Confirmado!
         </h1>
 
@@ -42,7 +42,7 @@ export default function SuccessPage() {
 
         {/* Features Unlocked */}
         <div className="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-xl p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <h2 className="text-lg font-semibold text-white mb-4">
             ✨ Recursos Desbloqueados
           </h2>
           <ul className="text-left space-y-2 text-gray-700">

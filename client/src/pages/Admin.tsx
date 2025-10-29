@@ -194,7 +194,7 @@ export default function Admin() {
 
   if (loading && activeTab === 'dashboard') {
     return (
-      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+      <div className="min-h-screen bg-[#000020] flex items-center justify-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -203,7 +203,7 @@ export default function Admin() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
       {/* Header */}
-      <header className="bg-white border-b border-slate-200 shadow-sm">
+      <header className="bg-white/5 border-b border-slate-200 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -236,7 +236,7 @@ export default function Admin() {
       </header>
 
       {/* Tabs */}
-      <div className="bg-white border-b border-slate-200">
+      <div className="bg-white/5 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-6">
             <button
@@ -290,7 +290,7 @@ export default function Admin() {
           <div className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 rounded-xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-slate-600 text-sm">Total de Usuários</p>
@@ -305,7 +305,7 @@ export default function Admin() {
                 <p className="text-green-600 text-sm mt-2">+{stats.recentUsers} nos últimos 30 dias</p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 rounded-xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-slate-600 text-sm">MRR</p>
@@ -320,7 +320,7 @@ export default function Admin() {
                 <p className="text-slate-500 text-sm mt-2">Receita Recorrente Mensal</p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 rounded-xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-slate-600 text-sm">Planos PRO</p>
@@ -335,7 +335,7 @@ export default function Admin() {
                 <p className="text-slate-500 text-sm mt-2">Assinaturas Ativas</p>
               </div>
 
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 rounded-xl shadow-lg p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-slate-600 text-sm">Planos ENTERPRISE</p>
@@ -352,7 +352,7 @@ export default function Admin() {
             </div>
 
             {/* Chart Placeholder */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="bg-white/5 rounded-xl shadow-lg p-6">
               <h3 className="text-lg font-bold text-slate-900 mb-4">Distribuição de Planos</h3>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
@@ -379,7 +379,7 @@ export default function Admin() {
         {activeTab === 'users' && (
           <div className="space-y-6">
             {/* Search */}
-            <div className="bg-white rounded-xl shadow-lg p-4">
+            <div className="bg-white/5 rounded-xl shadow-lg p-4">
               <input
                 type="text"
                 placeholder="Buscar por email ou nome..."
@@ -390,9 +390,9 @@ export default function Admin() {
             </div>
 
             {/* Users Table */}
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white/5 rounded-xl shadow-lg overflow-hidden">
               <table className="w-full">
-                <thead className="bg-slate-50 border-b border-slate-200">
+                <thead className="bg-[#000020] border-b border-slate-200">
                   <tr>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Email</th>
                     <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Nome</th>
@@ -404,7 +404,7 @@ export default function Admin() {
                 </thead>
                 <tbody className="divide-y divide-slate-200">
                   {filteredUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-slate-50">
+                    <tr key={user.id} className="hover:bg-[#000020]">
                       <td className="px-6 py-4 text-sm text-slate-900">{user.email}</td>
                       <td className="px-6 py-4 text-sm text-slate-900">{user.fullName || '-'}</td>
                       <td className="px-6 py-4 text-sm">
@@ -437,9 +437,9 @@ export default function Admin() {
 
         {/* Subscriptions Tab */}
         {activeTab === 'subscriptions' && (
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="bg-white/5 rounded-xl shadow-lg overflow-hidden">
             <table className="w-full">
-              <thead className="bg-slate-50 border-b border-slate-200">
+              <thead className="bg-[#000020] border-b border-slate-200">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Usuário</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Email</th>
@@ -451,7 +451,7 @@ export default function Admin() {
               </thead>
               <tbody className="divide-y divide-slate-200">
                 {subscriptions.map((sub) => (
-                  <tr key={sub.licenseId} className="hover:bg-slate-50">
+                  <tr key={sub.licenseId} className="hover:bg-[#000020]">
                     <td className="px-6 py-4 text-sm text-slate-900">{sub.userName || '-'}</td>
                     <td className="px-6 py-4 text-sm text-slate-900">{sub.userEmail}</td>
                     <td className="px-6 py-4 text-sm">
@@ -482,26 +482,26 @@ export default function Admin() {
           <div className="space-y-6">
             {/* Revenue Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 rounded-xl shadow-lg p-6">
                 <p className="text-slate-600 text-sm">MRR (Receita Recorrente Mensal)</p>
                 <p className="text-4xl font-bold text-green-600 mt-2">{formatCurrency(revenue.mrr)}</p>
               </div>
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 rounded-xl shadow-lg p-6">
                 <p className="text-slate-600 text-sm">ARR (Receita Recorrente Anual)</p>
                 <p className="text-4xl font-bold text-blue-600 mt-2">{formatCurrency(revenue.arr)}</p>
               </div>
-              <div className="bg-white rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 rounded-xl shadow-lg p-6">
                 <p className="text-slate-600 text-sm">Assinaturas Ativas</p>
                 <p className="text-4xl font-bold text-purple-600 mt-2">{revenue.totalActiveSubscriptions}</p>
               </div>
             </div>
 
             {/* Revenue by Plan */}
-            <div className="bg-white rounded-xl shadow-lg p-6">
+            <div className="bg-white/5 rounded-xl shadow-lg p-6">
               <h3 className="text-lg font-bold text-slate-900 mb-4">Receita por Plano</h3>
               <div className="space-y-4">
                 {Object.entries(revenue.revenueByPlan).map(([plan, data]) => (
-                  <div key={plan} className="flex items-center justify-between p-4 bg-slate-50 rounded-lg">
+                  <div key={plan} className="flex items-center justify-between p-4 bg-[#000020] rounded-lg">
                     <div>
                       <p className="font-semibold text-slate-900">{plan}</p>
                       <p className="text-sm text-slate-600">{data.count} assinaturas</p>

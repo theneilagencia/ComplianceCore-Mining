@@ -105,7 +105,7 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white/5 shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -113,14 +113,14 @@ export default function Settings() {
                 JI
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Configurações</h1>
+                <h1 className="text-2xl font-bold text-white">Configurações</h1>
                 <p className="text-sm text-gray-600">Gerencie suas preferências e conta</p>
               </div>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => setLocation('/dashboard')}
-                className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+                className="px-4 py-2 text-gray-700 hover:text-white font-medium transition-colors"
               >
                 Voltar ao Dashboard
               </button>
@@ -152,10 +152,10 @@ export default function Settings() {
         )}
 
         {/* Settings Form */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div className="bg-white/5 rounded-xl shadow-sm border border-white/20 overflow-hidden">
           {/* Personal Information */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Informações Pessoais</h2>
+          <div className="p-6 border-b border-white/20">
+            <h2 className="text-lg font-semibold text-white mb-4">Informações Pessoais</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -165,7 +165,7 @@ export default function Settings() {
                   type="text"
                   value={settings.fullName || ''}
                   onChange={(e) => setSettings({ ...settings, fullName: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
@@ -176,7 +176,7 @@ export default function Settings() {
                   type="email"
                   value={settings.email}
                   disabled
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 text-gray-500"
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg bg-gray-50 text-gray-500"
                 />
               </div>
               <div>
@@ -187,7 +187,7 @@ export default function Settings() {
                   type="text"
                   value={settings.company || ''}
                   onChange={(e) => setSettings({ ...settings, company: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
               <div>
@@ -198,15 +198,15 @@ export default function Settings() {
                   type="tel"
                   value={settings.phone || ''}
                   onChange={(e) => setSettings({ ...settings, phone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 />
               </div>
             </div>
           </div>
 
           {/* Preferences */}
-          <div className="p-6 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Preferências</h2>
+          <div className="p-6 border-b border-white/20">
+            <h2 className="text-lg font-semibold text-white mb-4">Preferências</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -215,7 +215,7 @@ export default function Settings() {
                 <select
                   value={settings.language || 'pt-BR'}
                   onChange={(e) => setSettings({ ...settings, language: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="pt-BR">Português (Brasil)</option>
                   <option value="en-US">English (US)</option>
@@ -229,7 +229,7 @@ export default function Settings() {
                 <select
                   value={settings.timezone || 'America/Sao_Paulo'}
                   onChange={(e) => setSettings({ ...settings, timezone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                 >
                   <option value="America/Sao_Paulo">São Paulo (GMT-3)</option>
                   <option value="America/New_York">New York (GMT-5)</option>
@@ -241,7 +241,7 @@ export default function Settings() {
 
           {/* Account Info */}
           <div className="p-6 bg-gray-50">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">Informações da Conta</h2>
+            <h2 className="text-lg font-semibold text-white mb-4">Informações da Conta</h2>
             <div className="text-sm text-gray-600">
               <p>Conta criada em: {new Date(settings.createdAt).toLocaleDateString('pt-BR')}</p>
               <p className="mt-2">ID da conta: {settings.id}</p>
@@ -253,7 +253,7 @@ export default function Settings() {
         <div className="mt-6 flex justify-end gap-4">
           <button
             onClick={() => setLocation('/dashboard')}
-            className="px-6 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors"
+            className="px-6 py-2 text-gray-700 hover:text-white font-medium transition-colors"
           >
             Cancelar
           </button>

@@ -36,14 +36,14 @@ export default function ForgotPassword() {
   if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
+        <div className="bg-white/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">Email Enviado!</h2>
+            <h2 className="text-2xl font-bold text-white mb-2">Email Enviado!</h2>
             <p className="text-gray-600 mb-6">
               Se o email {email} estiver cadastrado, você receberá um link para redefinir sua senha.
             </p>
@@ -60,12 +60,12 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="bg-white p-8 rounded-2xl shadow-xl max-w-md w-full">
+      <div className="bg-white/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-2xl">JI</span>
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Recuperar Senha</h1>
+          <h1 className="text-3xl font-bold text-white mb-2">Recuperar Senha</h1>
           <p className="text-gray-600">
             Digite seu email para receber um link de recuperação
           </p>
@@ -88,7 +88,7 @@ export default function ForgotPassword() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 border border-white/20 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="seu@email.com"
             />
           </div>

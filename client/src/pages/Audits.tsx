@@ -97,7 +97,7 @@ export default function Audits() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200">
+      <div className="bg-white/5 shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -105,14 +105,14 @@ export default function Audits() {
                 JI
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900">Auditorias KRCI</h1>
+                <h1 className="text-2xl font-bold text-white">Auditorias KRCI</h1>
                 <p className="text-sm text-gray-600">Key Risk and Critical Information</p>
               </div>
             </div>
             <div className="flex gap-3">
               <button
                 onClick={() => setLocation('/dashboard')}
-                className="px-4 py-2 text-gray-700 hover:text-gray-900 font-medium transition-colors border border-gray-300 rounded-lg hover:bg-gray-50"
+                className="px-4 py-2 text-gray-700 hover:text-white font-medium transition-colors border border-white/20 rounded-lg hover:bg-gray-50"
               >
                 Voltar ao Dashboard
               </button>
@@ -152,7 +152,7 @@ export default function Audits() {
         {/* Action Bar */}
         <div className="mb-6 flex justify-between items-center">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">Minhas Auditorias</h2>
+            <h2 className="text-xl font-semibold text-white">Minhas Auditorias</h2>
             <p className="text-sm text-gray-600 mt-1">{audits.length} auditorias encontradas</p>
           </div>
           <button
@@ -173,13 +173,13 @@ export default function Audits() {
 
         {/* Audits Grid */}
         {audits.length === 0 ? (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-12 text-center">
+          <div className="bg-white/5 rounded-xl shadow-sm border border-white/20 p-12 text-center">
             <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
               </svg>
             </div>
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">Nenhuma auditoria encontrada</h3>
+            <h3 className="text-lg font-semibold text-white mb-2">Nenhuma auditoria encontrada</h3>
             <p className="text-gray-600 mb-6">Comece criando sua primeira auditoria KRCI</p>
             <button
               onClick={createNewAudit}
@@ -194,7 +194,7 @@ export default function Audits() {
             {audits.map((audit) => (
               <div
                 key={audit.id}
-                className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer"
+                className="bg-white/5 rounded-xl shadow-sm border border-white/20 p-6 hover:shadow-md transition-shadow cursor-pointer"
                 onClick={() => alert(`Visualizar auditoria: ${audit.id}`)}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -207,7 +207,7 @@ export default function Audits() {
                     {getStatusLabel(audit.status)}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{audit.title}</h3>
+                <h3 className="text-lg font-semibold text-white mb-2">{audit.title}</h3>
                 <p className="text-sm text-gray-600 mb-4">Tipo: {audit.type}</p>
                 <div className="text-xs text-gray-500">
                   <p>Criado: {new Date(audit.createdAt).toLocaleDateString('pt-BR')}</p>

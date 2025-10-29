@@ -35,7 +35,7 @@ export default function Dashboard() {
 
  if (loading) {
  return (
- <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+ <div className="min-h-screen bg-[#000020] flex items-center justify-center">
  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
  </div>
  );
@@ -50,7 +50,7 @@ export default function Dashboard() {
  {/* Main Content */}
  <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
  {/* Welcome Section */}
- <div className="bg-white rounded-2xl shadow-lg p-8 mb-8">
+ <div className="bg-white/5 rounded-2xl shadow-lg p-8 mb-8">
  <h2 className="text-3xl font-bold text-slate-900 mb-2">
  Bem-vindo ao QIVO Mining! 
  </h2>
@@ -201,7 +201,7 @@ export default function Dashboard() {
  </div>
 
  {/* Usage Stats */}
- <div className="bg-white rounded-2xl shadow-lg p-8">
+ <div className="bg-white/5 rounded-2xl shadow-lg p-8">
  <h3 className="text-xl font-bold text-slate-900 mb-6">Uso do Plano</h3>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  {/* Reports Usage */}

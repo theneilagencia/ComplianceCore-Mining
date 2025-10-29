@@ -152,7 +152,7 @@ export default function PricingPage() {
           </div>
           <button
             onClick={() => setLocation('/')}
-            className="text-gray-600 hover:text-gray-900"
+            className="text-gray-600 hover:text-white"
           >
             Voltar
           </button>
@@ -176,7 +176,7 @@ export default function PricingPage() {
             className={`px-6 py-2 rounded-full transition-all ${
               billingPeriod === 'monthly'
                 ? 'bg-blue-600 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-gray-600 hover:text-white'
             }`}
           >
             Mensal
@@ -186,7 +186,7 @@ export default function PricingPage() {
             className={`px-6 py-2 rounded-full transition-all ${
               billingPeriod === 'annual'
                 ? 'bg-blue-600 text-white'
-                : 'text-gray-600 hover:text-gray-900'
+                : 'text-gray-600 hover:text-white'
             }`}
           >
             Anual
@@ -232,7 +232,7 @@ export default function PricingPage() {
                 className={`w-full py-3 rounded-lg font-semibold mb-2 transition-all ${
                   plan.popular
                     ? 'bg-blue-600 text-white hover:bg-blue-700'
-                    : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                    : 'bg-gray-100 text-white hover:bg-gray-200'
                 } disabled:opacity-50`}
               >
                 {loading === plan.name ? 'Processando...' : plan.cta}
@@ -295,7 +295,7 @@ export default function PricingPage() {
             Comparação Detalhada de Planos
           </h2>
           
-          <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-white/5 rounded-2xl shadow-xl overflow-hidden">
             <table className="w-full">
               <thead className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                 <tr>
@@ -378,7 +378,7 @@ export default function PricingPage() {
           </h2>
           
           <div className="space-y-6">
-            <div className="bg-white rounded-lg p-6 shadow">
+            <div className="bg-white/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 Posso mudar de plano depois?
               </h3>
@@ -388,7 +388,7 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow">
+            <div className="bg-white/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 O que acontece se eu exceder o limite de relatórios?
               </h3>
@@ -398,7 +398,7 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow">
+            <div className="bg-white/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 Há garantia de reembolso?
               </h3>
@@ -408,7 +408,7 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="bg-white rounded-lg p-6 shadow">
+            <div className="bg-white/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 Quais métodos de pagamento são aceitos?
               </h3>

@@ -189,7 +189,7 @@ export default function HelpSupport() {
  </div>
 
  {/* FAQs */}
- <div className="bg-white rounded-xl shadow-lg p-6">
+ <div className="bg-white/5 rounded-xl shadow-lg p-6">
  <h2 className="text-2xl font-bold text-slate-900 mb-6"> Perguntas Frequentes</h2>
  
  {filteredFaqs.length === 0 ? (
@@ -201,7 +201,7 @@ export default function HelpSupport() {
  <div className="space-y-4">
  {filteredFaqs.map((faq, index) => (
  <details key={index} className="group">
- <summary className="flex items-center justify-between cursor-pointer p-4 bg-slate-50 rounded-lg hover:bg-slate-100 transition-colors">
+ <summary className="flex items-center justify-between cursor-pointer p-4 bg-[#000020] rounded-lg hover:bg-slate-100 transition-colors">
  <span className="font-semibold text-slate-900">{faq.question}</span>
  <svg className="w-5 h-5 text-slate-500 group-open:rotate-180 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
