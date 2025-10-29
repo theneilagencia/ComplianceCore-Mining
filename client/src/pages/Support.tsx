@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 import DashboardLayout from '../components/DashboardLayout';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 interface Manual {
  id: string;
  title: string;
@@ -41,7 +43,7 @@ export default function Support() {
 
  const fetchManuals = async () => {
  try {
- const response = await fetch('/api/support/manuals', {
+ const response = await fetch(`${API_BASE_URL}/api/support/manuals`, {
  credentials: 'include',
  });
 

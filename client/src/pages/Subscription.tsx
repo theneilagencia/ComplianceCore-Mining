@@ -12,6 +12,8 @@ import {
   Loader2,
 } from 'lucide-react';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 interface License {
   id: string;
   plan: string;
@@ -100,7 +102,7 @@ export default function Subscription() {
 
   const fetchSubscriptionData = async () => {
     try {
-      const response = await fetch('/api/license/subscription', {
+      const response = await fetch(`${API_BASE_URL}/api/license/subscription`, {
         credentials: 'include',
       });
 
@@ -119,7 +121,7 @@ export default function Subscription() {
 
   const fetchInvoices = async () => {
     try {
-      const response = await fetch('/api/license/invoices', {
+      const response = await fetch(`${API_BASE_URL}/api/license/invoices`, {
         credentials: 'include',
       });
 
@@ -139,7 +141,7 @@ export default function Subscription() {
 
     setCancelLoading(true);
     try {
-      const response = await fetch('/api/license/cancel', {
+      const response = await fetch(`${API_BASE_URL}/api/license/cancel`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -164,7 +166,7 @@ export default function Subscription() {
 
     setChangePlanLoading(true);
     try {
-      const response = await fetch('/api/license/change-plan', {
+      const response = await fetch(`${API_BASE_URL}/api/license/change-plan`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -190,7 +192,7 @@ export default function Subscription() {
   const handleOpenPortal = async () => {
     setPortalLoading(true);
     try {
-      const response = await fetch('/api/license/portal', {
+      const response = await fetch(`${API_BASE_URL}/api/license/portal`, {
         method: 'POST',
         credentials: 'include',
       });
@@ -236,7 +238,7 @@ export default function Subscription() {
   if (error || !data) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 flex items-center justify-center p-4">
-        <div className="bg-white/5/5 rounded-xl shadow-lg p-8 max-w-md w-full text-center">
+        <div className="bg-white/5 rounded-xl shadow-lg p-8 max-w-md w-full text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
           <h2 className="text-2xl font-bold text-slate-800 mb-2">Erro ao Carregar</h2>
           <p className="text-gray-400 mb-6">{error || 'Não foi possível carregar os dados da assinatura'}</p>
@@ -259,7 +261,7 @@ export default function Subscription() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-white/5/5 border-b border-white/20">
+      <div className="bg-white/5 border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">

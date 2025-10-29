@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 interface UserSettings {
   id: string;
   email: string;
@@ -27,7 +29,7 @@ export default function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await fetch('/api/settings', {
+      const response = await fetch(`${API_BASE_URL}/api/settings`, {
         credentials: 'include',
       });
 
@@ -52,7 +54,7 @@ export default function Settings() {
     setSuccess('');
 
     try {
-      const response = await fetch('/api/settings', {
+      const response = await fetch(`${API_BASE_URL}/api/settings`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
@@ -105,7 +107,7 @@ export default function Settings() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
       {/* Header */}
-      <div className="bg-white/5/5 shadow-sm border-b border-white/20">
+      <div className="bg-white/5 shadow-sm border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
@@ -152,7 +154,7 @@ export default function Settings() {
         )}
 
         {/* Settings Form */}
-        <div className="bg-white/5/5 rounded-xl shadow-sm border border-white/20 overflow-hidden">
+        <div className="bg-white/5 rounded-xl shadow-sm border border-white/20 overflow-hidden">
           {/* Personal Information */}
           <div className="p-6 border-b border-white/20">
             <h2 className="text-lg font-semibold text-white mb-4">Informações Pessoais</h2>

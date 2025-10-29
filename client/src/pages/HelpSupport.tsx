@@ -189,7 +189,7 @@ export default function HelpSupport() {
  </div>
 
  {/* FAQs */}
- <div className="bg-white/5/5 rounded-xl shadow-lg p-6">
+ <div className="bg-white/5 rounded-xl shadow-lg p-6">
  <h2 className="text-2xl font-bold text-white mb-6"> Perguntas Frequentes</h2>
  
  {filteredFaqs.length === 0 ? (

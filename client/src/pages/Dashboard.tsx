@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 export default function Dashboard() {
  const [, setLocation] = useLocation();
  const [license, setLicense] = useState<any>(null);
@@ -13,7 +15,7 @@ export default function Dashboard() {
 
  const fetchLicense = async () => {
  try {
- const response = await fetch('/api/license/subscription', {
+ const response = await fetch(`${API_BASE_URL}/api/license/subscription`, {
  credentials: 'include',
  });
 

@@ -221,7 +221,7 @@ export default function PricingPage() {
             Perguntas Frequentes
           </h2>
           <div className="space-y-6">
-            <div className="bg-white/5/5 rounded-lg p-6 shadow-md">
+            <div className="bg-white/5 rounded-lg p-6 shadow-md">
               <h3 className="font-semibold text-lg text-white mb-2">
                 Posso cancelar a qualquer momento?
               </h3>
@@ -229,7 +229,7 @@ export default function PricingPage() {
                 Sim! Você pode cancelar sua assinatura a qualquer momento através do portal de gerenciamento. Não há taxas de cancelamento.
               </p>
             </div>
-            <div className="bg-white/5/5 rounded-lg p-6 shadow-md">
+            <div className="bg-white/5 rounded-lg p-6 shadow-md">
               <h3 className="font-semibold text-lg text-white mb-2">
                 Como funciona o período de teste?
               </h3>
@@ -237,7 +237,7 @@ export default function PricingPage() {
                 O plano START é completamente gratuito e não requer cartão de crédito. Você pode testar a plataforma sem compromisso.
               </p>
             </div>
-            <div className="bg-white/5/5 rounded-lg p-6 shadow-md">
+            <div className="bg-white/5 rounded-lg p-6 shadow-md">
               <h3 className="font-semibold text-lg text-white mb-2">
                 Posso fazer upgrade ou downgrade?
               </h3>

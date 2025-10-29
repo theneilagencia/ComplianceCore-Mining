@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { useLocation } from 'wouter';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 interface LicenseStats {
   plan: string;
   status: string;
@@ -26,7 +28,7 @@ export default function AccountPage() {
 
   const fetchLicenseStatus = async () => {
     try {
-      const response = await fetch('/api/license/status', {
+      const response = await fetch(`${API_BASE_URL}/api/license/status`, {
         credentials: 'include', // Send cookies for authentication
       });
       
@@ -45,7 +47,7 @@ export default function AccountPage() {
 
   const handleManageSubscription = async () => {
     try {
-      const response = await fetch('/api/payment/portal');
+      const response = await fetch(`${API_BASE_URL}/api/payment/portal`);
       const data = await response.json();
       
       if (data.url) {
@@ -109,7 +111,7 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-[#000020]">
       {/* Header */}
-      <header className="bg-white/5/5 border-b">
+      <header className="bg-white/5 border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
             <img
@@ -133,7 +135,7 @@ export default function AccountPage() {
 
       <div className="container mx-auto px-4 py-8 max-w-4xl">
         {/* Plan Overview */}
-        <div className="bg-white/5/5 rounded-lg shadow-lg p-6 mb-6">
+        <div className="bg-white/5 rounded-lg shadow-lg p-6 mb-6">
           <div className="flex justify-between items-start mb-6">
             <div>
               <h2 className="text-2xl font-bold mb-2">Plano Atual</h2>
@@ -200,7 +202,7 @@ export default function AccountPage() {
 
         {/* Billing Info */}
         {stats.plan !== 'START' && (
-          <div className="bg-white/5/5 rounded-lg shadow-lg p-6 mb-6">
+          <div className="bg-white/5 rounded-lg shadow-lg p-6 mb-6">
             <h2 className="text-xl font-bold mb-4">Informações de Cobrança</h2>
             
             <div className="space-y-3">
@@ -241,7 +243,7 @@ export default function AccountPage() {
         )}
 
         {/* Plan Features */}
-        <div className="bg-white/5/5 rounded-lg shadow-lg p-6">
+        <div className="bg-white/5 rounded-lg shadow-lg p-6">
           <h2 className="text-xl font-bold mb-4">Recursos do Seu Plano</h2>
           
           <ul className="space-y-2">

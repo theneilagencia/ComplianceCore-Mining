@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { Link } from 'wouter';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 export default function ForgotPassword() {
   const [email, setEmail] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -13,7 +15,7 @@ export default function ForgotPassword() {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/forgot-password', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/forgot-password`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -36,7 +38,7 @@ export default function ForgotPassword() {
   if (submitted) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-        <div className="bg-white/5/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
+        <div className="bg-white/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
           <div className="text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
               <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -60,7 +62,7 @@ export default function ForgotPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-purple-50">
-      <div className="bg-white/5/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
+      <div className="bg-white/5 p-8 rounded-2xl shadow-xl max-w-md w-full">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-[#2f2c79] rounded-lg flex items-center justify-center mx-auto mb-4">
             <span className="text-white font-bold text-2xl">JI</span>

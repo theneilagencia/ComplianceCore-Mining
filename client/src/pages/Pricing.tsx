@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 interface PlanFeature {
   text: string;
   included: boolean;
@@ -88,7 +90,7 @@ export default function PricingPage() {
     setLoading(planName);
 
     try {
-      const response = await fetch('/api/payment/checkout', {
+      const response = await fetch(`${API_BASE_URL}/api/payment/checkout`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -295,7 +297,7 @@ export default function PricingPage() {
             Comparação Detalhada de Planos
           </h2>
           
-          <div className="bg-white/5/5 rounded-2xl shadow-xl overflow-hidden">
+          <div className="bg-white/5 rounded-2xl shadow-xl overflow-hidden">
             <table className="w-full">
               <thead className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
                 <tr>
@@ -378,7 +380,7 @@ export default function PricingPage() {
           </h2>
           
           <div className="space-y-6">
-            <div className="bg-white/5/5 rounded-lg p-6 shadow">
+            <div className="bg-white/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 Posso mudar de plano depois?
               </h3>
@@ -388,7 +390,7 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="bg-white/5/5 rounded-lg p-6 shadow">
+            <div className="bg-white/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 O que acontece se eu exceder o limite de relatórios?
               </h3>
@@ -398,7 +400,7 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="bg-white/5/5 rounded-lg p-6 shadow">
+            <div className="bg-white/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 Há garantia de reembolso?
               </h3>
@@ -408,7 +410,7 @@ export default function PricingPage() {
               </p>
             </div>
 
-            <div className="bg-white/5/5 rounded-lg p-6 shadow">
+            <div className="bg-white/5 rounded-lg p-6 shadow">
               <h3 className="font-semibold mb-2">
                 Quais métodos de pagamento são aceitos?
               </h3>

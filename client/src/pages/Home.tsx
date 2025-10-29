@@ -11,6 +11,8 @@ import {
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || "";
+
 export default function Home() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
@@ -20,7 +22,7 @@ export default function Home() {
   const handleSubscriptionCheckout = async (plan: string) => {
     setCheckoutLoading(true);
     try {
-      const response = await fetch('/api/payment/checkout', {
+      const response = await fetch(`${API_BASE_URL}/api/payment/checkout`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -52,7 +54,7 @@ export default function Home() {
 
     setCheckoutLoading(true);
     try {
-      const response = await fetch('/api/payment/one-time', {
+      const response = await fetch(`${API_BASE_URL}/api/payment/one-time`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -199,7 +201,7 @@ export default function Home() {
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Radar Regulatório */}
-              <Card className="p-6 bg-white/5/5 border-white/10 hover:bg-white/5/10 transition-all">
+              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/5/10 transition-all">
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-[#2f2c79] rounded-lg">
                     <Radar className="h-8 w-8 text-white" />
@@ -216,7 +218,7 @@ export default function Home() {
               </Card>
 
               {/* Gerador de Relatórios */}
-              <Card className="p-6 bg-white/5/5 border-white/10 hover:bg-white/5/10 transition-all">
+              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/5/10 transition-all">
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-[#8d4925] rounded-lg">
                     <FileText className="h-8 w-8 text-white" />
@@ -233,7 +235,7 @@ export default function Home() {
               </Card>
 
               {/* Auditoria KRCI */}
-              <Card className="p-6 bg-white/5/5 border-white/10 hover:bg-white/5/10 transition-all">
+              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/5/10 transition-all">
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-[#b96e48] rounded-lg">
                     <Shield className="h-8 w-8 text-white" />
@@ -250,7 +252,7 @@ export default function Home() {
               </Card>
 
               {/* Bridge Regulatória */}
-              <Card className="p-6 bg-white/5/5 border-white/10 hover:bg-white/5/10 transition-all">
+              <Card className="p-6 bg-white/5 border-white/10 hover:bg-white/5/10 transition-all">
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-[#2f2c79] rounded-lg">
                     <ArrowRightLeft className="h-8 w-8 text-white" />
@@ -270,7 +272,7 @@ export default function Home() {
         </section>
 
         {/* Integrações Oficiais */}
-        <section className="bg-white/5/5 py-20 border-y border-white/10">
+        <section className="bg-white/5 py-20 border-y border-white/10">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
@@ -290,7 +292,7 @@ export default function Home() {
                   { icon: BarChart3, name: "USGS – MRDS/USMIN", area: "Benchmark técnico", desc: "Comparação de depósitos regionais" },
                   { icon: Satellite, name: "Copernicus / NASA", area: "Satelital", desc: "Detecção de alterações de solo" },
                 ].map((integration, i) => (
-                  <Card key={i} className="p-4 bg-white/5/5 border-white/10">
+                  <Card key={i} className="p-4 bg-white/5 border-white/10">
                     <div className="flex items-start gap-3">
                       <integration.icon className="h-6 w-6 text-[#b96e48] flex-shrink-0" />
                       <div>
@@ -322,7 +324,7 @@ export default function Home() {
                 { title: "Transparência ambiental", desc: "Integração com dados públicos e satelitais" },
                 { title: "Escalabilidade operacional", desc: "Estrutura robusta e compatível com grandes volumes" },
               ].map((diff, i) => (
-                <Card key={i} className="p-6 bg-white/5/5 border-white/10">
+                <Card key={i} className="p-6 bg-white/5 border-white/10">
                   <div className="flex items-start gap-3">
                     <Check className="h-5 w-5 text-[#b96e48] flex-shrink-0 mt-1" />
                     <div>
@@ -347,7 +349,7 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
                 {/* Start */}
-                <Card className="p-6 bg-white/5/5 border-white/10">
+                <Card className="p-6 bg-white/5 border-white/10">
                   <h3 className="text-2xl font-bold text-white mb-2">Start</h3>
                   <p className="text-gray-300 mb-4 text-sm">Consultores e pequenas mineradoras</p>
                   <div className="text-4xl font-bold text-[#b96e48] mb-4">
@@ -410,7 +412,7 @@ export default function Home() {
                 </Card>
 
                 {/* Enterprise */}
-                <Card className="p-6 bg-white/5/5 border-white/10">
+                <Card className="p-6 bg-white/5 border-white/10">
                   <h3 className="text-2xl font-bold text-white mb-2">Enterprise</h3>
                   <p className="text-gray-300 mb-4 text-sm">Mineradoras e órgãos reguladores</p>
                   <div className="text-4xl font-bold text-[#b96e48] mb-4">
@@ -441,7 +443,7 @@ export default function Home() {
               </div>
 
               {/* Relatórios Avulsos */}
-              <div className="bg-white/5/5 rounded-lg p-8 border border-white/10">
+              <div className="bg-white/5 rounded-lg p-8 border border-white/10">
                 <h3 className="text-2xl font-bold text-white mb-4">
                   Relatórios Avulsos — On-Demand
                 </h3>
@@ -456,7 +458,7 @@ export default function Home() {
                     { name: "Auditável", desc: "Com KRCI e assinatura digital verificável", price: "$9,800", time: "1–2h", type: "auditable" },
                     { name: "ESG Integrado", desc: "Integra dados IBAMA + Copernicus + NASA", price: "$12,500", time: "2–3h", type: "esg" },
                   ].map((report, i) => (
-                    <Card key={i} className="p-4 bg-white/5/5 border-white/10">
+                    <Card key={i} className="p-4 bg-white/5 border-white/10">
                       <h4 className="font-bold text-white mb-2">{report.name}</h4>
                       <p className="text-xs text-gray-400 mb-3">{report.desc}</p>
                       <div className="flex items-center justify-between mb-3">
