@@ -26,6 +26,7 @@ import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
 import makeAdminRouter from "../modules/dev/make-admin-router";
+import initProdRouter from "../modules/dev/init-prod-router";
 import createTablesRouter from "../modules/dev/create-tables-router";
 import populateDbRouter from "../modules/dev/populate-db-router";
 import stripeWebhookSetupRouter from "../modules/dev/setup-stripe-webhook";
@@ -106,6 +107,9 @@ async function startServer() {
   
   // Database initialization route (temporary, for setup)
   app.use("/api", initDbRouter);
+  
+  // Production initialization route (one-time setup)
+  app.use("/api", initProdRouter);
   
   // Make admin route (temporary, for setup)
   app.use("/api/dev", makeAdminRouter);
