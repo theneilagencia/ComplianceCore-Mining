@@ -3,6 +3,7 @@ import { protectedProcedure, router } from "../../../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { runAudit } from "../services/audit";
 import { runKRCIScan, getKRCIStats, ScanMode } from "../services/krci-extended";
+import { generateCorrectionPlan, exportCorrectionPlan } from "../services/correction-plan";
 import { generateAuditPDF } from "../services/pdf-generator";
 import { eq } from "drizzle-orm";
 
@@ -331,6 +332,122 @@ export const auditRouter = router({
   getStats: protectedProcedure
     .query(() => {
       return getKRCIStats();
+    }),
+
+  // Generate correction plan from audit
+  correctionPlan: protectedProcedure
+    .input(
+      z.object({
+        auditId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { audits } = await import("../../../../drizzle/schema");
+
+      const [audit] = await db
+        .select()
+        .from(audits)
+        .where(eq(audits.id, input.auditId))
+        .limit(1);
+
+      if (!audit) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Auditoria não encontrada",
+        });
+      }
+
+      if (audit.tenantId !== ctx.user.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+
+      const scanResult = {
+        mode: (audit.auditType === "partial" ? "light" : "full") as ScanMode,
+        score: audit.score,
+        totalRules: audit.totalRules,
+        passedRules: audit.passedRules,
+        failedRules: audit.failedRules,
+        krcis: audit.krcisJson as any[],
+        categoryScores: {},
+        recommendations: audit.recommendationsJson as string[],
+        executionTime: 0,
+      };
+
+      const plan = generateCorrectionPlan(audit.reportId, scanResult);
+
+      return plan;
+    }),
+
+  // Export correction plan
+  exportPlan: protectedProcedure
+    .input(
+      z.object({
+        auditId: z.string(),
+        format: z.enum(["json", "markdown", "csv"]),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { audits } = await import("../../../../drizzle/schema");
+
+      const [audit] = await db
+        .select()
+        .from(audits)
+        .where(eq(audits.id, input.auditId))
+        .limit(1);
+
+      if (!audit) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Auditoria não encontrada",
+        });
+      }
+
+      if (audit.tenantId !== ctx.user.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+
+      const scanResult = {
+        mode: (audit.auditType === "partial" ? "light" : "full") as ScanMode,
+        score: audit.score,
+        totalRules: audit.totalRules,
+        passedRules: audit.passedRules,
+        failedRules: audit.failedRules,
+        krcis: audit.krcisJson as any[],
+        categoryScores: {},
+        recommendations: audit.recommendationsJson as string[],
+        executionTime: 0,
+      };
+
+      const plan = generateCorrectionPlan(audit.reportId, scanResult);
+      const exported = exportCorrectionPlan(plan, input.format);
+
+      return {
+        format: input.format,
+        content: exported,
+        filename: `correction-plan-${audit.reportId}.${input.format}`,
+      };
     }),
 });
 
