@@ -133,7 +133,7 @@ export default function Home() {
           <div className="max-w-5xl mx-auto text-center space-y-8">
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-[#2f2c79]/20 text-[#b96e48] rounded-full text-sm font-medium mb-4 border border-[#b96e48]/30">
               <Globe className="h-4 w-4" aria-hidden="true" />
-              Infraestrutura Digital de Governança Técnica Global
+              Governança Técnica, Regulatória e Ambiental
             </div>
             
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight text-white">
