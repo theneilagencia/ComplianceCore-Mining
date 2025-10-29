@@ -307,6 +307,7 @@ export default function Admin() {
     }
 
     try {
+      console.log('[Admin] Creating user:', newUser.email);
       const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -314,15 +315,27 @@ export default function Admin() {
         body: JSON.stringify(newUser),
       });
 
-      if (!response.ok) throw new Error('Failed to create user');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        console.error('[Admin] Create user failed:', errorData);
+        throw new Error(errorData.error || 'Failed to create user');
+      }
 
+      const result = await response.json();
+      console.log('[Admin] User created successfully:', result);
+      
       alert('Usuário criado com sucesso!');
       handleCloseCreateUserModal();
       setNewUser({ email: '', fullName: '', password: '', plan: 'START' });
-      fetchUsers();
-    } catch (error) {
-      console.error('Error creating user:', error);
-      alert('Erro ao criar usuário');
+      
+      // Aguardar um pouco antes de recarregar para garantir que o banco foi atualizado
+      setTimeout(() => {
+        console.log('[Admin] Reloading users list...');
+        fetchUsers();
+      }, 500);
+    } catch (error: any) {
+      console.error('[Admin] Error creating user:', error);
+      alert(`Erro ao criar usuário: ${error.message || 'Erro desconhecido'}`);
     }
   };
 
