@@ -147,7 +147,7 @@ export default function PricingPage() {
             <img src="/qivo-logo.png" alt="QIVO Mining" className="w-10 h-10 rounded-lg" />
             <div>
               <div className="font-bold text-lg">QIVO Mining</div>
-              <div className="text-xs text-gray-500">Infraestrutura de Governança Minerária Digital</div>
+              <div className="text-xs text-gray-300">Governança Técnica, Regulatória e Ambiental</div>
             </div>
           </div>
           <button
@@ -426,7 +426,7 @@ export default function PricingPage() {
         <div className="container mx-auto px-4 text-center text-gray-400">
           <p>© 2025 QIVO Mining</p>
           <p className="text-sm mt-2">
-            Infraestrutura de Governança Minerária Digital
+            Governança Técnica, Regulatória e Ambiental
           </p>
         </div>
       </footer>
