@@ -136,21 +136,21 @@ export default function Dashboard() {
 
  {/* Pre-Certification removed - replaced by KRCI */}
 
- {/* Export Standards */}
- <button
- onClick={() => setLocation('/reports/export')}
- className="p-6 bg-white/5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
- >
- <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
- <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
- </svg>
- </div>
- <h3 className="text-lg font-semibold text-white mb-2">Exportar Padrões</h3>
- <p className="text-gray-400 text-sm">
- Exporte relatórios em diferentes formatos
- </p>
- </button>
+	 {/* Bridge Regulatória Global */}
+	 <button
+	 onClick={() => setLocation('/reports/regulatory')}
+	 className="p-6 backdrop-blur-md bg-white/5 border border-white/10 rounded-xl shadow-lg hover:bg-white/10 hover:shadow-xl hover:-translate-y-1 transition-all text-left"
+	 >
+	 <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-4">
+	 <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+	 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+	 </svg>
+	 </div>
+	 <h3 className="text-lg font-semibold text-white mb-2">Bridge Regulatória</h3>
+	 <p className="text-gray-400 text-sm">
+	 Conversão entre padrões regulatórios globais
+	 </p>
+	 </button>
 
  {/* ESG Reporting removed - not in briefing */}
 
@@ -174,37 +174,7 @@ export default function Dashboard() {
 
  {/* Governança & Segurança removed - not in briefing */}
 
- {/* Subscription */}
- <button
- onClick={() => setLocation('/subscription')}
- className="p-6 bg-white/5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
- >
- <div className="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center mb-4">
- <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
- </svg>
- </div>
- <h3 className="text-lg font-semibold text-white mb-2">Gerenciar Assinatura</h3>
- <p className="text-gray-400 text-sm">
- Veja seu plano, faturas e configurações
- </p>
- </button>
-
- {/* Help/Support */}
- <button
- onClick={() => setLocation('/help')}
- className="p-6 bg-white/5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
- >
- <div className="w-12 h-12 bg-yellow-100 rounded-lg flex items-center justify-center mb-4">
- <svg className="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
- <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
- </svg>
- </div>
- <h3 className="text-lg font-semibold text-white mb-2">Ajuda & Suporte</h3>
- <p className="text-gray-400 text-sm">
- Documentação e suporte técnico
- </p>
- </button>
+	 {/* Subscription and Help/Support removed - not core modules */}
 
  {/* Admin Panel - Only visible for admin users */}
  {user?.role === 'admin' && (
