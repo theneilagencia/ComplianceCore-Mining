@@ -50,11 +50,16 @@ router.post('/', async (req, res) => {
       .limit(1);
     
     if (existingAdmin.length > 0) {
-      return res.json({
-        success: true,
-        message: 'Admin user already exists',
-        userId: existingAdmin[0].id,
-      });
+      // Delete existing admin and recreate
+      const userId = existingAdmin[0].id;
+      
+      // Delete existing license
+      await db.delete(licenses).where(eq(licenses.userId, userId));
+      
+      // Delete existing user
+      await db.delete(users).where(eq(users.id, userId));
+      
+      console.log('[Create Admin] Deleted existing admin user');
     }
     
     // Hash password
