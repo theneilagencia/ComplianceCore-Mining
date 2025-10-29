@@ -7,6 +7,7 @@ export default function Dashboard() {
  const [loading, setLoading] = useState(true);
 
  useEffect(() => {
+ console.log('🎯 QIVO Dashboard v1.2.x - Design System Active');
  fetchLicense();
  }, []);
 
