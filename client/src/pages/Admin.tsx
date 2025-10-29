@@ -94,7 +94,7 @@ interface Profit {
 
 export default function Admin() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'sales' | 'costs'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'manage-users' | 'sales' | 'costs'>('dashboard');
   const [stats, setStats] = useState<Stats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
@@ -118,6 +118,8 @@ export default function Admin() {
     if (activeTab === 'dashboard') {
       fetchDashboardData();
     } else if (activeTab === 'users') {
+      fetchUsers();
+    } else if (activeTab === 'manage-users') {
       fetchUsers();
     } else if (activeTab === 'sales') {
       fetchSalesData();
@@ -377,6 +379,7 @@ export default function Admin() {
             {[
               { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
               { id: 'users', label: 'Usuários', icon: Users },
+              { id: 'manage-users', label: 'Gerenciar Usuários', icon: Settings },
               { id: 'sales', label: 'Vendas', icon: CreditCard },
               { id: 'costs', label: 'Custos', icon: Database },
             ].map(({ id, label, icon: Icon }) => (
@@ -730,6 +733,124 @@ export default function Admin() {
                   <p className="text-gray-400 text-sm">Mapbox Requests</p>
                   <p className="text-2xl font-bold text-white mt-1">{(costs?.usage.mapboxRequests || 0).toLocaleString()}</p>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Manage Users Tab */}
+        {activeTab === 'manage-users' && (
+          <div className="space-y-6">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Gerenciar Usuários</h2>
+              <button
+                onClick={openCreateModal}
+                className="px-6 py-3 bg-gradient-to-r from-[#7ed957] to-[#6bc247] text-white rounded-lg hover:opacity-90 transition-opacity font-medium flex items-center gap-2"
+              >
+                <Users className="w-5 h-5" />
+                Criar Novo Usuário
+              </button>
+            </div>
+
+            {/* Search Bar */}
+            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-4">
+              <input
+                type="text"
+                placeholder="Buscar por nome ou email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
+              />
+            </div>
+
+            {/* Users Table */}
+            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/10">
+                <h3 className="text-lg font-semibold text-white">Todos os Usuários ({filteredUsers.length})</h3>
+              </div>
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="bg-white/10">
+                    <tr>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Usuário</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Plano</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Uso</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado em</th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-white/10">
+                    {filteredUsers.map((user) => (
+                      <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <div>
+                            <p className="text-white font-medium">{user.fullName || '-'}</p>
+                            <p className="text-gray-400 text-xs">{user.email}</p>
+                          </div>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            user.license?.plan === 'ENTERPRISE' ? 'bg-[#8d4925]/20 text-[#b96e48]' :
+                            user.license?.plan === 'PRO' ? 'bg-blue-500/20 text-blue-400' :
+                            'bg-gray-500/20 text-gray-400'
+                          }`}>
+                            {user.license?.plan || 'START'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                            user.license?.status === 'active' ? 'bg-green-500/20 text-green-400' :
+                            user.license?.status === 'suspended' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>
+                            {user.license?.status === 'active' ? 'Ativo' :
+                             user.license?.status === 'suspended' ? 'Suspenso' : 'Cancelado'}
+                          </span>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          {user.license?.reportsUsed || 0} / {user.license?.reportsLimit || 0}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-300">
+                          {new Date(user.createdAt).toLocaleDateString('pt-BR')}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <button
+                            onClick={() => {
+                              setEditingUser(user);
+                              setShowEditModal(true);
+                            }}
+                            className="px-3 py-1 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors text-xs font-medium"
+                          >
+                            Editar
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Quick Stats */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                <p className="text-gray-400 text-sm">Usuários Ativos</p>
+                <p className="text-3xl font-bold text-[#7ed957] mt-2">
+                  {users.filter(u => u.license?.status === 'active').length}
+                </p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                <p className="text-gray-400 text-sm">Usuários Suspensos</p>
+                <p className="text-3xl font-bold text-yellow-400 mt-2">
+                  {users.filter(u => u.license?.status === 'suspended').length}
+                </p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                <p className="text-gray-400 text-sm">Usuários Cancelados</p>
+                <p className="text-3xl font-bold text-red-400 mt-2">
+                  {users.filter(u => u.license?.status === 'cancelled').length}
+                </p>
               </div>
             </div>
           </div>
