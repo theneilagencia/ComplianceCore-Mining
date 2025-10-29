@@ -44,19 +44,19 @@ export default function Dashboard() {
  const canCreateReport = license?.stats?.reportsUsed < license?.stats?.reportsLimit;
  const canCreateProject = license?.stats?.projectsActive < license?.stats?.projectsLimit;
 
- return (
- <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-[#000020] via-[#171a4a] to-[#2f2c79]">
 
  {/* Main Content */}
  <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
  {/* Welcome Section */}
- <div className="bg-white/5/5 rounded-2xl shadow-lg p-8 mb-8">
- <h2 className="text-3xl font-bold text-white mb-2">
- Bem-vindo ao QIVO Mining! 
- </h2>
- <p className="text-gray-400 text-lg">
- Plataforma de Geração de Relatórios Técnicos de Mineração
- </p>
+      <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl shadow-lg p-8 mb-8">
+        <h2 className="text-3xl font-bold text-white mb-2">
+          Bem-vindo ao QIVO Mining
+        </h2>
+        <p className="text-gray-300 text-lg">
+          Governança Técnica, Regulatória e Ambiental para Mineração
+        </p>
  </div>
 
  {/* Plan Status */}
@@ -89,11 +89,11 @@ export default function Dashboard() {
  }
  }}
  disabled={!canCreateReport}
- className={`p-6 rounded-xl shadow-lg text-left transition-all ${
- canCreateReport
- ? 'bg-white/5 hover:shadow-xl hover:-translate-y-1 cursor-pointer'
- : 'bg-[#171a4a] cursor-not-allowed opacity-60'
- }`}
+        className={`p-6 rounded-xl shadow-lg text-left transition-all ${
+          canCreateReport
+            ? 'backdrop-blur-md bg-white/5 border border-white/10 hover:bg-white/10 hover:shadow-xl hover:-translate-y-1 cursor-pointer'
+            : 'backdrop-blur-md bg-white/5 border border-white/10 cursor-not-allowed opacity-60'
+        }`}
  >
  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
  <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +102,7 @@ export default function Dashboard() {
  </div>
  <h3 className="text-lg font-semibold text-white mb-2">Gerar Relatório</h3>
  <p className="text-gray-400 text-sm">
- Crie um novo relatório técnico JORC/NI 43-101
+          Crie relatórios técnicos de mineração com IA
  </p>
  {!canCreateReport && (
  <p className="text-red-600 text-xs mt-2 font-semibold">
@@ -114,7 +114,7 @@ export default function Dashboard() {
  {/* Audit KRCI */}
  <button
  onClick={() => setLocation('/reports/audit')}
- className="p-6 bg-white/5 rounded-xl shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all text-left"
+        className="p-6 backdrop-blur-md bg-white/5 border border-white/10 rounded-xl shadow-lg hover:bg-white/10 hover:shadow-xl hover:-translate-y-1 transition-all text-left"
  >
  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mb-4">
  <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -201,7 +201,7 @@ export default function Dashboard() {
  </div>
 
  {/* Usage Stats */}
- <div className="bg-white/5/5 rounded-2xl shadow-lg p-8">
+      <div className="backdrop-blur-md bg-white/5 border border-white/10 rounded-2xl shadow-lg p-8">
  <h3 className="text-xl font-bold text-white mb-6">Uso do Plano</h3>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
  {/* Reports Usage */}

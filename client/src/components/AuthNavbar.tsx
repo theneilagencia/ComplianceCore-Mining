@@ -7,19 +7,21 @@ export default function AuthNavbar() {
  if (!user) return null;
 
  return (
- <header className="bg-white/5 border-b border-white/20 sticky top-0 z-50">
+  <header className="backdrop-blur-md bg-white/5 border-b border-white/10 sticky top-0 z-50">
  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
  <div className="flex justify-between items-center h-16">
  {/* Logo and Brand */}
- <Link href="/dashboard" className="flex items-center gap-3">
- <div className="w-10 h-10 bg-[#2f2c79] rounded-lg flex items-center justify-center text-white font-bold text-xl">
- JI
- </div>
- <div>
- <div className="font-bold text-white">QIVO Mining</div>
- <div className="text-xs text-gray-500">Infraestrutura de Governança Minerária Digital</div>
- </div>
- </Link>
+      <Link href="/dashboard" className="flex items-center gap-3">
+        <img
+          src="/assets/logo-Qivo.png"
+          alt="QIVO Mining"
+          className="h-10 w-auto"
+        />
+        <div>
+          <div className="font-bold text-white">QIVO Mining</div>
+          <div className="text-xs text-gray-300">Governança Técnica, Regulatória e Ambiental</div>
+        </div>
+      </Link>
 
  {/* User Info and Actions */}
  <div className="flex items-center gap-4">

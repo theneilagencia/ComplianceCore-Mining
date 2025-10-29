@@ -112,12 +112,14 @@ export default function AccountPage() {
       <header className="bg-white/5/5 border-b">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="w-10 h-10 bg-[#2f2c79] rounded-lg flex items-center justify-center text-white font-bold">
-              JI
-            </div>
+            <img
+              src="/assets/logo-Qivo.png"
+              alt="QIVO Mining"
+              className="h-10 w-auto"
+            />
             <div>
-              <div className="font-bold text-lg">Minha Conta</div>
-              <div className="text-xs text-gray-500">QIVO Mining</div>
+              <div className="font-bold text-lg text-white">Minha Conta</div>
+              <div className="text-xs text-gray-300">QIVO Mining</div>
             </div>
           </div>
           <button
