@@ -1,6 +1,9 @@
-import { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
-interface User {
+// Get API base URL from environment variable or use relative path for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
+interface User {ser {
   id: string;
   email: string;
   name: string | null;
@@ -43,7 +46,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const checkSession = async () => {
     try {
       // No need to check localStorage - cookies are sent automatically
-      const response = await fetch('/api/auth/session', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/session`, {
         credentials: 'include', // CRITICAL: Send cookies with request
       });
 
@@ -72,7 +75,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   };
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -99,7 +102,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const logout = async () => {
     try {
       // Cookies are sent automatically
-      await fetch('/api/auth/logout', {
+      await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
         credentials: 'include', // CRITICAL: Send cookies with request
       });
@@ -118,7 +121,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const refreshSession = async () => {
     try {
       // Try to refresh the access token using refresh token cookie
-      const response = await fetch('/api/auth/refresh', {
+      const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
         method: 'POST',
         credentials: 'include', // Send refresh token cookie
       });

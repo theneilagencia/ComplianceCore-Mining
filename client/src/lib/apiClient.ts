@@ -3,6 +3,9 @@
  * Intercepts 401 errors and automatically refreshes the access token
  */
 
+// Get API base URL from environment variable or use relative path for development
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+
 let isRefreshing = false;
 let refreshSubscribers: Array<(token: string) => void> = [];
 
@@ -17,7 +20,7 @@ function onTokenRefreshed(token: string) {
 
 async function refreshAccessToken(): Promise<boolean> {
   try {
-    const response = await fetch('/api/auth/refresh', {
+    const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
       method: 'POST',
       credentials: 'include', // Send refresh token cookie
       headers: {
@@ -51,8 +54,11 @@ export async function apiFetch(url: string, options: RequestInit = {}): Promise<
     },
   };
 
+  // Prepend API base URL if not already an absolute URL
+  const fullUrl = url.startsWith('http') ? url : `${API_BASE_URL}${url}`;
+
   // Make initial request
-  let response = await fetch(url, requestOptions);
+  let response = await fetch(fullUrl, requestOptions);
 
   // If 401 (Unauthorized), try to refresh token
   if (response.status === 401) {
@@ -63,7 +69,7 @@ export async function apiFetch(url: string, options: RequestInit = {}): Promise<
 
       if (refreshed) {
         // Retry original request with new token
-        response = await fetch(url, requestOptions);
+        response = await fetch(fullUrl, requestOptions);
       } else {
         // Refresh failed - redirect to login
         console.log('[API] Session expired, redirecting to login');
@@ -77,7 +83,7 @@ export async function apiFetch(url: string, options: RequestInit = {}): Promise<
       });
 
       // Retry original request
-      response = await fetch(url, requestOptions);
+      response = await fetch(fullUrl, requestOptions);
     }
   }
 
