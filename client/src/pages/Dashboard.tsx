@@ -12,6 +12,8 @@ export default function Dashboard() {
 
  useEffect(() => {
  console.log('🎯 QIVO Dashboard v1.2.x - Design System Active');
+ console.log('👤 User:', user);
+ console.log('🔐 User Role:', user?.role);
  fetchLicense();
  }, []);
 
