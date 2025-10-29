@@ -70,9 +70,9 @@ export default function DashboardLayout({
             <div className="relative group">
               <div className="relative">
                 <img
-                  src={APP_LOGO}
-                  alt={APP_TITLE}
-                  className="h-20 w-20 rounded-xl object-cover shadow"
+                  src="/assets/logo-Qivo.png"
+                  alt="Qivo Mining"
+                  className="h-20 w-auto"
                 />
               </div>
             </div>
@@ -179,9 +179,9 @@ function DashboardLayoutContent({
               {isCollapsed ? (
                 <div className="relative h-8 w-8 shrink-0 group">
                   <img
-                    src={APP_LOGO}
-                    className="h-8 w-8 rounded-md object-cover ring-1 ring-border"
-                    alt="Logo"
+                    src="/assets/logo-b.png"
+                    className="h-8 w-auto"
+                    alt="Qivo"
                   />
                   <button
                     onClick={toggleSidebar}
@@ -194,9 +194,9 @@ function DashboardLayoutContent({
                 <>
                   <div className="flex items-center gap-3 min-w-0">
                     <img
-                      src={APP_LOGO}
-                      className="h-8 w-8 rounded-md object-cover ring-1 ring-border shrink-0"
-                      alt="Logo"
+                      src="/assets/logo-Qivo.png"
+                      className="h-8 w-auto shrink-0"
+                      alt="Qivo"
                     />
                     <span className="font-semibold tracking-tight truncate">
                       {APP_TITLE}
