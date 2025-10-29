@@ -14,11 +14,17 @@ router.get('/debug/raw', async (req, res) => {
     const result = await db.execute(sql`SELECT COUNT(*) as count FROM users`);
     const users = await db.execute(sql`SELECT id, email, name FROM users LIMIT 5`);
     
+    // Drizzle returns array directly, not result.rows
+    const totalUsers = Array.isArray(result) ? (result[0]?.count || 0) : 0;
+    const sampleUsers = Array.isArray(users) ? users : [];
+    
     res.json({
       success: true,
       debug: {
-        totalUsers: result.rows[0]?.count || 0,
-        sampleUsers: users.rows,
+        totalUsers,
+        sampleUsers,
+        resultType: typeof result,
+        usersType: typeof users,
         timestamp: new Date().toISOString(),
       },
     });
