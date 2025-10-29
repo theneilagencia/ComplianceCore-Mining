@@ -105,9 +105,9 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
-  const openCreateModal = () => setShowCreateModal(true);
-  const closeCreateModal = () => setShowCreateModal(false);
+  const [isCreateUserModalOpen, setIsCreateUserModalOpen] = useState(false);
+  const handleOpenCreateUserModal = () => setIsCreateUserModalOpen(true);
+  const handleCloseCreateUserModal = () => setIsCreateUserModalOpen(false);
   const [newUser, setNewUser] = useState({ email: '', fullName: '', password: '', plan: 'START' });
 
   useEffect(() => {
@@ -317,7 +317,7 @@ export default function Admin() {
       if (!response.ok) throw new Error('Failed to create user');
 
       alert('Usuário criado com sucesso!');
-      closeCreateModal();
+      handleCloseCreateUserModal();
       setNewUser({ email: '', fullName: '', password: '', plan: 'START' });
       fetchUsers();
     } catch (error) {
@@ -511,7 +511,7 @@ export default function Admin() {
                   className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
                 />
                 <button
-                  onClick={openCreateModal}
+                  onClick={handleOpenCreateUserModal}
                   className="px-4 py-2 bg-[#7ed957] text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
                 >
                   <Users className="w-4 h-4" />
@@ -757,7 +757,7 @@ export default function Admin() {
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-white">Gerenciar Usuários</h2>
               <button
-                onClick={openCreateModal}
+                onClick={handleOpenCreateUserModal}
                 className="px-6 py-3 bg-gradient-to-r from-[#7ed957] to-[#6bc247] text-white rounded-lg hover:opacity-90 transition-opacity font-medium flex items-center gap-2"
               >
                 <Users className="w-5 h-5" />
@@ -964,7 +964,7 @@ export default function Admin() {
       )}
 
       {/* Create User Modal */}
-      {showCreateModal && (
+      {isCreateUserModalOpen && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-[#171a4a] border border-white/20 rounded-xl p-6 max-w-md w-full mx-4">
             <h3 className="text-xl font-bold text-white mb-4">Criar Novo Usuário</h3>
@@ -1014,7 +1014,7 @@ export default function Admin() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => {
-                    closeCreateModal();
+                    handleCloseCreateUserModal();
                     setNewUser({ email: '', fullName: '', password: '', plan: 'START' });
                   }}
                   className="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
