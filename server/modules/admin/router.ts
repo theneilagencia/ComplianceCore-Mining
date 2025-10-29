@@ -132,10 +132,7 @@ router.get('/users', requireAdmin, async (req, res) => {
         projectsLimit: licenses.projectsLimit,
       })
       .from(users)
-      .leftJoin(licenses, and(
-        eq(users.id, licenses.userId),
-        eq(licenses.status, 'active')
-      ))
+      .leftJoin(licenses, eq(users.id, licenses.userId))
       .orderBy(desc(users.createdAt))
       .limit(limit)
       .offset(offset);
