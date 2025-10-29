@@ -32,7 +32,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#000020] via-[#171a4a] to-[#2f2c79] flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white/5/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8">
+      <div className="max-w-md w-full bg-white/5 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src="/assets/logo-Qivo.png" alt="QIVO Mining" className="h-12 w-auto" />
