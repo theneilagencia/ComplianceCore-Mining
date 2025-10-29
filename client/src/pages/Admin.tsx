@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
-import { useAdminModal } from '../hooks/useAdminModal';
 import { Users, DollarSign, TrendingUp, Settings, BarChart3, CreditCard, Database } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -106,7 +105,9 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const { isVisible: showCreateModal, showCreateModal: openCreateModal, hideModal: closeCreateModal } = useAdminModal();
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const openCreateModal = () => setShowCreateModal(true);
+  const closeCreateModal = () => setShowCreateModal(false);
   const [newUser, setNewUser] = useState({ email: '', fullName: '', password: '', plan: 'START' });
 
   useEffect(() => {
