@@ -17,6 +17,31 @@ export default function Home() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [emailInput, setEmailInput] = useState("");
 
+  const handleSubscriptionCheckout = async (plan: string) => {
+    setCheckoutLoading(true);
+    try {
+      const response = await fetch('/api/payment/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ plan, billingPeriod: 'monthly' }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Checkout failed');
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (error) {
+      console.error('Subscription checkout error:', error);
+      alert('Erro ao iniciar checkout. Tente novamente.');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
+
   const handleOneTimeCheckout = async (reportType: string) => {
     const email = user?.email || emailInput;
     
@@ -342,8 +367,12 @@ export default function Home() {
                       <span>Auditoria básica</span>
                     </li>
                   </ul>
-                  <Button className="w-full bg-[#2f2c79] hover:bg-[#b96e48]">
-                    Começar Agora
+                  <Button 
+                    className="w-full bg-[#2f2c79] hover:bg-[#b96e48]"
+                    onClick={() => handleSubscriptionCheckout('START')}
+                    disabled={checkoutLoading}
+                  >
+                    {checkoutLoading ? 'Processando...' : 'Começar Agora'}
                   </Button>
                 </Card>
 
@@ -371,8 +400,12 @@ export default function Home() {
                       <span>Conversão multinormativa</span>
                     </li>
                   </ul>
-                  <Button className="w-full bg-[#b96e48] hover:bg-[#8d4925]">
-                    Começar Agora
+                  <Button 
+                    className="w-full bg-[#b96e48] hover:bg-[#8d4925]"
+                    onClick={() => handleSubscriptionCheckout('PRO')}
+                    disabled={checkoutLoading}
+                  >
+                    {checkoutLoading ? 'Processando...' : 'Começar Agora'}
                   </Button>
                 </Card>
 
@@ -397,8 +430,12 @@ export default function Home() {
                       <span>Integrações corporativas</span>
                     </li>
                   </ul>
-                  <Button className="w-full bg-[#2f2c79] hover:bg-[#b96e48]">
-                    Falar com Vendas
+                  <Button 
+                    className="w-full bg-[#2f2c79] hover:bg-[#b96e48]"
+                    onClick={() => handleSubscriptionCheckout('ENTERPRISE')}
+                    disabled={checkoutLoading}
+                  >
+                    {checkoutLoading ? 'Processando...' : 'Começar Agora'}
                   </Button>
                 </Card>
               </div>
