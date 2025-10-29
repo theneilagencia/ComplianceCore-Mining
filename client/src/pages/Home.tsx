@@ -2,6 +2,7 @@ import { useAuth } from "@/_core/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getLoginUrl } from "@/const";
+import { useState } from "react";
 import { 
   FileText, Shield, ArrowRightLeft, 
   Globe, BarChart3, CheckCircle2, Zap, Radar, Settings,
@@ -13,6 +14,40 @@ import { useLocation } from "wouter";
 export default function Home() {
   const { user, loading } = useAuth();
   const [, setLocation] = useLocation();
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [emailInput, setEmailInput] = useState("");
+
+  const handleOneTimeCheckout = async (reportType: string) => {
+    const email = user?.email || emailInput;
+    
+    if (!email) {
+      alert("Por favor, informe seu email para continuar");
+      return;
+    }
+
+    setCheckoutLoading(true);
+    try {
+      const response = await fetch('/api/payment/one-time', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ reportType, email }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Falha ao criar checkout');
+      }
+
+      // Redirecionar para Stripe Checkout
+      window.location.href = data.url;
+    } catch (error: any) {
+      alert(error.message || 'Erro ao processar pagamento');
+    } finally {
+      setCheckoutLoading(false);
+    }
+  };
 
   // Redirecionar usuários autenticados para o dashboard
   useEffect(() => {
@@ -378,11 +413,11 @@ export default function Home() {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
-                    { name: "Simplificado", desc: "Sumário técnico automatizado CRIRSCO", price: "$2,000", time: "15 min" },
-                    { name: "Técnico Completo", desc: "Relatório validado por IA e QP", price: "$4,900", time: "30–45 min" },
-                    { name: "Multinormativo", desc: "Conversão NI ↔ JORC ↔ ANM com Loss Map", price: "$7,500", time: "1h" },
-                    { name: "Auditável", desc: "Com KRCI e assinatura digital verificável", price: "$9,800", time: "1–2h" },
-                    { name: "ESG Integrado", desc: "Integra dados IBAMA + Copernicus + NASA", price: "$12,500", time: "2–3h" },
+                    { name: "Simplificado", desc: "Sumário técnico automatizado CRIRSCO", price: "$2,000", time: "15 min", type: "simplified" },
+                    { name: "Técnico Completo", desc: "Relatório validado por IA e QP", price: "$4,900", time: "30–45 min", type: "complete" },
+                    { name: "Multinormativo", desc: "Conversão NI ↔ JORC ↔ ANM com Loss Map", price: "$7,500", time: "1h", type: "multinorm" },
+                    { name: "Auditável", desc: "Com KRCI e assinatura digital verificável", price: "$9,800", time: "1–2h", type: "auditable" },
+                    { name: "ESG Integrado", desc: "Integra dados IBAMA + Copernicus + NASA", price: "$12,500", time: "2–3h", type: "esg" },
                   ].map((report, i) => (
                     <Card key={i} className="p-4 bg-white/5 border-white/10">
                       <h4 className="font-bold text-white mb-2">{report.name}</h4>
@@ -391,8 +426,13 @@ export default function Home() {
                         <span className="text-2xl font-bold text-[#b96e48]">{report.price}</span>
                         <span className="text-xs text-gray-400">{report.time}</span>
                       </div>
-                      <Button size="sm" className="w-full bg-[#2f2c79] hover:bg-[#b96e48]">
-                        Gerar Agora
+                      <Button 
+                        size="sm" 
+                        className="w-full bg-[#2f2c79] hover:bg-[#b96e48]"
+                        onClick={() => handleOneTimeCheckout(report.type)}
+                        disabled={checkoutLoading}
+                      >
+                        {checkoutLoading ? "Processando..." : "Gerar Agora"}
                       </Button>
                     </Card>
                   ))}

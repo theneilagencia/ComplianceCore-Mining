@@ -6,6 +6,7 @@
 import express, { type Request, type Response } from 'express';
 import { sdk } from '../../_core/sdk';
 import * as stripeService from './stripe';
+import * as oneTimeCheckout from './one-time-checkout';
 import * as licenseService from '../licenses/service';
 import { authenticateFromCookie } from './auth-helper';
 
@@ -223,6 +224,54 @@ router.get('/portal', async (req: Request, res: Response) => {
     console.error('[Payment] Portal error:', error);
     res.status(500).json({
       error: error.message || 'Failed to create portal session',
+    });
+  }
+});
+
+/**
+ * POST /api/payment/one-time
+ * Create one-time payment checkout for reports
+ */
+router.post('/one-time', async (req: Request, res: Response) => {
+  try {
+    const { reportType, email } = req.body;
+
+    if (!reportType || !email) {
+      res.status(400).json({
+        error: 'Missing required fields: reportType, email',
+      });
+      return;
+    }
+
+    // Optional: get user if authenticated
+    let userId: string | undefined;
+    try {
+      const user = await authenticateFromCookie(req);
+      userId = user.id;
+    } catch {
+      // Not authenticated, continue with email only
+    }
+
+    const baseUrl = process.env.APP_URL || `${req.protocol}://${req.get('host')}`;
+    const successUrl = `${baseUrl}/success?session_id={CHECKOUT_SESSION_ID}&type=report`;
+    const cancelUrl = `${baseUrl}/#planos`;
+
+    const session = await oneTimeCheckout.createOneTimeCheckout({
+      reportType,
+      userEmail: email,
+      userId,
+      successUrl,
+      cancelUrl,
+    });
+
+    res.json({
+      sessionId: session.id,
+      url: session.url,
+    });
+  } catch (error: any) {
+    console.error('[Payment] One-time checkout error:', error);
+    res.status(500).json({
+      error: error.message || 'Failed to create checkout session',
     });
   }
 });

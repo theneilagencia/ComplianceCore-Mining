@@ -32,7 +32,7 @@ export default function RegisterPage() {
       const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include', // CRITICAL: Send cookies with request
+        credentials: 'include',
         body: JSON.stringify({ name, email, password }),
       });
 
@@ -42,8 +42,6 @@ export default function RegisterPage() {
         throw new Error(data.error || 'Registration failed');
       }
 
-      // Tokens are now in HttpOnly cookies - no localStorage needed
-      // Just redirect to dashboard
       setLocation('/dashboard');
     } catch (err: any) {
       setError(err.message);
@@ -57,22 +55,20 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#000020] via-[#171a4a] to-[#2f2c79] flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-2xl">
-            JI
-          </div>
+          <img src="/assets/logo-Qivo.png" alt="QIVO Mining" className="h-12 w-auto" />
         </div>
 
-        <h1 className="text-3xl font-bold text-center mb-2">Criar Conta</h1>
-        <p className="text-gray-600 text-center mb-8">
+        <h1 className="text-3xl font-bold text-center mb-2 text-white">Criar Conta</h1>
+        <p className="text-gray-300 text-center mb-8">
           Comece gratuitamente com o plano START
         </p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -80,7 +76,7 @@ export default function RegisterPage() {
         {/* Google Signup Button */}
         <button
           onClick={handleGoogleSignup}
-          className="w-full flex items-center justify-center gap-3 bg-white border-2 border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-all mb-6"
+          className="w-full flex items-center justify-center gap-3 bg-white/10 border-2 border-white/20 text-white py-3 rounded-lg font-semibold hover:bg-white/20 transition-all mb-6"
         >
           <svg className="w-5 h-5" viewBox="0 0 24 24">
             <path
@@ -105,17 +101,17 @@ export default function RegisterPage() {
 
         <div className="relative mb-6">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-gray-300"></div>
+            <div className="w-full border-t border-white/20"></div>
           </div>
           <div className="relative flex justify-center text-sm">
-            <span className="px-2 bg-white text-gray-500">Ou cadastre-se com email</span>
+            <span className="px-2 bg-[#171a4a] text-gray-300">Ou cadastre-se com email</span>
           </div>
         </div>
 
         {/* Registration Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="name" className="block text-sm font-medium text-white mb-1">
               Nome Completo
             </label>
             <input
@@ -123,13 +119,14 @@ export default function RegisterPage() {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="João Silva"
+              required
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
+              placeholder="Seu nome"
             />
           </div>
 
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-white mb-1">
               Email
             </label>
             <input
@@ -138,13 +135,13 @@ export default function RegisterPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="seu@email.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-white mb-1">
               Senha
             </label>
             <input
@@ -153,13 +150,13 @@ export default function RegisterPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="Mínimo 8 caracteres"
             />
           </div>
 
           <div>
-            <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="confirmPassword" className="block text-sm font-medium text-white mb-1">
               Confirmar Senha
             </label>
             <input
@@ -168,39 +165,28 @@ export default function RegisterPage() {
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Digite a senha novamente"
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
+              placeholder="Repita sua senha"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all disabled:opacity-50"
+            className="w-full bg-[#2f2c79] text-white py-3 rounded-lg font-semibold hover:bg-[#b96e48] transition-all disabled:opacity-50"
           >
             {loading ? 'Criando conta...' : 'Criar Conta Gratuita'}
           </button>
         </form>
 
-        <p className="text-center text-gray-600 mt-6">
+        <p className="text-center text-gray-300 mt-6">
           Já tem uma conta?{' '}
           <button
             onClick={() => setLocation('/login')}
-            className="text-blue-600 font-semibold hover:underline"
+            className="text-[#b96e48] font-semibold hover:underline"
           >
             Entrar
           </button>
-        </p>
-
-        <p className="text-xs text-gray-500 text-center mt-4">
-          Ao criar uma conta, você concorda com nossos{' '}
-          <a href="/terms" className="text-blue-600 hover:underline">
-            Termos de Serviço
-          </a>{' '}
-          e{' '}
-          <a href="/privacy" className="text-blue-600 hover:underline">
-            Política de Privacidade
-          </a>
         </p>
       </div>
     </div>
