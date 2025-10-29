@@ -12,7 +12,7 @@ router.get('/debug/raw', async (req, res) => {
     
     // Test with raw SQL
     const result = await db.execute(sql`SELECT COUNT(*) as count FROM users`);
-    const users = await db.execute(sql`SELECT id, email, "fullName" FROM users LIMIT 5`);
+    const users = await db.execute(sql`SELECT id, email, name FROM users LIMIT 5`);
     
     res.json({
       success: true,
@@ -47,7 +47,7 @@ router.get('/debug/users', async (req, res) => {
       .select({
         id: users.id,
         email: users.email,
-        fullName: users.fullName,
+        fullName: users.name,
         createdAt: users.createdAt,
       })
       .from(users)

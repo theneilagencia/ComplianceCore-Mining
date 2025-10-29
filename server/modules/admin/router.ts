@@ -120,7 +120,7 @@ router.get('/users', requireAdmin, async (req, res) => {
       .select({
         id: users.id,
         email: users.email,
-        fullName: users.fullName,
+        fullName: users.name,
         createdAt: users.createdAt,
         lastLoginAt: users.lastLoginAt,
       })
@@ -155,7 +155,7 @@ router.get('/users', requireAdmin, async (req, res) => {
       return {
         id: u.id,
         email: u.email,
-        fullName: u.fullName,
+        fullName: u.name,
         createdAt: u.createdAt,
         lastLoginAt: u.lastLoginAt,
         license: license ? {
@@ -174,7 +174,7 @@ router.get('/users', requireAdmin, async (req, res) => {
     if (search) {
       filteredUsers = transformedUsers.filter(u => 
         u.email?.toLowerCase().includes(search.toLowerCase()) ||
-        u.fullName?.toLowerCase().includes(search.toLowerCase())
+        u.name?.toLowerCase().includes(search.toLowerCase())
       );
     }
 
@@ -229,7 +229,7 @@ router.get('/users/:userId', requireAdmin, async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        fullName: user.fullName,
+        fullName: user.name,
         createdAt: user.createdAt,
         lastLoginAt: user.lastLoginAt,
       },
@@ -273,7 +273,7 @@ router.post('/users', requireAdmin, async (req, res) => {
       id: userId,
       tenantId,
       email,
-      fullName: fullName || null,
+      name: fullName || null,
       passwordHash,
       role: 'user',
       createdAt: new Date(),
@@ -359,7 +359,7 @@ router.patch('/users/:userId', requireAdmin, async (req, res) => {
     await db
       .update(users)
       .set({
-        fullName: fullName.trim(),
+        name: fullName.trim(),
         updatedAt: new Date(),
       })
       .where(eq(users.id, userId));
@@ -483,7 +483,7 @@ router.get('/subscriptions', requireAdmin, async (req, res) => {
         licenseId: licenses.id,
         userId: licenses.userId,
         userEmail: users.email,
-        userName: users.fullName,
+        userName: users.name,
         plan: licenses.plan,
         status: licenses.status,
         reportsUsed: licenses.reportsUsed,
