@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 // Get API base URL from environment variable or use relative path for development
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
-interface User {ser {
+interface User {
   id: string;
   email: string;
   name: string | null;
