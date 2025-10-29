@@ -81,7 +81,7 @@ export default function Admin() {
   const checkAdminAccess = async () => {
     // Check if user is admin by trying to fetch stats
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/stats', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
         credentials: 'include',
       });
 
@@ -105,7 +105,7 @@ export default function Admin() {
   const fetchStats = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/stats', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
         credentials: 'include',
       });
 
@@ -123,7 +123,7 @@ export default function Admin() {
   const fetchUsers = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/users?limit=100', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users?limit=100`, {
         credentials: 'include',
       });
 
@@ -141,7 +141,7 @@ export default function Admin() {
   const fetchSubscriptions = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions`, {
         credentials: 'include',
       });
 
@@ -159,7 +159,7 @@ export default function Admin() {
   const fetchRevenue = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/revenue', {
+      const response = await fetch(`${API_BASE_URL}/api/admin/revenue`, {
         credentials: 'include',
       });
 
