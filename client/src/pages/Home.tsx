@@ -49,7 +49,7 @@ export default function Home() {
       <header role="banner" className="border-b border-white/10 bg-[#000020]/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src="/assets/logo-Qivo.png" alt="Qivo Mining" className="h-12 w-auto" />
+            <img src="/assets/logo-Qivo.png" alt="Qivo Mining" className="h-8 w-auto" />
           </div>
           <nav role="navigation" aria-label="Navegação principal">
             <div className="flex items-center gap-3">
@@ -112,6 +112,28 @@ export default function Home() {
               <CheckCircle2 className="h-4 w-4 text-[#b96e48]" aria-hidden="true" />
               <span>Governança operacional</span>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Video Section */}
+      <section className="container mx-auto px-4 py-20">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center space-y-4 mb-12">
+            <h2 className="text-4xl font-bold text-white">Saiba mais sobre o Qivo Mining</h2>
+            <p className="text-lg text-gray-300">
+              Conheça como transformamos compliance em valor estratégico
+            </p>
+          </div>
+          <div className="relative w-full" style={{ paddingBottom: '56.25%' }}>
+            <iframe
+              className="absolute top-0 left-0 w-full h-full rounded-2xl shadow-2xl"
+              src="https://www.youtube.com/embed/QKLnZbl5Z-E"
+              title="QIVO Mining - Infraestrutura de Governança Minerária Digital"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+              allowFullScreen
+              loading="lazy"
+            ></iframe>
           </div>
         </div>
       </section>
