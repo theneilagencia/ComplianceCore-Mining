@@ -13,6 +13,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { Shield, CheckCircle, AlertTriangle, FileSearch, Download, ExternalLink } from "lucide-react";
 import GuardRailModal from "../components/GuardRailModal";
+import { CorrectionPlan } from "../components/CorrectionPlan";
 import { useState } from "react";
 import { toast } from "sonner";
 import DocumentUploadValidator from "@/components/DocumentUploadValidator";
@@ -21,6 +22,8 @@ export default function AuditKRCI() {
   const [selectedReport, setSelectedReport] = useState<string>("");
   const [showGuardRail, setShowGuardRail] = useState<boolean>(false);
   const [auditResult, setAuditResult] = useState<any>(null);
+  const [correctionPlan, setCorrectionPlan] = useState<any>(null);
+  const [shouldGeneratePlan, setShouldGeneratePlan] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'select' | 'upload'>('select');
 
   // Query para listar relatórios (sem polling)
@@ -40,6 +43,25 @@ export default function AuditKRCI() {
       refetchInterval: false,
       refetchOnWindowFocus: false,
       staleTime: 5 * 60 * 1000,
+    }
+  );
+
+  // Query para gerar plano de correção
+  const { data: planData } = trpc.technicalReports.audit.correctionPlan.useQuery(
+    { auditId: auditResult?.auditId || '' },
+    {
+      enabled: shouldGeneratePlan && !!auditResult?.auditId,
+      onSuccess: (data) => {
+        setCorrectionPlan(data);
+        setShouldGeneratePlan(false);
+        toast.success('Plano de correção gerado!');
+      },
+      onError: (error) => {
+        setShouldGeneratePlan(false);
+        toast.error('Erro ao gerar plano', {
+          description: error.message,
+        });
+      },
     }
   );
 
@@ -278,6 +300,20 @@ export default function AuditKRCI() {
               </div>
             </div>
 
+            {/* Botão para Gerar Plano de Correção */}
+            {auditResult.failedRules > 0 && !correctionPlan && (
+              <div className="mb-6">
+                <Button
+                  onClick={() => setShouldGeneratePlan(true)}
+                  className="w-full"
+                  variant="default"
+                >
+                  <FileSearch className="h-4 w-4 mr-2" />
+                  Gerar Plano de Correção Automático
+                </Button>
+              </div>
+            )}
+
             {/* KRCI Identificados */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold mb-4">KRCI Identificados</h3>
@@ -350,6 +386,56 @@ export default function AuditKRCI() {
                 </a>
               </Button>
             </div>
+          </Card>
+        )}
+
+        {/* Plano de Correção */}
+        {correctionPlan && (
+          <Card className="p-6">
+            <CorrectionPlan
+              plan={correctionPlan}
+              onExport={(format) => {
+                // Exportar plano de correção usando o próprio objeto
+                let content = '';
+                let mimeType = 'text/plain';
+                
+                if (format === 'json') {
+                  content = JSON.stringify(correctionPlan, null, 2);
+                  mimeType = 'application/json';
+                } else if (format === 'markdown') {
+                  content = `# Plano de Correção - KRCI\n\n${correctionPlan.summary}\n\n`;
+                  content += `## Resumo\n\n`;
+                  content += `- **Score KRCI**: ${correctionPlan.auditScore}%\n`;
+                  content += `- **Total de Issues**: ${correctionPlan.totalIssues}\n`;
+                  content += `- **Tempo Estimado**: ${Math.floor(correctionPlan.estimatedTotalTime / 60)}h ${correctionPlan.estimatedTotalTime % 60}m\n\n`;
+                  content += `## Correções\n\n`;
+                  correctionPlan.corrections.forEach((item: any, i: number) => {
+                    content += `### ${i + 1}. ${item.ruleCode} - ${item.issue}\n`;
+                    content += `- **Categoria**: ${item.category}\n`;
+                    content += `- **Severidade**: ${item.severity}\n`;
+                    content += `- **Tempo**: ${item.estimatedTime} min\n`;
+                    content += `- **Sugestão**: ${item.suggestedFix}\n\n`;
+                  });
+                } else if (format === 'csv') {
+                  content = 'Code,Category,Severity,Priority,Time,Issue,Suggestion\n';
+                  correctionPlan.corrections.forEach((item: any) => {
+                    content += `"${item.ruleCode}","${item.category}","${item.severity}",${item.priority},${item.estimatedTime},"${item.issue}","${item.suggestedFix}"\n`;
+                  });
+                  mimeType = 'text/csv';
+                }
+                
+                const blob = new Blob([content], { type: mimeType });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `correction-plan-${correctionPlan.reportId}.${format}`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                toast.success(`Plano exportado em ${format.toUpperCase()}`);
+              }}
+            />
           </Card>
         )}
 
