@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [1.2.1] - 2025-10-28
+
+### Added
+
+- **New Qivo Brand Design System (Mailchimp-inspired)**
+  - New logo `logo-Qivo.png` and `logo-b.png`.
+  - New color palette: `#000020` (dark blue), `#171a4a`, `#2f2c79`, `#8d4925` (brown), `#b96e48` (light brown).
+  - Dark mode theme with gradient background (`#000020` -> `#171a4a` -> `#2f2c79`).
+
+### Changed
+
+- **Homepage (`Home.tsx`) completely rewritten:**
+  - Reflects only the 5 active modules as per the technical briefing.
+  - Updated copy to focus on "governança técnica e regulatória".
+  - New layout inspired by Mailchimp.
+- **Dashboard Layout (`DashboardLayout.tsx`) updated:**
+  - New Qivo logo in the sidebar.
+  - ThemeToggle component for dark/light mode.
+
+### Removed
+
+- **5 discontinued modules completely removed from the platform:**
+  - ESG Reporting
+  - Valuation
+  - Pre-Certification
+  - Governance & Security
+  - Explainability View
+- **Cleaned up routes** in `App.tsx`, `Dashboard.tsx`, and `DashboardLayout.tsx`.
+
+---
+
 ## [1.2.0-full-compliance] - 2025-10-28
 
 ### Added
