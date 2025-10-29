@@ -122,7 +122,7 @@ router.get('/users', requireAdmin, async (req, res) => {
         email: users.email,
         fullName: users.name,
         createdAt: users.createdAt,
-        lastLoginAt: users.lastLoginAt,
+        lastLoginAt: users.lastSignedIn,
       })
       .from(users)
       .orderBy(desc(users.createdAt))
@@ -157,7 +157,7 @@ router.get('/users', requireAdmin, async (req, res) => {
         email: u.email,
         fullName: u.name,
         createdAt: u.createdAt,
-        lastLoginAt: u.lastLoginAt,
+        lastLoginAt: u.lastSignedIn,
         license: license ? {
           id: license.id,
           plan: license.plan,
@@ -231,7 +231,7 @@ router.get('/users/:userId', requireAdmin, async (req, res) => {
         email: user.email,
         fullName: user.name,
         createdAt: user.createdAt,
-        lastLoginAt: user.lastLoginAt,
+        lastLoginAt: user.lastSignedIn,
       },
       licenses: userLicenses,
     });
