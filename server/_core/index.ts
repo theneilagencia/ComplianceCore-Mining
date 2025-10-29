@@ -12,6 +12,7 @@ import authRouter from "../modules/auth/router";
 import googleHealthRouter from "../modules/auth/google-health-router";
 import adminRouter from "../modules/admin/router";
 import createAdminRouter from "../modules/admin/create-admin-router";
+import fixAdminLicenseRouter from "../modules/admin/fix-admin-license";
 import reportsRouter from "../modules/reports/router";
 import auditsRouter from "../modules/audits/router";
 import settingsRouter from "../modules/settings/router";
@@ -131,6 +132,7 @@ async function startServer() {
   // Admin routes
   app.use("/api/admin", adminRouter);
   app.use("/api/create-admin", createAdminRouter);
+  app.use("/api/fix-admin-license", fixAdminLicenseRouter);
   
   // Reports, Audits, and Settings routes
   app.use("/api/reports", reportsRouter);
