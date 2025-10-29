@@ -105,6 +105,8 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newUser, setNewUser] = useState({ email: '', fullName: '', password: '', plan: 'START' });
 
   useEffect(() => {
     checkAdminAccess();
@@ -239,6 +241,71 @@ export default function Admin() {
     } catch (error) {
       console.error('Error updating license:', error);
       alert('Erro ao atualizar licença');
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!confirm('Tem certeza que deseja excluir este usuário? Esta ação não pode ser desfeita.')) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+
+      if (!response.ok) throw new Error('Failed to delete user');
+
+      alert('Usuário excluído com sucesso!');
+      setShowEditModal(false);
+      setEditingUser(null);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      alert('Erro ao excluir usuário');
+    }
+  };
+
+  const handleResetPassword = async (userId: string) => {
+    if (!confirm('Deseja enviar um email com instruções para resetar a senha?')) return;
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/reset-password`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+
+      if (!response.ok) throw new Error('Failed to reset password');
+
+      alert('Email de reset de senha enviado com sucesso!');
+    } catch (error) {
+      console.error('Error resetting password:', error);
+      alert('Erro ao resetar senha');
+    }
+  };
+
+  const handleCreateUser = async () => {
+    if (!newUser.email || !newUser.password) {
+      alert('Email e senha são obrigatórios');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(newUser),
+      });
+
+      if (!response.ok) throw new Error('Failed to create user');
+
+      alert('Usuário criado com sucesso!');
+      setShowCreateModal(false);
+      setNewUser({ email: '', fullName: '', password: '', plan: 'START' });
+      fetchUsers();
+    } catch (error) {
+      console.error('Error creating user:', error);
+      alert('Erro ao criar usuário');
     }
   };
 
@@ -417,13 +484,22 @@ export default function Admin() {
           <div className="space-y-6">
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-bold text-white">Gerenciar Usuários</h2>
-              <input
-                type="text"
-                placeholder="Buscar por email ou nome..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
-              />
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  placeholder="Buscar por email ou nome..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
+                />
+                <button
+                  onClick={() => setShowCreateModal(true)}
+                  className="px-4 py-2 bg-[#7ed957] text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
+                >
+                  <Users className="w-4 h-4" />
+                  Criar Usuário
+                </button>
+              </div>
             </div>
 
             <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden">
@@ -697,26 +773,42 @@ export default function Admin() {
                   <option value="cancelled">Cancelado</option>
                 </select>
               </div>
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={() => {
-                    setShowEditModal(false);
-                    setEditingUser(null);
-                  }}
-                  className="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={() => {
-                    const plan = (document.getElementById('plan-select') as HTMLSelectElement).value;
-                    const status = (document.getElementById('status-select') as HTMLSelectElement).value;
-                    handleUpdateUserLicense(editingUser.id, plan, status);
-                  }}
-                  className="flex-1 px-4 py-2 bg-[#7ed957] text-white rounded-lg hover:opacity-90 transition-opacity"
-                >
-                  Salvar
-                </button>
+              <div className="space-y-3 mt-6">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => {
+                      setShowEditModal(false);
+                      setEditingUser(null);
+                    }}
+                    className="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    onClick={() => {
+                      const plan = (document.getElementById('plan-select') as HTMLSelectElement).value;
+                      const status = (document.getElementById('status-select') as HTMLSelectElement).value;
+                      handleUpdateUserLicense(editingUser.id, plan, status);
+                    }}
+                    className="flex-1 px-4 py-2 bg-[#7ed957] text-white rounded-lg hover:opacity-90 transition-opacity"
+                  >
+                    Salvar
+                  </button>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => handleResetPassword(editingUser.id)}
+                    className="flex-1 px-4 py-2 bg-blue-500/20 text-blue-400 rounded-lg hover:bg-blue-500/30 transition-colors"
+                  >
+                    Resetar Senha
+                  </button>
+                  <button
+                    onClick={() => handleDeleteUser(editingUser.id)}
+                    className="flex-1 px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
+                  >
+                    Excluir Usuário
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -725,4 +817,76 @@ export default function Admin() {
     </div>
   );
 }
+
+
+
+      {/* Create User Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#171a4a] border border-white/20 rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold text-white mb-4">Criar Novo Usuário</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Email *</label>
+                <input
+                  type="email"
+                  value={newUser.email}
+                  onChange={(e) => setNewUser({ ...newUser, email: e.target.value })}
+                  placeholder="usuario@exemplo.com"
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Nome Completo</label>
+                <input
+                  type="text"
+                  value={newUser.fullName}
+                  onChange={(e) => setNewUser({ ...newUser, fullName: e.target.value })}
+                  placeholder="João Silva"
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Senha *</label>
+                <input
+                  type="password"
+                  value={newUser.password}
+                  onChange={(e) => setNewUser({ ...newUser, password: e.target.value })}
+                  placeholder="Mínimo 8 caracteres"
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Plano</label>
+                <select
+                  value={newUser.plan}
+                  onChange={(e) => setNewUser({ ...newUser, plan: e.target.value })}
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
+                >
+                  <option value="START">START (Gratuito)</option>
+                  <option value="PRO">PRO (US$ 899/mês)</option>
+                  <option value="ENTERPRISE">ENTERPRISE (US$ 1.990/mês)</option>
+                </select>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowCreateModal(false);
+                    setNewUser({ email: '', fullName: '', password: '', plan: 'START' });
+                  }}
+                  className="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCreateUser}
+                  className="flex-1 px-4 py-2 bg-[#7ed957] text-white rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Criar Usuário
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 

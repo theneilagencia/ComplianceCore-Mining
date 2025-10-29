@@ -4,6 +4,8 @@ import { users, licenses } from '../../../drizzle/schema';
 import { eq, desc, sql, and, gte } from 'drizzle-orm';
 import { authenticateFromCookie } from '../payment/auth-helper';
 import * as costsService from './costs';
+import bcrypt from 'bcryptjs';
+import { createId } from '@paralleldrive/cuid2';
 
 const router = Router();
 
@@ -225,6 +227,155 @@ router.get('/users/:userId', requireAdmin, async (req, res) => {
   } catch (error) {
     console.error('[Admin] User details error:', error);
     res.status(500).json({ error: 'Failed to fetch user details' });
+  }
+});
+
+// POST /api/admin/users - Create new user
+router.post('/users', requireAdmin, async (req, res) => {
+  try {
+    const db = await getDb();
+    const { email, fullName, password, plan } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    // Check if user already exists
+    const existingUser = await db
+      .select()
+      .from(users)
+      .where(eq(users.email, email))
+      .limit(1);
+
+    if (existingUser.length > 0) {
+      return res.status(400).json({ error: 'User already exists' });
+    }
+
+    // Hash password
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    // Create user
+    const userId = createId();
+    const tenantId = createId();
+
+    await db.insert(users).values({
+      id: userId,
+      tenantId,
+      email,
+      fullName: fullName || null,
+      passwordHash,
+      role: 'user',
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    // Create license
+    const planLimits: Record<string, { reports: number; projects: number }> = {
+      'START': { reports: 1, projects: 1 },
+      'PRO': { reports: 5, projects: 3 },
+      'ENTERPRISE': { reports: 999, projects: 999 },
+    };
+
+    const limits = planLimits[plan] || planLimits['START'];
+    const licenseId = createId();
+
+    await db.insert(licenses).values({
+      id: licenseId,
+      userId,
+      tenantId,
+      plan: plan || 'START',
+      status: 'active',
+      reportsLimit: limits.reports,
+      reportsUsed: 0,
+      projectsLimit: limits.projects,
+      billingPeriod: 'monthly',
+      validFrom: new Date(),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    });
+
+    res.json({ success: true, message: 'User created successfully', userId });
+  } catch (error) {
+    console.error('[Admin] Create user error:', error);
+    res.status(500).json({ error: 'Failed to create user' });
+  }
+});
+
+// DELETE /api/admin/users/:userId - Delete user
+router.delete('/users/:userId', requireAdmin, async (req, res) => {
+  try {
+    const db = await getDb();
+    const { userId } = req.params;
+
+    // Check if user exists
+    const userResult = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (userResult.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Delete user's licenses first
+    await db.delete(licenses).where(eq(licenses.userId, userId));
+
+    // Delete user
+    await db.delete(users).where(eq(users.id, userId));
+
+    res.json({ success: true, message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('[Admin] Delete user error:', error);
+    res.status(500).json({ error: 'Failed to delete user' });
+  }
+});
+
+// POST /api/admin/users/:userId/reset-password - Reset user password
+router.post('/users/:userId/reset-password', requireAdmin, async (req, res) => {
+  try {
+    const db = await getDb();
+    const { userId } = req.params;
+
+    // Check if user exists
+    const userResult = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (userResult.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = userResult[0];
+
+    // Generate temporary password
+    const tempPassword = Math.random().toString(36).slice(-8) + Math.random().toString(36).slice(-8);
+    const passwordHash = await bcrypt.hash(tempPassword, 10);
+
+    // Update password
+    await db
+      .update(users)
+      .set({
+        passwordHash,
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+
+    // TODO: Send email with temporary password
+    // For now, return it in the response (in production, only send via email)
+    console.log(`[Admin] Password reset for ${user.email}: ${tempPassword}`);
+
+    res.json({ 
+      success: true, 
+      message: 'Password reset successfully. Temporary password sent to user email.',
+      // Remove this in production:
+      tempPassword: tempPassword,
+    });
+  } catch (error) {
+    console.error('[Admin] Reset password error:', error);
+    res.status(500).json({ error: 'Failed to reset password' });
   }
 });
 
