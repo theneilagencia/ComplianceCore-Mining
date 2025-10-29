@@ -164,7 +164,6 @@ router.get('/users', requireAdmin, async (req, res) => {
           status: license.status,
           reportsUsed: license.reportsUsed,
           reportsLimit: license.reportsLimit,
-          projectsActive: license.projectsActive,
           projectsLimit: license.projectsLimit,
         } : null,
       };
