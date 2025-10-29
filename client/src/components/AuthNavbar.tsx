@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Link } from 'wouter';
 
+// Updated: 2025-10-29 - Qivo Design System
 export default function AuthNavbar() {
  const { user, plan, logout } = useAuth();
 
