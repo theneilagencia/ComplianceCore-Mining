@@ -6,6 +6,32 @@ import { sql } from 'drizzle-orm';
 const router = Router();
 
 // Debug endpoint - REMOVE IN PRODUCTION
+router.get('/debug/raw', async (req, res) => {
+  try {
+    const db = await getDb();
+    
+    // Test with raw SQL
+    const result = await db.execute(sql`SELECT COUNT(*) as count FROM users`);
+    const users = await db.execute(sql`SELECT id, email, "fullName" FROM users LIMIT 5`);
+    
+    res.json({
+      success: true,
+      debug: {
+        totalUsers: result.rows[0]?.count || 0,
+        sampleUsers: users.rows,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  } catch (error: any) {
+    console.error('[Debug Raw] Error:', error);
+    res.status(500).json({ 
+      error: 'Debug raw query failed',
+      message: error.message,
+      stack: error.stack,
+    });
+  }
+});
+
 router.get('/debug/users', async (req, res) => {
   try {
     const db = await getDb();
