@@ -82,16 +82,15 @@ router.post('/', async (req, res) => {
     await db.insert(licenses).values({
       id: licenseId,
       userId: adminId,
+      tenantId,
       plan: 'ENTERPRISE',
       status: 'active',
       reportsUsed: 0,
       reportsLimit: 999,
-      projectsActive: 0,
       projectsLimit: 999,
       billingPeriod: 'annual',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      expiresAt: null, // Never expires
+      validFrom: new Date(),
+      validUntil: null, // Never expires
     });
     
     console.log('[Create Admin] ✅ Admin user created successfully');
