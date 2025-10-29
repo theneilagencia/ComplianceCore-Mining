@@ -3,6 +3,7 @@ import { getDb } from '../../db';
 import { users, licenses } from '../../../drizzle/schema';
 import { eq, desc, sql, and, gte } from 'drizzle-orm';
 import { authenticateFromCookie } from '../payment/auth-helper';
+import * as costsService from './costs';
 
 const router = Router();
 
@@ -346,6 +347,84 @@ router.get('/revenue', requireAdmin, async (req, res) => {
   } catch (error) {
     console.error('[Admin] Revenue error:', error);
     res.status(500).json({ error: 'Failed to fetch revenue statistics' });
+  }
+});
+
+// GET /api/admin/costs - Service costs breakdown
+router.get('/costs', requireAdmin, async (req, res) => {
+  try {
+    const costs = costsService.getServiceCosts();
+    const fixedCosts = costsService.calculateFixedCosts();
+
+    // Example usage metrics (in production, fetch from database)
+    const usage: costsService.UsageMetrics = {
+      s3StorageGB: 10,
+      openaiTokens: 50000,
+      copernicusRequests: 100,
+      mapboxRequests: 5000,
+    };
+
+    const variableCosts = costsService.calculateVariableCosts(usage);
+
+    res.json({
+      costs,
+      summary: {
+        fixedCosts,
+        variableCosts,
+        totalCosts: fixedCosts + variableCosts,
+      },
+      usage,
+    });
+  } catch (error) {
+    console.error('[Admin] Costs error:', error);
+    res.status(500).json({ error: 'Failed to fetch costs' });
+  }
+});
+
+// GET /api/admin/profit - Profit calculation
+router.get('/profit', requireAdmin, async (req, res) => {
+  try {
+    const db = await getDb();
+
+    // Get revenue from active licenses
+    const licensesByPlan = await db
+      .select({
+        plan: licenses.plan,
+        count: sql<number>`count(*)::int`,
+      })
+      .from(licenses)
+      .where(eq(licenses.status, 'active'))
+      .groupBy(licenses.plan);
+
+    // Plan prices (monthly)
+    const planPrices: Record<string, number> = {
+      'START': 1890,
+      'PRO': 9980,
+      'ENTERPRISE': 14900,
+    };
+
+    let revenue = 0;
+    licensesByPlan.forEach(({ plan, count }) => {
+      revenue += (planPrices[plan] || 0) * count;
+    });
+
+    // Example usage metrics (in production, fetch from database)
+    const usage: costsService.UsageMetrics = {
+      s3StorageGB: 10,
+      openaiTokens: 50000,
+      copernicusRequests: 100,
+      mapboxRequests: 5000,
+    };
+
+    const profit = costsService.calculateProfit(revenue, usage);
+
+    res.json({
+      ...profit,
+      usage,
+    });
+  } catch (error) {
+    console.error('[Admin] Profit error:', error);
+    res.status(500).json({ error: 'Failed to calculate profit' });
   }
 });
 
