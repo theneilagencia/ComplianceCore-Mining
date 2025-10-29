@@ -1,42 +1,13 @@
 {
   "version": 2,
-  "name": "qivo-mining",
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/server/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/client/dist/$1"
-    }
-  ],
-  "env": {
-    "NODE_ENV": "production"
-  },
-  "build": {
-    "env": {
-      "NODE_ENV": "production"
-    }
-  },
-  "installCommand": "npm install",
-  "buildCommand": "npm run build",
-  "outputDirectory": "client/dist",
+  "buildCommand": "pnpm install --frozen-lockfile && pnpm vite build",
+  "outputDirectory": "dist/public",
+  "installCommand": "echo 'Using buildCommand install'",
   "framework": null,
   "rewrites": [
     {
-      "source": "/api/:path*",
-      "destination": "/server/index.js"
-    },
-    {
       "source": "/(.*)",
-      "destination": "/client/dist/index.html"
+      "destination": "/index.html"
     }
   ]
 }
