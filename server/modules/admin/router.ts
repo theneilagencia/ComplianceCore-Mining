@@ -157,6 +157,7 @@ router.get('/users', requireAdmin, async (req, res) => {
         projectsLimit: u.projectsLimit,
       } : null,
     }));
+    console.log(`[Admin] Fetched ${transformedUsers.length} users (total in DB: ${allUsers.length})`);
 
     // Filter by search if provided
     let filteredUsers = transformedUsers;
@@ -268,6 +269,7 @@ router.post('/users', requireAdmin, async (req, res) => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    console.log('[Admin] User inserted:', { userId, email, fullName });
 
     // Create license
     const planLimits: Record<string, { reports: number; projects: number }> = {
@@ -293,8 +295,9 @@ router.post('/users', requireAdmin, async (req, res) => {
       createdAt: new Date(),
       updatedAt: new Date(),
     });
+    console.log('[Admin] License inserted:', { licenseId, userId, plan: plan || 'START', status: 'active' });
 
-    res.json({ success: true, message: 'User created successfully', userId });
+    res.json({ success: true, message: 'User created successfully', userId, licenseId });
   } catch (error) {
     console.error('[Admin] Create user error:', error);
     res.status(500).json({ error: 'Failed to create user' });
