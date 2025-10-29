@@ -7,6 +7,12 @@ import * as costsService from './costs';
 
 const router = Router();
 
+// Allowed admin emails
+const ALLOWED_ADMIN_EMAILS = [
+  'admin@qivo-mining.com',
+  'admin@jorc.com', // Legacy admin for development
+];
+
 // Middleware to check if user is admin
 async function requireAdmin(req: any, res: any, next: any) {
   try {
@@ -16,10 +22,16 @@ async function requireAdmin(req: any, res: any, next: any) {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
-    // Check if user is admin
+    // Check if user is admin by role
     if (user.role !== 'admin') {
       console.log('[Admin] Access denied for user:', user.email, 'role:', user.role);
       return res.status(403).json({ error: 'Forbidden - Admin access required' });
+    }
+
+    // Check if user email is in allowed list
+    if (!ALLOWED_ADMIN_EMAILS.includes(user.email)) {
+      console.log('[Admin] Access denied - email not in allowed list:', user.email);
+      return res.status(403).json({ error: 'Forbidden - Admin access restricted' });
     }
     
     console.log('[Admin] Access granted for admin:', user.email);

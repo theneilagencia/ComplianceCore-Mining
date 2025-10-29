@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { Users, DollarSign, TrendingUp, Settings, BarChart3, CreditCard, Database } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
@@ -21,6 +22,7 @@ interface User {
   createdAt: string;
   lastLoginAt: string;
   license: {
+    id: string;
     plan: string;
     status: string;
     reportsUsed: number;
@@ -43,6 +45,7 @@ interface Subscription {
   projectsLimit: number;
   createdAt: string;
   expiresAt: string | null;
+  stripeSubscriptionId: string | null;
 }
 
 interface Revenue {
@@ -52,15 +55,56 @@ interface Revenue {
   revenueByPlan: Record<string, { count: number; revenue: number }>;
 }
 
+interface Costs {
+  costs: Array<{
+    service: string;
+    category: string;
+    monthlyCost: number;
+    variableCost: number;
+    description: string;
+  }>;
+  summary: {
+    fixedCosts: number;
+    variableCosts: number;
+    totalCosts: number;
+  };
+  usage: {
+    s3StorageGB: number;
+    openaiTokens: number;
+    copernicusRequests: number;
+    mapboxRequests: number;
+  };
+}
+
+interface Profit {
+  revenue: number;
+  fixedCosts: number;
+  variableCosts: number;
+  totalCosts: number;
+  grossProfit: number;
+  netProfit: number;
+  profitMargin: number;
+  usage: {
+    s3StorageGB: number;
+    openaiTokens: number;
+    copernicusRequests: number;
+    mapboxRequests: number;
+  };
+}
+
 export default function Admin() {
   const [, setLocation] = useLocation();
-  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'subscriptions' | 'revenue'>('dashboard');
+  const [activeTab, setActiveTab] = useState<'dashboard' | 'users' | 'sales' | 'costs'>('dashboard');
   const [stats, setStats] = useState<Stats | null>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [subscriptions, setSubscriptions] = useState<Subscription[]>([]);
   const [revenue, setRevenue] = useState<Revenue | null>(null);
+  const [costs, setCosts] = useState<Costs | null>(null);
+  const [profit, setProfit] = useState<Profit | null>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     checkAdminAccess();
@@ -68,18 +112,17 @@ export default function Admin() {
 
   useEffect(() => {
     if (activeTab === 'dashboard') {
-      fetchStats();
+      fetchDashboardData();
     } else if (activeTab === 'users') {
       fetchUsers();
-    } else if (activeTab === 'subscriptions') {
-      fetchSubscriptions();
-    } else if (activeTab === 'revenue') {
-      fetchRevenue();
+    } else if (activeTab === 'sales') {
+      fetchSalesData();
+    } else if (activeTab === 'costs') {
+      fetchCostsData();
     }
   }, [activeTab]);
 
   const checkAdminAccess = async () => {
-    // Check if user is admin by trying to fetch stats
     try {
       const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
         credentials: 'include',
@@ -95,26 +138,29 @@ export default function Admin() {
         throw new Error('Failed to verify admin access');
       }
 
-      fetchStats();
+      fetchDashboardData();
     } catch (error) {
       console.error('Admin access check failed:', error);
       setLocation('/dashboard');
     }
   };
 
-  const fetchStats = async () => {
+  const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/stats`, {
-        credentials: 'include',
-      });
+      const [statsRes, revenueRes, costsRes, profitRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/admin/stats`, { credentials: 'include' }),
+        fetch(`${API_BASE_URL}/api/admin/revenue`, { credentials: 'include' }),
+        fetch(`${API_BASE_URL}/api/admin/costs`, { credentials: 'include' }),
+        fetch(`${API_BASE_URL}/api/admin/profit`, { credentials: 'include' }),
+      ]);
 
-      if (!response.ok) throw new Error('Failed to fetch stats');
-
-      const data = await response.json();
-      setStats(data);
+      if (statsRes.ok) setStats(await statsRes.json());
+      if (revenueRes.ok) setRevenue(await revenueRes.json());
+      if (costsRes.ok) setCosts(await costsRes.json());
+      if (profitRes.ok) setProfit(await profitRes.json());
     } catch (error) {
-      console.error('Error fetching stats:', error);
+      console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
     }
@@ -138,39 +184,61 @@ export default function Admin() {
     }
   };
 
-  const fetchSubscriptions = async () => {
+  const fetchSalesData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/subscriptions`, {
-        credentials: 'include',
-      });
+      const [subsRes, revenueRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/admin/subscriptions`, { credentials: 'include' }),
+        fetch(`${API_BASE_URL}/api/admin/revenue`, { credentials: 'include' }),
+      ]);
 
-      if (!response.ok) throw new Error('Failed to fetch subscriptions');
-
-      const data = await response.json();
-      setSubscriptions(data.subscriptions);
+      if (subsRes.ok) {
+        const data = await subsRes.json();
+        setSubscriptions(data.subscriptions);
+      }
+      if (revenueRes.ok) setRevenue(await revenueRes.json());
     } catch (error) {
-      console.error('Error fetching subscriptions:', error);
+      console.error('Error fetching sales data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const fetchRevenue = async () => {
+  const fetchCostsData = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/api/admin/revenue`, {
-        credentials: 'include',
-      });
+      const [costsRes, profitRes] = await Promise.all([
+        fetch(`${API_BASE_URL}/api/admin/costs`, { credentials: 'include' }),
+        fetch(`${API_BASE_URL}/api/admin/profit`, { credentials: 'include' }),
+      ]);
 
-      if (!response.ok) throw new Error('Failed to fetch revenue');
-
-      const data = await response.json();
-      setRevenue(data);
+      if (costsRes.ok) setCosts(await costsRes.json());
+      if (profitRes.ok) setProfit(await profitRes.json());
     } catch (error) {
-      console.error('Error fetching revenue:', error);
+      console.error('Error fetching costs data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUpdateUserLicense = async (userId: string, plan: string, status: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/admin/users/${userId}/license`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ plan, status }),
+      });
+
+      if (!response.ok) throw new Error('Failed to update license');
+
+      alert('Licença atualizada com sucesso!');
+      setShowEditModal(false);
+      setEditingUser(null);
+      fetchUsers();
+    } catch (error) {
+      console.error('Error updating license:', error);
+      alert('Erro ao atualizar licença');
     }
   };
 
@@ -196,39 +264,35 @@ export default function Admin() {
 
   if (loading && activeTab === 'dashboard') {
     return (
-      <div className="min-h-screen bg-[#000020] flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen bg-gradient-to-br from-[#000020] via-[#171a4a] to-[#2f2c79] flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#7ed957]"></div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-[#000020] via-[#171a4a] to-[#2f2c79]">
       {/* Header */}
-      <header className="bg-white/5 border-b border-white/20 shadow-sm">
+      <header className="bg-white/5 backdrop-blur-md border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">
-                A
-              </div>
+            <div className="flex items-center gap-4">
+              <img src="/assets/logo-Qivo.png" alt="Qivo" className="h-10" />
               <div>
                 <h1 className="text-2xl font-bold text-white">Painel de Administração</h1>
-                <p className="text-sm text-gray-400">Gerenciamento de Usuários e Assinaturas</p>
+                <p className="text-sm text-gray-400">Gerenciamento Completo da Plataforma</p>
               </div>
             </div>
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setLocation('/dashboard')}
-                className="px-4 py-2 text-gray-300 hover:bg-[#171a4a] rounded-lg transition-colors"
+                className="px-4 py-2 text-gray-300 hover:bg-white/10 rounded-lg transition-colors"
               >
                 Voltar ao Dashboard
               </button>
               <button
-                onClick={() => {
-                  setLocation('/login');
-                }}
-                className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                onClick={() => setLocation('/login')}
+                className="px-4 py-2 bg-gradient-to-r from-[#8d4925] to-[#b96e48] text-white rounded-lg hover:opacity-90 transition-opacity"
               >
                 Sair
               </button>
@@ -238,49 +302,28 @@ export default function Admin() {
       </header>
 
       {/* Tabs */}
-      <div className="bg-white/5 border-b border-white/20">
+      <div className="bg-white/5 backdrop-blur-md border-b border-white/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex gap-6">
-            <button
-              onClick={() => setActiveTab('dashboard')}
-              className={`px-4 py-3 font-medium transition-colors border-b-2 ${
-                activeTab === 'dashboard'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-400 hover:text-white'
-              }`}
-            >
-              Dashboard
-            </button>
-            <button
-              onClick={() => setActiveTab('users')}
-              className={`px-4 py-3 font-medium transition-colors border-b-2 ${
-                activeTab === 'users'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-400 hover:text-white'
-              }`}
-            >
-              Usuários
-            </button>
-            <button
-              onClick={() => setActiveTab('subscriptions')}
-              className={`px-4 py-3 font-medium transition-colors border-b-2 ${
-                activeTab === 'subscriptions'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-400 hover:text-white'
-              }`}
-            >
-              Assinaturas
-            </button>
-            <button
-              onClick={() => setActiveTab('revenue')}
-              className={`px-4 py-3 font-medium transition-colors border-b-2 ${
-                activeTab === 'revenue'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-400 hover:text-white'
-              }`}
-            >
-              Receita
-            </button>
+            {[
+              { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+              { id: 'users', label: 'Usuários', icon: Users },
+              { id: 'sales', label: 'Vendas', icon: CreditCard },
+              { id: 'costs', label: 'Custos', icon: Database },
+            ].map(({ id, label, icon: Icon }) => (
+              <button
+                key={id}
+                onClick={() => setActiveTab(id as any)}
+                className={`px-4 py-3 font-medium transition-all border-b-2 flex items-center gap-2 ${
+                  activeTab === id
+                    ? 'border-[#7ed957] text-[#7ed957]'
+                    : 'border-transparent text-gray-400 hover:text-white'
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                {label}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -288,89 +331,81 @@ export default function Admin() {
       {/* Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Dashboard Tab */}
-        {activeTab === 'dashboard' && stats && (
+        {activeTab === 'dashboard' && (
           <div className="space-y-6">
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">Total de Usuários</p>
-                    <p className="text-3xl font-bold text-white mt-2">{stats.totalUsers}</p>
+                    <p className="text-3xl font-bold text-white mt-2">{stats?.totalUsers || 0}</p>
                   </div>
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                    </svg>
+                  <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+                    <Users className="w-6 h-6 text-blue-400" />
                   </div>
                 </div>
-                <p className="text-green-600 text-sm mt-2">+{stats.recentUsers} nos últimos 30 dias</p>
+                <p className="text-[#7ed957] text-sm mt-2">+{stats?.recentUsers || 0} nos últimos 30 dias</p>
               </div>
 
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-gray-400 text-sm">MRR</p>
-                    <p className="text-3xl font-bold text-white mt-2">{formatCurrency(stats.mrr)}</p>
+                    <p className="text-3xl font-bold text-white mt-2">{formatCurrency(stats?.mrr || 0)}</p>
                   </div>
-                  <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                  <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+                    <DollarSign className="w-6 h-6 text-green-400" />
                   </div>
                 </div>
-                <p className="text-slate-500 text-sm mt-2">Receita Recorrente Mensal</p>
+                <p className="text-gray-400 text-sm mt-2">Receita Recorrente Mensal</p>
               </div>
 
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Planos PRO</p>
-                    <p className="text-3xl font-bold text-white mt-2">{stats.stats.proUsers}</p>
+                    <p className="text-gray-400 text-sm">Custos Mensais</p>
+                    <p className="text-3xl font-bold text-white mt-2">{formatCurrency(costs?.summary.totalCosts || 0)}</p>
                   </div>
-                  <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
-                    </svg>
+                  <div className="w-12 h-12 bg-red-500/20 rounded-lg flex items-center justify-center">
+                    <Database className="w-6 h-6 text-red-400" />
                   </div>
                 </div>
-                <p className="text-slate-500 text-sm mt-2">Assinaturas Ativas</p>
+                <p className="text-gray-400 text-sm mt-2">Fixos + Variáveis</p>
               </div>
 
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-gray-400 text-sm">Planos ENTERPRISE</p>
-                    <p className="text-3xl font-bold text-white mt-2">{stats.stats.enterpriseUsers}</p>
+                    <p className="text-gray-400 text-sm">Lucro Líquido</p>
+                    <p className="text-3xl font-bold text-white mt-2">{formatCurrency(profit?.netProfit || 0)}</p>
                   </div>
-                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center">
-                    <svg className="w-6 h-6 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
+                  <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+                    <TrendingUp className="w-6 h-6 text-purple-400" />
                   </div>
                 </div>
-                <p className="text-slate-500 text-sm mt-2">Assinaturas Ativas</p>
+                <p className="text-[#7ed957] text-sm mt-2">Margem: {profit?.profitMargin.toFixed(1) || 0}%</p>
               </div>
             </div>
 
-            {/* Chart Placeholder */}
-            <div className="bg-white/5 rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Distribuição de Planos</h3>
+            {/* Planos Distribution */}
+            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Distribuição de Planos</h3>
               <div className="grid grid-cols-3 gap-4">
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-slate-400">{stats.stats.startUsers}</div>
-                  <div className="text-gray-400 mt-2">START</div>
-                  <div className="text-slate-500 text-sm">Gratuito</div>
+                  <p className="text-4xl font-bold text-gray-400">{stats?.stats.startUsers || 0}</p>
+                  <p className="text-sm text-gray-500 mt-1">START</p>
+                  <p className="text-xs text-gray-600">Gratuito</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-purple-600">{stats.stats.proUsers}</div>
-                  <div className="text-gray-400 mt-2">PRO</div>
-                  <div className="text-slate-500 text-sm">{formatCurrency(899)}/mês</div>
+                  <p className="text-4xl font-bold text-blue-400">{stats?.stats.proUsers || 0}</p>
+                  <p className="text-sm text-blue-300 mt-1">PRO</p>
+                  <p className="text-xs text-gray-600">US$ 899,00/mês</p>
                 </div>
                 <div className="text-center">
-                  <div className="text-4xl font-bold text-orange-600">{stats.stats.enterpriseUsers}</div>
-                  <div className="text-gray-400 mt-2">ENTERPRISE</div>
-                  <div className="text-slate-500 text-sm">{formatCurrency(1990)}/mês</div>
+                  <p className="text-4xl font-bold text-[#b96e48]">{stats?.stats.enterpriseUsers || 0}</p>
+                  <p className="text-sm text-[#8d4925] mt-1">ENTERPRISE</p>
+                  <p className="text-xs text-gray-600">US$ 1.990,00/mês</p>
                 </div>
               </div>
             </div>
@@ -380,55 +415,66 @@ export default function Admin() {
         {/* Users Tab */}
         {activeTab === 'users' && (
           <div className="space-y-6">
-            {/* Search */}
-            <div className="bg-white/5 rounded-xl shadow-lg p-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-white">Gerenciar Usuários</h2>
               <input
                 type="text"
                 placeholder="Buscar por email ou nome..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
               />
             </div>
 
-            {/* Users Table */}
-            <div className="bg-white/5 rounded-xl shadow-lg overflow-hidden">
+            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden">
               <table className="w-full">
-                <thead className="bg-[#000020] border-b border-white/20">
+                <thead className="bg-white/10">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Nome</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Plano</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Status</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Uso</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Criado em</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Email</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Nome</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Plano</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Uso</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado em</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Ações</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-200">
+                <tbody className="divide-y divide-white/10">
                   {filteredUsers.map((user) => (
-                    <tr key={user.id} className="hover:bg-[#000020]">
-                      <td className="px-6 py-4 text-sm text-white">{user.email}</td>
-                      <td className="px-6 py-4 text-sm text-white">{user.fullName || '-'}</td>
-                      <td className="px-6 py-4 text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          user.license?.plan === 'ENTERPRISE' ? 'bg-orange-100 text-orange-800' :
-                          user.license?.plan === 'PRO' ? 'bg-purple-100 text-purple-800' :
-                          'bg-[#171a4a] text-slate-800'
+                    <tr key={user.id} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{user.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white">{user.fullName || '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          user.license?.plan === 'ENTERPRISE' ? 'bg-[#8d4925]/20 text-[#b96e48]' :
+                          user.license?.plan === 'PRO' ? 'bg-blue-500/20 text-blue-400' :
+                          'bg-gray-500/20 text-gray-400'
                         }`}>
-                          {user.license?.plan || 'Nenhum'}
+                          {user.license?.plan || 'START'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm">
-                        <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          user.license?.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          user.license?.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
                         }`}>
-                          {user.license?.status === 'active' ? 'Ativo' : 'Inativo'}
+                          {user.license?.status || 'inactive'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-400">
-                        {user.license ? `${user.license.reportsUsed}/${user.license.reportsLimit} relatórios` : '-'}
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                        {user.license ? `${user.license.reportsUsed}/${user.license.reportsLimit}` : '-'}
                       </td>
-                      <td className="px-6 py-4 text-sm text-gray-400">{formatDate(user.createdAt)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{formatDate(user.createdAt)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <button
+                          onClick={() => {
+                            setEditingUser(user);
+                            setShowEditModal(true);
+                          }}
+                          className="px-3 py-1 bg-[#7ed957]/20 text-[#7ed957] rounded-lg hover:bg-[#7ed957]/30 transition-colors"
+                        >
+                          Editar
+                        </button>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -437,94 +483,245 @@ export default function Admin() {
           </div>
         )}
 
-        {/* Subscriptions Tab */}
-        {activeTab === 'subscriptions' && (
-          <div className="bg-white/5 rounded-xl shadow-lg overflow-hidden">
-            <table className="w-full">
-              <thead className="bg-[#000020] border-b border-white/20">
-                <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Usuário</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Email</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Plano</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Relatórios</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Projetos</th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase">Criado em</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {subscriptions.map((sub) => (
-                  <tr key={sub.licenseId} className="hover:bg-[#000020]">
-                    <td className="px-6 py-4 text-sm text-white">{sub.userName || '-'}</td>
-                    <td className="px-6 py-4 text-sm text-white">{sub.userEmail}</td>
-                    <td className="px-6 py-4 text-sm">
-                      <span className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                        sub.plan === 'ENTERPRISE' ? 'bg-orange-100 text-orange-800' :
-                        sub.plan === 'PRO' ? 'bg-purple-100 text-purple-800' :
-                        'bg-[#171a4a] text-slate-800'
-                      }`}>
-                        {sub.plan}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-400">
-                      {sub.reportsUsed}/{sub.reportsLimit}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-400">
-                      {sub.projectsActive}/{sub.projectsLimit === 999 ? '∞' : sub.projectsLimit}
-                    </td>
-                    <td className="px-6 py-4 text-sm text-gray-400">{formatDate(sub.createdAt)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        {/* Revenue Tab */}
-        {activeTab === 'revenue' && revenue && (
+        {/* Sales Tab */}
+        {activeTab === 'sales' && (
           <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white">Vendas e Assinaturas</h2>
+
             {/* Revenue Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
-                <p className="text-gray-400 text-sm">MRR (Receita Recorrente Mensal)</p>
-                <p className="text-4xl font-bold text-green-600 mt-2">{formatCurrency(revenue.mrr)}</p>
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                <p className="text-gray-400 text-sm">MRR</p>
+                <p className="text-3xl font-bold text-white mt-2">{formatCurrency(revenue?.mrr || 0)}</p>
+                <p className="text-gray-500 text-xs mt-1">Receita Recorrente Mensal</p>
               </div>
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
-                <p className="text-gray-400 text-sm">ARR (Receita Recorrente Anual)</p>
-                <p className="text-4xl font-bold text-blue-600 mt-2">{formatCurrency(revenue.arr)}</p>
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                <p className="text-gray-400 text-sm">ARR</p>
+                <p className="text-3xl font-bold text-white mt-2">{formatCurrency(revenue?.arr || 0)}</p>
+                <p className="text-gray-500 text-xs mt-1">Receita Recorrente Anual</p>
               </div>
-              <div className="bg-white/5 rounded-xl shadow-lg p-6">
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
                 <p className="text-gray-400 text-sm">Assinaturas Ativas</p>
-                <p className="text-4xl font-bold text-purple-600 mt-2">{revenue.totalActiveSubscriptions}</p>
+                <p className="text-3xl font-bold text-white mt-2">{revenue?.totalActiveSubscriptions || 0}</p>
+                <p className="text-gray-500 text-xs mt-1">Total de clientes pagantes</p>
               </div>
             </div>
 
-            {/* Revenue by Plan */}
-            <div className="bg-white/5 rounded-xl shadow-lg p-6">
-              <h3 className="text-lg font-bold text-white mb-4">Receita por Plano</h3>
-              <div className="space-y-4">
-                {Object.entries(revenue.revenueByPlan).map(([plan, data]) => (
-                  <div key={plan} className="flex items-center justify-between p-4 bg-[#000020] rounded-lg">
-                    <div>
-                      <p className="font-semibold text-white">{plan}</p>
-                      <p className="text-sm text-gray-400">{data.count} assinaturas</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-2xl font-bold text-green-600">{formatCurrency(data.revenue)}</p>
-                      <p className="text-sm text-gray-400">por mês</p>
-                    </div>
-                  </div>
-                ))}
+            {/* Subscriptions Table */}
+            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/10">
+                <h3 className="text-lg font-semibold text-white">Assinaturas Ativas</h3>
               </div>
+              <table className="w-full">
+                <thead className="bg-white/10">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Usuário</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Plano</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Uso</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Criado em</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Stripe ID</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {subscriptions.map((sub) => (
+                    <tr key={sub.licenseId} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <div>
+                          <p className="text-white">{sub.userName || '-'}</p>
+                          <p className="text-gray-400 text-xs">{sub.userEmail}</p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          sub.plan === 'ENTERPRISE' ? 'bg-[#8d4925]/20 text-[#b96e48]' :
+                          sub.plan === 'PRO' ? 'bg-blue-500/20 text-blue-400' :
+                          'bg-gray-500/20 text-gray-400'
+                        }`}>
+                          {sub.plan}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-500/20 text-green-400">
+                          {sub.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                        {sub.reportsUsed}/{sub.reportsLimit} relatórios
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">{formatDate(sub.createdAt)}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400 font-mono text-xs">
+                        {sub.stripeSubscriptionId || '-'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           </div>
         )}
 
-        {loading && activeTab !== 'dashboard' && (
-          <div className="flex items-center justify-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        {/* Costs Tab */}
+        {activeTab === 'costs' && (
+          <div className="space-y-6">
+            <h2 className="text-2xl font-bold text-white">Custos e Despesas</h2>
+
+            {/* Costs Summary */}
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                <p className="text-gray-400 text-sm">Custos Fixos</p>
+                <p className="text-3xl font-bold text-white mt-2">{formatCurrency(costs?.summary.fixedCosts || 0)}</p>
+                <p className="text-gray-500 text-xs mt-1">Mensais</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                <p className="text-gray-400 text-sm">Custos Variáveis</p>
+                <p className="text-3xl font-bold text-white mt-2">{formatCurrency(costs?.summary.variableCosts || 0)}</p>
+                <p className="text-gray-500 text-xs mt-1">Baseado em uso</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                <p className="text-gray-400 text-sm">Total de Custos</p>
+                <p className="text-3xl font-bold text-white mt-2">{formatCurrency(costs?.summary.totalCosts || 0)}</p>
+                <p className="text-gray-500 text-xs mt-1">Fixos + Variáveis</p>
+              </div>
+              <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+                <p className="text-gray-400 text-sm">Margem Operacional</p>
+                <p className="text-3xl font-bold text-white mt-2">{profit?.profitMargin.toFixed(1) || 0}%</p>
+                <p className="text-gray-500 text-xs mt-1">Lucro / Receita</p>
+              </div>
+            </div>
+
+            {/* Services Breakdown */}
+            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 overflow-hidden">
+              <div className="px-6 py-4 border-b border-white/10">
+                <h3 className="text-lg font-semibold text-white">Detalhamento por Serviço</h3>
+              </div>
+              <table className="w-full">
+                <thead className="bg-white/10">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Serviço</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Categoria</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Custo Fixo</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Custo Variável</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Descrição</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-white/10">
+                  {costs?.costs.map((cost, index) => (
+                    <tr key={index} className="hover:bg-white/5 transition-colors">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white font-medium">{cost.service}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          cost.category === 'infrastructure' ? 'bg-blue-500/20 text-blue-400' :
+                          cost.category === 'ai' ? 'bg-purple-500/20 text-purple-400' :
+                          cost.category === 'data' ? 'bg-green-500/20 text-green-400' :
+                          'bg-orange-500/20 text-orange-400'
+                        }`}>
+                          {cost.category}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
+                        {cost.monthlyCost > 0 ? formatCurrency(cost.monthlyCost) : '-'}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-400">
+                        {cost.variableCost > 0 ? `${formatCurrency(cost.variableCost)}/unidade` : '-'}
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-400">{cost.description}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Usage Metrics */}
+            <div className="bg-white/5 backdrop-blur-md rounded-xl border border-white/20 p-6">
+              <h3 className="text-lg font-semibold text-white mb-4">Métricas de Uso</h3>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div>
+                  <p className="text-gray-400 text-sm">S3 Storage</p>
+                  <p className="text-2xl font-bold text-white mt-1">{costs?.usage.s3StorageGB || 0} GB</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">OpenAI Tokens</p>
+                  <p className="text-2xl font-bold text-white mt-1">{(costs?.usage.openaiTokens || 0).toLocaleString()}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Copernicus Requests</p>
+                  <p className="text-2xl font-bold text-white mt-1">{costs?.usage.copernicusRequests || 0}</p>
+                </div>
+                <div>
+                  <p className="text-gray-400 text-sm">Mapbox Requests</p>
+                  <p className="text-2xl font-bold text-white mt-1">{(costs?.usage.mapboxRequests || 0).toLocaleString()}</p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
       </main>
+
+      {/* Edit User Modal */}
+      {showEditModal && editingUser && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#171a4a] border border-white/20 rounded-xl p-6 max-w-md w-full mx-4">
+            <h3 className="text-xl font-bold text-white mb-4">Editar Usuário</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Email</label>
+                <input
+                  type="text"
+                  value={editingUser.email}
+                  disabled
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Plano</label>
+                <select
+                  defaultValue={editingUser.license?.plan || 'START'}
+                  id="plan-select"
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white"
+                >
+                  <option value="START">START</option>
+                  <option value="PRO">PRO</option>
+                  <option value="ENTERPRISE">ENTERPRISE</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm text-gray-400 mb-1">Status</label>
+                <select
+                  defaultValue={editingUser.license?.status || 'active'}
+                  id="status-select"
+                  className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white"
+                >
+                  <option value="active">Ativo</option>
+                  <option value="suspended">Suspenso</option>
+                  <option value="cancelled">Cancelado</option>
+                </select>
+              </div>
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setShowEditModal(false);
+                    setEditingUser(null);
+                  }}
+                  className="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={() => {
+                    const plan = (document.getElementById('plan-select') as HTMLSelectElement).value;
+                    const status = (document.getElementById('status-select') as HTMLSelectElement).value;
+                    handleUpdateUserLicense(editingUser.id, plan, status);
+                  }}
+                  className="flex-1 px-4 py-2 bg-[#7ed957] text-white rounded-lg hover:opacity-90 transition-opacity"
+                >
+                  Salvar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

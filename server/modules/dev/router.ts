@@ -5,6 +5,7 @@
 
 import { Router, Request, Response } from 'express';
 import { runDevSeeds } from './seed';
+import { createQivoAdmin } from './create-qivo-admin';
 import { loginUser } from '../auth/service';
 import { getUserLicense, upgradeLicense } from '../licenses/service';
 import type { Plan } from '../licenses/service';
@@ -144,6 +145,19 @@ router.get('/user/:userId', async (req: Request, res: Response) => {
         lastResetAt: license.lastResetAt,
       },
     });
+  } catch (error: any) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+/**
+ * Create QIVO Admin User
+ * POST /api/dev/create-qivo-admin
+ */
+router.post('/create-qivo-admin', async (req: Request, res: Response) => {
+  try {
+    const result = await createQivoAdmin();
+    res.json(result);
   } catch (error: any) {
     res.status(500).json({ error: error.message });
   }
