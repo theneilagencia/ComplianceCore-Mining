@@ -31,20 +31,20 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 flex items-center justify-center p-4">
-      <div className="max-w-md w-full bg-white rounded-2xl shadow-2xl p-8">
+    <div className="min-h-screen bg-gradient-to-br from-[#000020] via-[#171a4a] to-[#2f2c79] flex items-center justify-center p-4">
+      <div className="max-w-md w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl shadow-2xl p-8">
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <img src="/qivo-logo.png" alt="QIVO Mining" className="w-20 h-20" />
+          <img src="/assets/logo-Qivo.png" alt="QIVO Mining" className="h-12 w-auto" />
         </div>
 
-        <h1 className="text-3xl font-bold text-center mb-2">Bem-vindo de Volta</h1>
-        <p className="text-gray-600 text-center mb-8">
+        <h1 className="text-3xl font-bold text-center mb-2 text-white">Bem-vindo de Volta</h1>
+        <p className="text-gray-300 text-center mb-8">
           Entre na sua conta para continuar
         </p>
 
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <div className="bg-red-500/20 border border-red-500/50 text-red-200 px-4 py-3 rounded-lg mb-6">
             {error}
           </div>
         )}
@@ -52,7 +52,7 @@ export default function LoginPage() {
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="email" className="block text-sm font-medium text-white mb-1">
               Email
             </label>
             <input
@@ -61,13 +61,13 @@ export default function LoginPage() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="seu@email.com"
             />
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1">
+            <label htmlFor="password" className="block text-sm font-medium text-white mb-1">
               Senha
             </label>
             <input
@@ -76,7 +76,7 @@ export default function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-4 py-3 bg-white/5 border border-white/20 text-white rounded-lg focus:ring-2 focus:ring-[#b96e48] focus:border-transparent placeholder:text-gray-400"
               placeholder="••••••••"
             />
           </div>
@@ -85,7 +85,7 @@ export default function LoginPage() {
             <button
               type="button"
               onClick={() => setLocation('/forgot-password')}
-              className="text-sm text-blue-600 hover:text-blue-700 font-medium"
+              className="text-sm text-[#b96e48] hover:text-[#8d4925] font-medium"
             >
               Esqueci minha senha
             </button>
@@ -94,17 +94,17 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-all disabled:opacity-50"
+            className="w-full bg-[#2f2c79] text-white py-3 rounded-lg font-semibold hover:bg-[#b96e48] transition-all disabled:opacity-50"
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </button>
         </form>
 
-        <p className="text-center text-gray-600 mt-6">
+        <p className="text-center text-gray-300 mt-6">
           Não tem uma conta?{' '}
           <button
             onClick={() => setLocation('/register')}
-            className="text-blue-600 font-semibold hover:underline"
+            className="text-[#b96e48] font-semibold hover:underline"
           >
             Criar conta
           </button>
