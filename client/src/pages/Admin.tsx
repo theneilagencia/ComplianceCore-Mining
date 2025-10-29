@@ -816,11 +816,6 @@ export default function Admin() {
           </div>
         </div>
       )}
-    </div>
-  );
-}
-
-
 
       {/* Create User Modal */}
       {showCreateModal && (
@@ -891,5 +886,7 @@ export default function Admin() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
 
-// Cache bust 1761759214
