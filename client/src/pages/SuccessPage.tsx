@@ -58,10 +58,7 @@ export default function SuccessPage() {
               <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
               Módulo ESG com 4 frameworks
             </li>
-            <li className="flex items-center">
-              <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
-              Valuation automático com APIs
-            </li>
+
             <li className="flex items-center">
               <CheckCircle className="w-5 h-5 text-green-500 mr-2" />
               Branding personalizado

@@ -86,12 +86,7 @@ export default function HelpSupport() {
  thumbnail: '',
  url: '#',
  },
- {
- title: 'ESG Reporting Completo',
- duration: '10 min',
- thumbnail: '',
- url: '#',
- },
+
  ];
 
  const filteredFaqs = faqs.filter(faq => {

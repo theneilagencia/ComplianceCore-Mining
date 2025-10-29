@@ -76,7 +76,7 @@ export default function PricingPage() {
         '15 relatórios técnicos/mês',
         'Projetos ilimitados',
         'Todos os recursos PRO',
-        '**Valuation Automático** (NPV, IRR, cenários)',
+
         '**APIs de preços em tempo real** (8 APIs integradas)',
         'Dados macroeconômicos (câmbio, inflação, juros)',
         'Extração automática de dados de PDFs',
