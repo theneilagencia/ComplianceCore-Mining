@@ -4,6 +4,7 @@ import { TRPCError } from "@trpc/server";
 import { runAudit } from "../services/audit";
 import { runKRCIScan, getKRCIStats, ScanMode } from "../services/krci-extended";
 import { generateCorrectionPlan, exportCorrectionPlan } from "../services/correction-plan";
+import { compareWithAI } from "../services/ai-comparison";
 import { generateAuditPDF } from "../services/pdf-generator";
 import { eq } from "drizzle-orm";
 
@@ -448,6 +449,62 @@ export const auditRouter = router({
         content: exported,
         filename: `correction-plan-${audit.reportId}.${input.format}`,
       };
+    }),
+
+  // Compare report with AI-generated version
+  aiComparison: protectedProcedure
+    .input(
+      z.object({
+        reportId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { reports } = await import("../../../../drizzle/schema");
+
+      const [report] = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.id, input.reportId))
+        .limit(1);
+
+      if (!report) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Relatório não encontrado",
+        });
+      }
+
+      if (report.tenantId !== ctx.user.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+
+      // Parse report data
+      const reportData = {
+        title: report.title,
+        location: report.location,
+        commodity: report.commodity,
+        sections: report.sectionsJson as any,
+      };
+
+      // Run AI comparison
+      const comparison = await compareWithAI(
+        input.reportId,
+        reportData,
+        report.standard
+      );
+
+      return comparison;
     }),
 });
 
