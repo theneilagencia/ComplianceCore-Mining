@@ -6,6 +6,7 @@ import { runKRCIScan, getKRCIStats, ScanMode } from "../services/krci-extended";
 import { generateCorrectionPlan, exportCorrectionPlan } from "../services/correction-plan";
 import { compareWithAI } from "../services/ai-comparison";
 import { generateExecutiveSummary } from "../services/ai-executive-summary";
+import { exportAuditResults } from "../services/advanced-export";
 import { generateAuditPDF } from "../services/pdf-generator";
 import { eq } from "drizzle-orm";
 
@@ -569,6 +570,87 @@ export const auditRouter = router({
       );
 
       return summary;
+    }),
+
+  // Export audit with advanced options
+  exportAdvanced: protectedProcedure
+    .input(
+      z.object({
+        auditId: z.string(),
+        format: z.enum(['excel', 'json', 'markdown']),
+        includeCharts: z.boolean().optional(),
+        includeRawData: z.boolean().optional(),
+        includeRecommendations: z.boolean().optional(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { audits, reports } = await import("../../../../drizzle/schema");
+
+      const [audit] = await db
+        .select()
+        .from(audits)
+        .where(eq(audits.id, input.auditId))
+        .limit(1);
+
+      if (!audit) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Auditoria não encontrada",
+        });
+      }
+
+      const [report] = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.id, audit.reportId))
+        .limit(1);
+
+      if (!report || report.tenantId !== ctx.user.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+
+      // Prepare audit data
+      const auditData = {
+        reportId: audit.reportId,
+        auditId: audit.id,
+        score: audit.score,
+        totalRules: audit.totalRules,
+        passedRules: audit.passedRules,
+        failedRules: audit.failedRules,
+        krcis: (audit.krcis as any) || [],
+        createdAt: audit.createdAt,
+        reportData: {
+          title: report.title,
+          standard: report.standard,
+          location: report.location,
+          commodity: report.commodity,
+        },
+      };
+
+      // Export with advanced options
+      const result = await exportAuditResults(auditData, {
+        format: input.format,
+        includeCharts: input.includeCharts,
+        includeRawData: input.includeRawData,
+        includeRecommendations: input.includeRecommendations,
+      });
+
+      return {
+        content: result.content.toString('base64'),
+        filename: result.filename,
+        mimeType: result.mimeType,
+      };
     }),
 });
 
