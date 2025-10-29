@@ -4,7 +4,7 @@ import { users, licenses } from '../../../drizzle/schema';
 import { eq, desc, sql, and, gte } from 'drizzle-orm';
 import { authenticateFromCookie } from '../payment/auth-helper';
 import * as costsService from './costs';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 import { createId } from '@paralleldrive/cuid2';
 
 const router = Router();
