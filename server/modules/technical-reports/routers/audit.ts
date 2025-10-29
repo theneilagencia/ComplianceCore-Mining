@@ -5,6 +5,7 @@ import { runAudit } from "../services/audit";
 import { runKRCIScan, getKRCIStats, ScanMode } from "../services/krci-extended";
 import { generateCorrectionPlan, exportCorrectionPlan } from "../services/correction-plan";
 import { compareWithAI } from "../services/ai-comparison";
+import { generateExecutiveSummary } from "../services/ai-executive-summary";
 import { generateAuditPDF } from "../services/pdf-generator";
 import { eq } from "drizzle-orm";
 
@@ -505,6 +506,69 @@ export const auditRouter = router({
       );
 
       return comparison;
+    }),
+
+  // Generate AI-powered executive summary
+  executiveSummary: protectedProcedure
+    .input(
+      z.object({
+        auditId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { audits, reports } = await import("../../../../drizzle/schema");
+
+      const [audit] = await db
+        .select()
+        .from(audits)
+        .where(eq(audits.id, input.auditId))
+        .limit(1);
+
+      if (!audit) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Auditoria não encontrada",
+        });
+      }
+
+      const [report] = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.id, audit.reportId))
+        .limit(1);
+
+      if (!report || report.tenantId !== ctx.user.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+
+      // Parse KRCI results
+      const krcis = (audit.krcis as any) || [];
+
+      // Generate executive summary
+      const summary = await generateExecutiveSummary(
+        audit.reportId,
+        audit.score,
+        krcis,
+        {
+          standard: report.standard,
+          title: report.title,
+          location: report.location,
+          commodity: report.commodity,
+        }
+      );
+
+      return summary;
     }),
 });
 
