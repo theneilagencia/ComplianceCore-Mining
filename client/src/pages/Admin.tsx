@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation } from 'wouter';
+import { useAdminModal } from '../hooks/useAdminModal';
 import { Users, DollarSign, TrendingUp, Settings, BarChart3, CreditCard, Database } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || '';
@@ -105,7 +106,7 @@ export default function Admin() {
   const [searchTerm, setSearchTerm] = useState('');
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
-  const [showCreateModal, setShowCreateModal] = useState(false);
+  const { isVisible: showCreateModal, showCreateModal: openCreateModal, hideModal: closeCreateModal } = useAdminModal();
   const [newUser, setNewUser] = useState({ email: '', fullName: '', password: '', plan: 'START' });
 
   useEffect(() => {
@@ -300,7 +301,7 @@ export default function Admin() {
       if (!response.ok) throw new Error('Failed to create user');
 
       alert('Usuário criado com sucesso!');
-      setShowCreateModal(false);
+      closeCreateModal();
       setNewUser({ email: '', fullName: '', password: '', plan: 'START' });
       fetchUsers();
     } catch (error) {
@@ -493,7 +494,7 @@ export default function Admin() {
                   className="px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-[#7ed957]"
                 />
                 <button
-                  onClick={() => setShowCreateModal(true)}
+                  onClick={openCreateModal}
                   className="px-4 py-2 bg-[#7ed957] text-white rounded-lg hover:opacity-90 transition-opacity flex items-center gap-2"
                 >
                   <Users className="w-4 h-4" />
@@ -871,7 +872,7 @@ export default function Admin() {
               <div className="flex gap-3 mt-6">
                 <button
                   onClick={() => {
-                    setShowCreateModal(false);
+                    closeCreateModal();
                     setNewUser({ email: '', fullName: '', password: '', plan: 'START' });
                   }}
                   className="flex-1 px-4 py-2 bg-white/10 text-white rounded-lg hover:bg-white/20 transition-colors"
