@@ -30,10 +30,13 @@ import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
 import { Button } from "./ui/button";
 
 const menuItems = [
-  { icon: FileText, label: "Gerar Relatório", path: "/reports/generate" },
-  { icon: BarChart3, label: "Auditoria & KRCI", path: "/reports/audit" },
-  { icon: ArrowRightLeft, label: "Exportar Padrões", path: "/reports/export" },
-  { icon: Bell, label: "Radar Regulatório", path: "/radar" },
+  // 4 M\u00f3dulos Oficiais
+  { icon: Bell, label: "Regulatory Radar", path: "/radar", description: "Monitor regulat\u00f3rio em tempo real" },
+  { icon: FileText, label: "AI Report Generator", path: "/reports/generate", description: "Gera\u00e7\u00e3o de relat\u00f3rios com IA" },
+  { icon: Shield, label: "Auditoria & KRCI", path: "/reports/audit", description: "Auditoria completa com 100 regras" },
+  { icon: ArrowRightLeft, label: "Bridge Regulat\u00f3ria Global", path: "/reports/export", description: "Convers\u00e3o entre padr\u00f5es internacionais" },
+  
+  // Suporte
   { icon: HelpCircle, label: "Ajuda & Suporte", path: "/help" },
   { icon: BookOpen, label: "Central de Suporte", path: "/support" },
 ];
