@@ -14,6 +14,9 @@ import { trpc } from "@/lib/trpc";
 import { Shield, CheckCircle, AlertTriangle, FileSearch, Download, ExternalLink } from "lucide-react";
 import GuardRailModal from "../components/GuardRailModal";
 import { CorrectionPlan } from "../components/CorrectionPlan";
+import { AuditTrendsDashboard } from "@/components/AuditTrendsDashboard";
+import { HistoricalComparison } from "@/components/HistoricalComparison";
+import { OfficialSourcesValidation } from "@/components/OfficialSourcesValidation";
 import { useState } from "react";
 import { toast } from "sonner";
 import DocumentUploadValidator from "@/components/DocumentUploadValidator";
@@ -25,6 +28,7 @@ export default function AuditKRCI() {
   const [correctionPlan, setCorrectionPlan] = useState<any>(null);
   const [shouldGeneratePlan, setShouldGeneratePlan] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'select' | 'upload'>('select');
+  const [advancedTab, setAdvancedTab] = useState<'trends' | 'comparison' | 'official'>('trends');
 
   // Query para listar relatórios (sem polling)
   const { data: reports } = trpc.technicalReports.generate.list.useQuery(
@@ -436,6 +440,60 @@ export default function AuditKRCI() {
                 toast.success(`Plano exportado em ${format.toUpperCase()}`);
               }}
             />
+          </Card>
+        )}
+
+        {/* Análises Avançadas */}
+        {selectedReport && (
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6">Análises Avançadas</h2>
+            
+            {/* Advanced Tabs */}
+            <div className="flex gap-2 mb-6 border-b">
+              <button
+                onClick={() => setAdvancedTab('trends')}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  advancedTab === 'trends'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Dashboard de Tendências
+              </button>
+              <button
+                onClick={() => setAdvancedTab('comparison')}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  advancedTab === 'comparison'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Comparativo Histórico
+              </button>
+              <button
+                onClick={() => setAdvancedTab('official')}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  advancedTab === 'official'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Fontes Oficiais
+              </button>
+            </div>
+
+            {/* Advanced Content */}
+            <div>
+              {advancedTab === 'trends' && (
+                <AuditTrendsDashboard reportId={selectedReport} />
+              )}
+              {advancedTab === 'comparison' && (
+                <HistoricalComparison reportId={selectedReport} />
+              )}
+              {advancedTab === 'official' && (
+                <OfficialSourcesValidation reportId={selectedReport} />
+              )}
+            </div>
           </Card>
         )}
 
