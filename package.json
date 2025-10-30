@@ -87,7 +87,6 @@
     "openai": "^6.7.0",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0",
-    "pdf-parse": "^2.4.5",
     "postgres": "^3.4.7",
     "puppeteer": "^24.26.0",
     "react": "^19.1.1",

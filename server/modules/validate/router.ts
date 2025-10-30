@@ -4,9 +4,12 @@ import * as XLSX from 'xlsx';
 import { createRequire } from 'module';
 import fs from 'fs/promises';
 import path from 'path';
+import { exec } from 'child_process';
+import { promisify } from 'util';
+import os from 'os';
 
+const execAsync = promisify(exec);
 const require = createRequire(import.meta.url);
-const pdfParse = require('pdf-parse');
 
 const router = express.Router();
 
@@ -242,8 +245,34 @@ const ni43101Rules: ValidationRule[] = [
 // ============================================================================
 
 async function parsePDF(buffer: Buffer): Promise<string> {
-  const data = await pdfParse(buffer);
-  return data.text;
+  // Create temporary file for PDF
+  const tmpDir = os.tmpdir();
+  const pdfPath = path.join(tmpDir, `pdf-${Date.now()}-${Math.random().toString(36).substring(7)}.pdf`);
+  const txtPath = path.join(tmpDir, `txt-${Date.now()}-${Math.random().toString(36).substring(7)}.txt`);
+  
+  try {
+    // Write buffer to temporary PDF file
+    await fs.writeFile(pdfPath, buffer);
+    
+    // Use pdftotext to extract text
+    await execAsync(`pdftotext "${pdfPath}" "${txtPath}"`);
+    
+    // Read extracted text
+    const text = await fs.readFile(txtPath, 'utf-8');
+    
+    // Clean up temporary files
+    await fs.unlink(pdfPath).catch(() => {});
+    await fs.unlink(txtPath).catch(() => {});
+    
+    return text.trim();
+  } catch (error) {
+    // Clean up on error
+    await fs.unlink(pdfPath).catch(() => {});
+    await fs.unlink(txtPath).catch(() => {});
+    
+    console.error('Error parsing PDF with pdftotext:', error);
+    throw new Error(`Failed to parse PDF: ${error instanceof Error ? error.message : 'Unknown error'}`);
+  }
 }
 
 async function parseExcel(buffer: Buffer): Promise<string> {
