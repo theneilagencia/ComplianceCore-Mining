@@ -13,7 +13,7 @@ rm -rf node_modules/ || true
 rm -rf .pnpm-store/ || true
 
 echo "📦 Installing dependencies (clean install)..."
-pnpm install --frozen-lockfile --no-optional
+pnpm install --frozen-lockfile
 
 echo "🧹 Cleaning old build..."
 rm -rf dist/
