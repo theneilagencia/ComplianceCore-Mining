@@ -10,25 +10,9 @@ const pdfParse = require('pdf-parse');
 
 const router = express.Router();
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: async (req, file, cb) => {
-    const uploadDir = path.join(process.cwd(), 'uploads');
-    try {
-      await fs.mkdir(uploadDir, { recursive: true });
-      cb(null, uploadDir);
-    } catch (error) {
-      cb(error as Error, uploadDir);
-    }
-  },
-  filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
-
+// Configure multer for file uploads (using memory storage for serverless compatibility)
 const upload = multer({
-  storage,
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 50 * 1024 * 1024 // 50MB
   },
@@ -257,14 +241,13 @@ const ni43101Rules: ValidationRule[] = [
 // DOCUMENT PARSING FUNCTIONS
 // ============================================================================
 
-async function parsePDF(filePath: string): Promise<string> {
-  const dataBuffer = await fs.readFile(filePath);
-  const data = await pdfParse(dataBuffer);
+async function parsePDF(buffer: Buffer): Promise<string> {
+  const data = await pdfParse(buffer);
   return data.text;
 }
 
-async function parseExcel(filePath: string): Promise<string> {
-  const workbook = XLSX.readFile(filePath);
+async function parseExcel(buffer: Buffer): Promise<string> {
+  const workbook = XLSX.read(buffer, { type: 'buffer' });
   let text = '';
   
   workbook.SheetNames.forEach(sheetName => {
@@ -276,8 +259,8 @@ async function parseExcel(filePath: string): Promise<string> {
   return text;
 }
 
-async function parseCSV(filePath: string): Promise<string> {
-  return await fs.readFile(filePath, 'utf-8');
+async function parseCSV(buffer: Buffer): Promise<string> {
+  return buffer.toString('utf-8');
 }
 
 // ============================================================================
@@ -400,11 +383,11 @@ router.post('/upload', upload.single('document'), async (req, res) => {
     
     try {
       if (ext === '.pdf') {
-        content = await parsePDF(req.file.path);
+        content = await parsePDF(req.file.buffer);
       } else if (ext === '.xlsx' || ext === '.xls') {
-        content = await parseExcel(req.file.path);
+        content = await parseExcel(req.file.buffer);
       } else if (ext === '.csv') {
-        content = await parseCSV(req.file.path);
+        content = await parseCSV(req.file.buffer);
       } else {
         return res.status(400).json({
           error: 'Unsupported file type',
@@ -441,12 +424,7 @@ router.post('/upload', upload.single('document'), async (req, res) => {
       criticalMissing: validationResults.filter(r => r.category === 'critical' && !r.found).length
     };
     
-    // Clean up uploaded file
-    try {
-      await fs.unlink(req.file.path);
-    } catch (unlinkError) {
-      console.error('Error deleting uploaded file:', unlinkError);
-    }
+    // No cleanup needed - using memory storage
     
     // Return validation report
     res.json({
@@ -471,14 +449,7 @@ router.post('/upload', upload.single('document'), async (req, res) => {
   } catch (error) {
     console.error('Error processing upload:', error);
     
-    // Clean up file if it exists
-    if (req.file) {
-      try {
-        await fs.unlink(req.file.path);
-      } catch (unlinkError) {
-        console.error('Error deleting uploaded file:', unlinkError);
-      }
-    }
+    // No cleanup needed - using memory storage
     
     res.status(500).json({
       error: 'Internal server error',
