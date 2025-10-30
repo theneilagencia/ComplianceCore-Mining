@@ -78,7 +78,22 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
         throw new Error(error.message || 'Erro ao validar documento');
       }
 
-      const result: ValidationResult = await response.json();
+      const backendResult = await response.json();
+      
+      // Transform backend response to frontend format
+      const result: ValidationResult = {
+        valid: backendResult.compliance.score >= 70,
+        score: backendResult.compliance.score,
+        standard: backendResult.standard,
+        criteria: backendResult.results.map((r: any) => ({
+          name: r.criterion,
+          met: r.found,
+          details: `${r.section} - Score: ${r.score}% (${r.matchedKeywords.length} palavras-chave encontradas)`
+        })),
+        recommendations: backendResult.recommendations,
+        summary: `Documento ${backendResult.compliance.level} - ${backendResult.statistics.requiredFound} de ${backendResult.statistics.required} critérios obrigatórios atendidos.`
+      };
+      
       setValidationResult(result);
       
       toast.success('Validação concluída!', {
