@@ -7,6 +7,8 @@ import { generateCorrectionPlan, exportCorrectionPlan } from "../services/correc
 import { compareWithAI } from "../services/ai-comparison";
 import { generateExecutiveSummary } from "../services/ai-executive-summary";
 import { exportAuditResults } from "../services/advanced-export";
+import { validateWithOfficialSources } from "../services/official-integrations";
+import { calculateAuditTrends, compareAudits, getAuditStatistics } from "../services/audit-trends";
 import { generateAuditPDF } from "../services/pdf-generator";
 import { eq } from "drizzle-orm";
 
@@ -651,6 +653,295 @@ export const auditRouter = router({
         filename: result.filename,
         mimeType: result.mimeType,
       };
+    }),
+
+  // Validate report with official sources (ANM, CPRM, IBAMA)
+  validateOfficial: protectedProcedure
+    .input(
+      z.object({
+        reportId: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { reports } = await import("../../../../drizzle/schema");
+
+      const [report] = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.id, input.reportId))
+        .limit(1);
+
+      if (!report) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Relatório não encontrado",
+        });
+      }
+
+      if (report.tenantId !== ctx.user.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+
+      // Prepare report data for validation
+      const reportData = {
+        miningTitleNumber: report.miningTitleNumber,
+        commodity: report.commodity,
+        location: report.location,
+        geologicalFormation: report.geologicalFormation,
+        geologicalAge: report.geologicalAge,
+        coordinates: report.coordinates,
+        environmentalLicense: report.environmentalLicense,
+        licenseType: report.licenseType,
+        hasEIA: report.hasEIA,
+      };
+
+      // Run validation
+      const result = await validateWithOfficialSources(
+        input.reportId,
+        reportData
+      );
+
+      return result;
+    }),
+
+  // Get audit trends for a report
+  getTrends: protectedProcedure
+    .input(
+      z.object({
+        reportId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { reports, auditResults } = await import("../../../../drizzle/schema");
+
+      // Verify report access
+      const [report] = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.id, input.reportId))
+        .limit(1);
+
+      if (!report) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Relatório não encontrado",
+        });
+      }
+
+      if (report.tenantId !== ctx.user.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+
+      // Get all audits for this report
+      const audits = await db
+        .select()
+        .from(auditResults)
+        .where(eq(auditResults.reportId, input.reportId));
+
+      if (audits.length === 0) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Nenhuma auditoria encontrada para este relatório",
+        });
+      }
+
+      // Transform to AuditHistoryItem format
+      const historyItems = audits.map((audit) => ({
+        auditId: audit.id,
+        reportId: audit.reportId,
+        score: audit.score,
+        totalRules: audit.totalRules,
+        passedRules: audit.passedRules,
+        failedRules: audit.failedRules,
+        krcis: audit.krcis || [],
+        createdAt: audit.createdAt,
+      }));
+
+      const trends = await calculateAuditTrends(input.reportId, historyItems);
+      return trends;
+    }),
+
+  // Compare two audits
+  compareAudits: protectedProcedure
+    .input(
+      z.object({
+        reportId: z.string(),
+        previousAuditId: z.string(),
+        currentAuditId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { reports, auditResults } = await import("../../../../drizzle/schema");
+
+      // Verify report access
+      const [report] = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.id, input.reportId))
+        .limit(1);
+
+      if (!report) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Relatório não encontrado",
+        });
+      }
+
+      if (report.tenantId !== ctx.user.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+
+      // Get all audits
+      const allAudits = await db
+        .select()
+        .from(auditResults)
+        .where(eq(auditResults.reportId, input.reportId));
+
+      const previousAudit = allAudits.find((a) => a.id === input.previousAuditId);
+      const currentAudit = allAudits.find((a) => a.id === input.currentAuditId);
+
+      if (!previousAudit || !currentAudit) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Auditoria não encontrada",
+        });
+      }
+
+      // Transform to AuditHistoryItem format
+      const historyItems = allAudits.map((audit) => ({
+        auditId: audit.id,
+        reportId: audit.reportId,
+        score: audit.score,
+        totalRules: audit.totalRules,
+        passedRules: audit.passedRules,
+        failedRules: audit.failedRules,
+        krcis: audit.krcis || [],
+        createdAt: audit.createdAt,
+      }));
+
+      const previous = {
+        auditId: previousAudit.id,
+        reportId: previousAudit.reportId,
+        score: previousAudit.score,
+        totalRules: previousAudit.totalRules,
+        passedRules: previousAudit.passedRules,
+        failedRules: previousAudit.failedRules,
+        krcis: previousAudit.krcis || [],
+        createdAt: previousAudit.createdAt,
+      };
+
+      const current = {
+        auditId: currentAudit.id,
+        reportId: currentAudit.reportId,
+        score: currentAudit.score,
+        totalRules: currentAudit.totalRules,
+        passedRules: currentAudit.passedRules,
+        failedRules: currentAudit.failedRules,
+        krcis: currentAudit.krcis || [],
+        createdAt: currentAudit.createdAt,
+      };
+
+      const comparison = compareAudits(
+        input.reportId,
+        previous,
+        current,
+        historyItems
+      );
+
+      return comparison;
+    }),
+
+  // Get audit statistics
+  getStatistics: protectedProcedure
+    .input(
+      z.object({
+        reportId: z.string(),
+      })
+    )
+    .query(async ({ ctx, input }) => {
+      const db = await import("../../../db").then((m) => m.getDb());
+      if (!db) {
+        throw new TRPCError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Database not available",
+        });
+      }
+
+      const { reports, auditResults } = await import("../../../../drizzle/schema");
+
+      // Verify report access
+      const [report] = await db
+        .select()
+        .from(reports)
+        .where(eq(reports.id, input.reportId))
+        .limit(1);
+
+      if (!report) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Relatório não encontrado",
+        });
+      }
+
+      if (report.tenantId !== ctx.user.tenantId) {
+        throw new TRPCError({
+          code: "FORBIDDEN",
+          message: "Acesso negado",
+        });
+      }
+
+      // Get all audits
+      const audits = await db
+        .select()
+        .from(auditResults)
+        .where(eq(auditResults.reportId, input.reportId));
+
+      const historyItems = audits.map((audit) => ({
+        auditId: audit.id,
+        reportId: audit.reportId,
+        score: audit.score,
+        totalRules: audit.totalRules,
+        passedRules: audit.passedRules,
+        failedRules: audit.failedRules,
+        krcis: audit.krcis || [],
+        createdAt: audit.createdAt,
+      }));
+
+      const statistics = getAuditStatistics(historyItems);
+      return statistics;
     }),
 });
 
