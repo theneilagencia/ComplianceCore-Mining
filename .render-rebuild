@@ -1,0 +1,5 @@
+# Force Render to rebuild completely
+# This file forces cache invalidation
+REBUILD_TIMESTAMP=2025-10-29-22-15
+FORCE_CLEAN_INSTALL=true
+
