@@ -91,7 +91,7 @@ router.post('/login', async (req: Request, res: Response) => {
 
     const authTokens = await authService.loginUser({ email, password });
     
-    // Set JWT in secure HTTP-only cookie
+    // Set JWT in secure HTTP-only cookie (fallback for same-origin)
     res.cookie('accessToken', authTokens.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -106,10 +106,12 @@ router.post('/login', async (req: Request, res: Response) => {
       maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
     });
 
-    // Return only user data - tokens are in HttpOnly cookies
+    // Return tokens in body for cross-origin scenarios
     res.json({
       success: true,
-      user: authTokens.user
+      user: authTokens.user,
+      accessToken: authTokens.accessToken,
+      refreshToken: authTokens.refreshToken
     });
   } catch (error: any) {
     console.error('[Auth] Login error:', error);
@@ -125,8 +127,8 @@ router.post('/login', async (req: Request, res: Response) => {
  */
 router.post('/refresh', async (req: Request, res: Response) => {
   try {
-    // Get refresh token from cookie
-    const refreshToken = req.cookies.refreshToken;
+    // Get refresh token from body or cookie
+    const refreshToken = req.body.refreshToken || req.cookies.refreshToken;
 
     if (!refreshToken) {
       res.status(401).json({
@@ -138,7 +140,7 @@ router.post('/refresh', async (req: Request, res: Response) => {
     // Generate new access token
     const result = await authService.refreshAccessToken(refreshToken);
 
-    // Set new access token in cookie
+    // Set new access token in cookie (fallback)
     res.cookie('accessToken', result.accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
@@ -146,7 +148,12 @@ router.post('/refresh', async (req: Request, res: Response) => {
       maxAge: 15 * 60 * 1000 // 15 minutes
     });
 
-    res.json({ success: true, message: 'Token refreshed successfully' });
+    // Return new access token in body for cross-origin
+    res.json({ 
+      success: true, 
+      message: 'Token refreshed successfully',
+      accessToken: result.accessToken
+    });
   } catch (error: any) {
     console.error('[Auth] Refresh error:', error);
     

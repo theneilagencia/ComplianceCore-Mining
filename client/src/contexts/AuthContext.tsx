@@ -80,7 +80,7 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // CRITICAL: Send cookies with request
+      credentials: 'include', // Send cookies as fallback
       body: JSON.stringify({ email, password }),
     });
 
@@ -91,8 +91,15 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
     const data = await response.json();
     
-    // Tokens are now in HttpOnly cookies - no localStorage needed
-    // Just set user data from response
+    // Save tokens to localStorage for cross-origin scenarios
+    if (data.accessToken) {
+      localStorage.setItem('accessToken', data.accessToken);
+    }
+    if (data.refreshToken) {
+      localStorage.setItem('refreshToken', data.refreshToken);
+    }
+    
+    // Set user data from response
     setUser(data.user);
     
     // Get user's plan
@@ -101,14 +108,18 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const logout = async () => {
     try {
-      // Cookies are sent automatically
+      // Send logout request
       await fetch(`${API_BASE_URL}/api/auth/logout`, {
         method: 'POST',
-        credentials: 'include', // CRITICAL: Send cookies with request
+        credentials: 'include',
       });
     } catch (error) {
       console.error('[Auth] Logout error:', error);
     } finally {
+      // Clear tokens from localStorage
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
+      
       // Clear local state
       setUser(null);
       setPlan('START');
@@ -120,22 +131,39 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const refreshSession = async () => {
     try {
-      // Try to refresh the access token using refresh token cookie
+      const refreshToken = localStorage.getItem('refreshToken');
+      
+      // Try to refresh the access token
       const response = await fetch(`${API_BASE_URL}/api/auth/refresh`, {
         method: 'POST',
-        credentials: 'include', // Send refresh token cookie
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify({ refreshToken }),
       });
 
       if (response.ok) {
-        // New access token is now in cookie, re-check session
+        const data = await response.json();
+        
+        // Save new access token
+        if (data.accessToken) {
+          localStorage.setItem('accessToken', data.accessToken);
+        }
+        
+        // Re-check session
         await checkSession();
       } else {
         // Refresh failed, clear session
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         setUser(null);
         setPlan('START');
       }
     } catch (error) {
       console.error('[Auth] Refresh session failed:', error);
+      localStorage.removeItem('accessToken');
+      localStorage.removeItem('refreshToken');
       setUser(null);
       setPlan('START');
     }
