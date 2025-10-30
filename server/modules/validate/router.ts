@@ -403,6 +403,99 @@ router.post('/upload', upload.single('document'), async (req, res) => {
       });
     }
 
+    // Detect document type
+    const documentType = detectDocumentType(content);
+    
+    // Check if document is a technical mining report
+    if (documentType.type !== 'technical_report') {
+      const errorMessages: Record<string, { title: string; message: string; suggestion: string }> = {
+        'api_documentation': {
+          title: 'Documento não suportado',
+          message: 'Este documento parece ser uma documentação de API, não um relatório técnico de mineração.',
+          suggestion: 'O módulo de Auditoria & KRCI está preparado para validar apenas relatórios técnicos de mineração (JORC, NI 43-101, PERC, SAMREC). Por favor, faça upload de um relatório técnico de mineração.'
+        },
+        'general': {
+          title: 'Documento não identificado',
+          message: 'Este documento não foi identificado como um relatório técnico de mineração.',
+          suggestion: 'O módulo de Auditoria & KRCI valida relatórios técnicos de mineração conforme padrões internacionais (JORC, NI 43-101, PERC, SAMREC). Verifique se o documento contém seções típicas como: Geologia, Amostragem, Estimativa de Recursos, Pessoa Competente, etc.'
+        },
+        'unknown': {
+          title: 'Conteúdo insuficiente',
+          message: 'Não foi possível identificar o tipo de documento. O conteúdo pode estar vazio ou corrompido.',
+          suggestion: 'Verifique se o arquivo está correto e contém texto legível. Tente fazer upload novamente ou use um arquivo diferente.'
+        }
+      };
+      
+      const errorInfo = errorMessages[documentType.type] || errorMessages['unknown'];
+      
+      return res.status(400).json({
+        error: errorInfo.title,
+        message: errorInfo.message,
+        suggestion: errorInfo.suggestion,
+        documentType: {
+          detected: documentType.type,
+          confidence: documentType.confidence,
+          reason: documentType.reason
+        },
+        acceptedTypes: [
+          'Relatórios JORC (2012)',
+          'Relatórios NI 43-101',
+          'Relatórios PERC',
+          'Relatórios SAMREC',
+          'Relatórios CRIRSCO'
+        ]
+      });
+    }
+
+// Helper function to detect document type
+function detectDocumentType(text: string): { type: 'technical_report' | 'api_documentation' | 'general' | 'unknown'; confidence: number; reason: string } {
+  const lowerText = text.toLowerCase();
+  
+  // Detectar documentação de API
+  const apiKeywords = ['api', 'endpoint', 'swagger', 'rest', 'post /', 'get /', 'headers:', 'body (json)', 'response:'];
+  const apiMatches = apiKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  
+  if (apiMatches >= 4) {
+    return {
+      type: 'api_documentation',
+      confidence: Math.min(apiMatches / apiKeywords.length, 1),
+      reason: 'Documento contém terminologia típica de documentação de API'
+    };
+  }
+  
+  // Detectar relatório técnico de mineração
+  const technicalKeywords = [
+    'jorc', 'ni 43-101', 'perc', 'samrec',
+    'mineral resource', 'ore reserve', 'competent person',
+    'geological interpretation', 'sampling', 'drilling',
+    'resource estimation', 'grade', 'tonnage'
+  ];
+  const technicalMatches = technicalKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  
+  if (technicalMatches >= 3) {
+    return {
+      type: 'technical_report',
+      confidence: Math.min(technicalMatches / technicalKeywords.length, 1),
+      reason: 'Documento contém terminologia típica de relatórios técnicos de mineração'
+    };
+  }
+  
+  // Documento genérico
+  if (text.length > 500) {
+    return {
+      type: 'general',
+      confidence: 0.5,
+      reason: 'Documento não identificado como relatório técnico de mineração'
+    };
+  }
+  
+  return {
+    type: 'unknown',
+    confidence: 0,
+    reason: 'Tipo de documento desconhecido ou conteúdo insuficiente'
+  };
+}
+
     // Select validation rules
     const rules = standard === 'jorc' ? jorc2012Rules : ni43101Rules;
     

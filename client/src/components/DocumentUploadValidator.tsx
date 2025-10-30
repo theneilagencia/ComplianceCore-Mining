@@ -75,6 +75,26 @@ export default function DocumentUploadValidator({ onValidationComplete }: Docume
 
       if (!response.ok) {
         const error = await response.json();
+        
+        // Handle specific error types with better messages
+        if (error.error && error.suggestion) {
+          toast.error(error.error, {
+            description: error.message,
+            duration: 8000,
+          });
+          
+          // Show suggestion in a separate toast
+          setTimeout(() => {
+            toast.info('Sugestão', {
+              description: error.suggestion,
+              duration: 10000,
+            });
+          }, 500);
+          
+          setUploading(false);
+          return;
+        }
+        
         throw new Error(error.message || 'Erro ao validar documento');
       }
 

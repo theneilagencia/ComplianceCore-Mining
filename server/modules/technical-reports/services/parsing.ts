@@ -71,6 +71,57 @@ export interface ParsingResult {
 }
 
 /**
+ * Detecta o tipo de documento (relatório técnico vs outros)
+ */
+function detectDocumentType(text: string): { type: 'technical_report' | 'api_documentation' | 'general' | 'unknown'; confidence: number; reason: string } {
+  const lowerText = text.toLowerCase();
+  
+  // Detectar documentação de API
+  const apiKeywords = ['api', 'endpoint', 'swagger', 'rest', 'post /', 'get /', 'headers:', 'body (json)', 'response:'];
+  const apiMatches = apiKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  
+  if (apiMatches >= 4) {
+    return {
+      type: 'api_documentation',
+      confidence: Math.min(apiMatches / apiKeywords.length, 1),
+      reason: 'Documento contém terminologia típica de documentação de API'
+    };
+  }
+  
+  // Detectar relatório técnico de mineração
+  const technicalKeywords = [
+    'jorc', 'ni 43-101', 'perc', 'samrec',
+    'mineral resource', 'ore reserve', 'competent person',
+    'geological interpretation', 'sampling', 'drilling',
+    'resource estimation', 'grade', 'tonnage'
+  ];
+  const technicalMatches = technicalKeywords.filter(keyword => lowerText.includes(keyword)).length;
+  
+  if (technicalMatches >= 3) {
+    return {
+      type: 'technical_report',
+      confidence: Math.min(technicalMatches / technicalKeywords.length, 1),
+      reason: 'Documento contém terminologia típica de relatórios técnicos de mineração'
+    };
+  }
+  
+  // Documento genérico
+  if (text.length > 500) {
+    return {
+      type: 'general',
+      confidence: 0.5,
+      reason: 'Documento não identificado como relatório técnico de mineração'
+    };
+  }
+  
+  return {
+    type: 'unknown',
+    confidence: 0,
+    reason: 'Tipo de documento desconhecido ou conteúdo insuficiente'
+  };
+}
+
+/**
  * Detecta o padrão internacional baseado em palavras-chave
  */
 function detectStandard(text: string): { standard: string; confidence: number } {
