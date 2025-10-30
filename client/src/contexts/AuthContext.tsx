@@ -45,9 +45,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
 
   const checkSession = async () => {
     try {
-      // No need to check localStorage - cookies are sent automatically
+      // Check if we have a token in localStorage
+      const accessToken = localStorage.getItem('accessToken');
+      
+      if (!accessToken) {
+        // No token, user is not authenticated
+        setUser(null);
+        setPlan('START');
+        setLoading(false);
+        return;
+      }
+
+      // Try to get user info with the token
       const response = await fetch(`${API_BASE_URL}/api/auth/session`, {
-        credentials: 'include', // CRITICAL: Send cookies with request
+        headers: {
+          'Authorization': `Bearer ${accessToken}`,
+        },
+        credentials: 'include',
       });
 
       if (response.ok) {
@@ -56,19 +70,23 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
           setUser(data.user);
           setPlan(data.plan);
         } else {
-          // Session invalid
-          setUser(null);
-          setPlan('START');
+          // Session invalid, try to refresh
+          await refreshSession();
         }
+      } else if (response.status === 401) {
+        // Token expired, try to refresh
+        await refreshSession();
       } else {
-        // Session expired or invalid
+        // Other error, clear session
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
         setUser(null);
         setPlan('START');
       }
     } catch (error) {
       console.error('[Auth] Session check failed:', error);
-      setUser(null);
-      setPlan('START');
+      // On error, try to refresh
+      await refreshSession();
     } finally {
       setLoading(false);
     }
