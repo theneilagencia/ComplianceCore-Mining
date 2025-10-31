@@ -121,6 +121,9 @@ export default function Home() {
               <Button variant="ghost" className="text-white hover:bg-white/5/10" asChild>
                 <a href="#pricing">Planos</a>
               </Button>
+              <Button variant="ghost" className="text-white hover:bg-white/5/10" asChild>
+                <a href="#contact">Contato</a>
+              </Button>
               <Button className="bg-[#2f2c79] hover:bg-[#b96e48] text-white" asChild>
                 <a href={getLoginUrl()}>Entrar</a>
               </Button>
@@ -460,102 +463,112 @@ export default function Home() {
                     </Card>
                   ))}
                 </div>
-                
-                {/* Formulário de Contato */}
-                <div className="mt-8 bg-white/5 rounded-lg p-6 border border-white/10">
-                  <h4 className="text-xl font-bold text-white mb-4 text-center">
-                    Solicite um Orçamento Personalizado
-                  </h4>
-                  <p className="text-gray-300 mb-6 text-center">
-                    Entre em contato para discutir suas necessidades específicas
-                  </p>
-                  <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={(e) => {
-                    e.preventDefault();
-                    const formData = new FormData(e.currentTarget);
-                    const data = {
-                      nome: formData.get('nome'),
-                      email: formData.get('email'),
-                      empresa: formData.get('empresa'),
-                      mensagem: formData.get('mensagem')
-                    };
-                    
-                    fetch(`${API_BASE_URL}/api/contact`, {
-                      method: 'POST',
-                      headers: { 'Content-Type': 'application/json' },
-                      body: JSON.stringify(data)
-                    }).then(res => {
-                      if (res.ok) {
-                        alert('Mensagem enviada com sucesso!');
-                        e.currentTarget.reset();
-                      } else {
-                        alert('Erro ao enviar mensagem. Tente novamente.');
-                      }
-                    }).catch(() => {
+
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contato */}
+        <section id="contact" className="bg-gradient-to-br from-[#171a4a] to-[#2f2c79] py-20 border-y border-white/10">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-white mb-4">
+                  Entre em contato
+                </h2>
+                <p className="text-lg text-gray-300">
+                  Fale conosco para discutir suas necessidades e conhecer melhor o QIVO
+                </p>
+              </div>
+              
+              <div className="bg-white/5 rounded-lg p-8 border border-white/10">
+                <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={(e) => {
+                  e.preventDefault();
+                  const formData = new FormData(e.currentTarget);
+                  const data = {
+                    nome: formData.get('nome'),
+                    email: formData.get('email'),
+                    empresa: formData.get('empresa'),
+                    mensagem: formData.get('mensagem')
+                  };
+                  
+                  fetch(`${API_BASE_URL}/api/contact`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                  }).then(res => {
+                    if (res.ok) {
+                      alert('Mensagem enviada com sucesso!');
+                      e.currentTarget.reset();
+                    } else {
                       alert('Erro ao enviar mensagem. Tente novamente.');
-                    });
-                  }}>
-                    <div>
-                      <label htmlFor="nome" className="block text-sm font-medium text-gray-300 mb-2">
-                        Nome *
-                      </label>
-                      <input
-                        type="text"
-                        id="nome"
-                        name="nome"
-                        required
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
-                        placeholder="Seu nome"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
-                        Email *
-                      </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
-                        placeholder="seu@email.com"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="empresa" className="block text-sm font-medium text-gray-300 mb-2">
-                        Empresa
-                      </label>
-                      <input
-                        type="text"
-                        id="empresa"
-                        name="empresa"
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
-                        placeholder="Nome da empresa"
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <label htmlFor="mensagem" className="block text-sm font-medium text-gray-300 mb-2">
-                        Mensagem *
-                      </label>
-                      <textarea
-                        id="mensagem"
-                        name="mensagem"
-                        required
-                        rows={4}
-                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
-                        placeholder="Descreva suas necessidades..."
-                      />
-                    </div>
-                    <div className="md:col-span-2">
-                      <Button 
-                        type="submit"
-                        size="lg"
-                        className="w-full bg-[#2f2c79] hover:bg-[#b96e48] text-white"
-                      >
-                        Enviar Solicitação
-                      </Button>
-                    </div>
-                  </form>
-                </div>
+                    }
+                  }).catch(() => {
+                    alert('Erro ao enviar mensagem. Tente novamente.');
+                  });
+                }}>
+                  <div>
+                    <label htmlFor="nome" className="block text-sm font-medium text-gray-300 mb-2">
+                      Nome *
+                    </label>
+                    <input
+                      type="text"
+                      id="nome"
+                      name="nome"
+                      required
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
+                      placeholder="Seu nome"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                      Email *
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      name="email"
+                      required
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
+                      placeholder="seu@email.com"
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="empresa" className="block text-sm font-medium text-gray-300 mb-2">
+                      Empresa
+                    </label>
+                    <input
+                      type="text"
+                      id="empresa"
+                      name="empresa"
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
+                      placeholder="Nome da empresa"
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <label htmlFor="mensagem" className="block text-sm font-medium text-gray-300 mb-2">
+                      Mensagem *
+                    </label>
+                    <textarea
+                      id="mensagem"
+                      name="mensagem"
+                      required
+                      rows={4}
+                      className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
+                      placeholder="Descreva suas necessidades..."
+                    />
+                  </div>
+                  <div className="md:col-span-2">
+                    <Button 
+                      type="submit"
+                      size="lg"
+                      className="w-full bg-[#2f2c79] hover:bg-[#b96e48] text-white"
+                    >
+                      Enviar Mensagem
+                    </Button>
+                  </div>
+                </form>
               </div>
             </div>
           </div>
