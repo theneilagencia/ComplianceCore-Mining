@@ -320,9 +320,9 @@ export default function GenerateReport() {
 					END OLD FORM */}
 
  <div className="mt-6 p-4 bg-blue-50 rounded-lg">
- <p className="text-sm text-blue-700">
- <strong>Dica:</strong> Você pode fazer upload de planilhas Excel preenchidas ou preencher manualmente os dados do relatório.
- </p>
+					<p className="text-sm text-blue-700">
+						<strong>Dica:</strong> Você pode fazer upload de relatórios existentes (PDF, DOCX, XLSX, CSV, ZIP) ou preencher manualmente os dados.
+					</p>
  </div>
  </TabsContent>
 
@@ -370,18 +370,18 @@ export default function GenerateReport() {
  {/* Upload Area */}
  <div className="border-2 border-dashed border-white/20 rounded-lg p-8">
  <div className="text-center">
- <UploadIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
- <h3 className="text-lg font-semibold mb-2">Upload de Planilha</h3>
- <p className="text-sm text-gray-400 mb-4">
- Arraste e solte seu arquivo aqui ou clique para selecionar
- </p>
- <Button onClick={() => setShowUploadModal(true)}>
- <UploadIcon className="h-4 w-4 mr-2" />
- Selecionar Arquivo
- </Button>
- <p className="text-xs text-gray-500 mt-3">
- Formatos aceitos: .xlsx, .xls, .csv (máx. 10MB)
- </p>
+					<UploadIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
+					<h3 className="text-lg font-semibold mb-2">Upload de Relatório</h3>
+					<p className="text-sm text-gray-400 mb-4">
+						Faça upload de relatórios em PDF, DOCX, XLSX, CSV ou ZIP
+					</p>
+					<Button onClick={() => setShowUploadModal(true)}>
+						<UploadIcon className="h-4 w-4 mr-2" />
+						Selecionar Arquivo
+					</Button>
+					<p className="text-xs text-gray-500 mt-3">
+						Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP (máx. 50MB)
+					</p>
  </div>
  </div>
 
@@ -390,10 +390,10 @@ export default function GenerateReport() {
  <AlertCircle className="h-5 w-5 text-yellow-600 mt-0.5" />
  <div>
  <h4 className="font-semibold text-yellow-900 mb-1">Importante</h4>
- <p className="text-sm text-yellow-700">
- Certifique-se de que sua planilha segue o formato do template. 
- Dados incorretos ou fora do padrão podem causar erros na geração do relatório.
- </p>
+					<p className="text-sm text-yellow-700">
+						Certifique-se de que seu arquivo está no formato correto. 
+						O sistema fará análise automática e pode solicitar revisão de campos incertos.
+					</p>
  </div>
  </div>
  </div>
@@ -443,9 +443,9 @@ export default function GenerateReport() {
  </Card>
  </div>
 
- {showUploadModal && (
- <UploadModal onClose={() => setShowUploadModal(false)} />
- )}
+	{showUploadModal && (
+		<UploadModal open={showUploadModal} onClose={() => setShowUploadModal(false)} />
+	)}
  </DashboardLayout>
  );
 }
