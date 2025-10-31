@@ -488,10 +488,10 @@ export default function Home() {
                   ].map((report, i) => (
                     <Card key={i} className="p-4 bg-white/5 border-white/10">
                       <h4 className="font-bold text-white mb-1">{report.name}</h4>
-                      <p className="text-xs text-gray-500 italic mb-2">{report.subtitle}</p>
-                      <p className="text-sm text-gray-400 mb-2">{report.desc}</p>
-                      <p className="text-xs text-gray-500 mb-1"><strong>Requisitos:</strong> {report.requirements}</p>
-                      <p className="text-xs text-gray-500 mb-3"><strong>Benefícios:</strong> {report.benefits}</p>
+                      <p className="text-xs text-gray-300 italic mb-2">{report.subtitle}</p>
+                      <p className="text-sm text-gray-200 mb-2">{report.desc}</p>
+                      <p className="text-xs text-gray-300 mb-1"><strong className="text-white">Requisitos:</strong> {report.requirements}</p>
+                      <p className="text-xs text-gray-300 mb-3"><strong className="text-white">Benefícios:</strong> {report.benefits}</p>
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-2xl font-bold text-[#b96e48]">{report.price}</span>
                       </div>
