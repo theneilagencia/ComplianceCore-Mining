@@ -501,7 +501,7 @@ export default function Home() {
                         onClick={() => handleOneTimeCheckout(report.type)}
                         disabled={checkoutLoading}
                       >
-                        {checkoutLoading ? "Processando..." : "Solicitar Orçamento"}
+                        {checkoutLoading ? "Processando..." : "Contratar"}
                       </Button>
                     </Card>
                   ))}
