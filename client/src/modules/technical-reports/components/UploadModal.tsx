@@ -29,6 +29,7 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
   const utils = trpc.useUtils();
 
   const initiateUpload = trpc.technicalReports.uploads.initiate.useMutation();
+  const uploadFile = trpc.technicalReports.uploads.uploadFile.useMutation();
   const completeUpload = trpc.technicalReports.uploads.complete.useMutation();
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -69,10 +70,26 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
         description: `Arquivo: ${file.name}`,
       });
 
-      // Simular upload para S3 (em produção, usar presigned URL)
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      // Converter arquivo para base64
+      const fileData = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          const base64 = (reader.result as string).split(",")[1];
+          resolve(base64);
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
 
-      const mockS3Url = `https://s3.example.com/${initResult.s3Key}`;
+      // Upload real para S3
+      const uploadResult = await uploadFile.mutateAsync({
+        uploadId: initResult.uploadId,
+        fileData,
+        fileName: file.name,
+        contentType: file.type || "application/pdf",
+      });
+
+      const s3Url = uploadResult.s3Url;
 
       // Completar upload e iniciar parsing
       setParsing(true);
@@ -84,8 +101,8 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
 
       const completeResult = await completeUpload.mutateAsync({
         uploadId: initResult.uploadId,
-        s3Url: mockS3Url,
-        fileContent: undefined, // Em produção, o backend baixaria do S3
+        s3Url: s3Url,
+        fileContent: undefined, // Backend vai baixar do S3 real
       });
 
       setParsing(false);

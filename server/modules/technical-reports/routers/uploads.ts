@@ -65,6 +65,32 @@ export const uploadsRouter = router({
     }),
 
   /**
+   * Upload direto do arquivo (novo endpoint)
+   */
+  uploadFile: protectedProcedure
+    .input(
+      z.object({
+        uploadId: z.string(),
+        fileData: z.string(), // Base64 encoded file
+        fileName: z.string(),
+        contentType: z.string(),
+      })
+    )
+    .mutation(async ({ ctx, input }) => {
+      // Decodificar base64
+      const buffer = Buffer.from(input.fileData, "base64");
+
+      // Fazer upload real para S3
+      const s3Key = `tenants/${ctx.user.tenantId}/uploads/${input.uploadId}/${input.fileName}`;
+      const uploadResult = await storagePut(s3Key, buffer, input.contentType);
+
+      return {
+        s3Url: uploadResult.url,
+        s3Key: uploadResult.key,
+      };
+    }),
+
+  /**
    * Finalizar upload e iniciar parsing
    */
   complete: protectedProcedure
