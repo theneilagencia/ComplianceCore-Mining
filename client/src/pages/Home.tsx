@@ -169,7 +169,7 @@ export default function Home() {
               </h2>
               <div className="text-lg text-gray-300 space-y-4 text-center">
                 <p>
-                  O QIVO foi criado para simplificar o que sempre foi complexo: manter a mineração em conformidade com um mundo que muda todos os dias. Transformamos obrigações técnicas em inteligência operacional, dados dispersos em evidências rastreáveis e relatórios em ativos de credibilidade internacional. Nosso papel é claro: garantir que cada operação — em qualquer país — seja transparente, verificável e compatível com os mais altos padrões globais.
+                  Simplificamos a governança minerária global, conectando dados, pessoas e padrões em uma só linguagem. Transformamos relatórios em inteligência, dados em confiança e conformidade em vantagem competitiva.
                 </p>
               </div>
             </div>
