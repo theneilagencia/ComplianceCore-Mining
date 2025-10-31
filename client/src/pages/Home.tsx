@@ -436,19 +436,62 @@ export default function Home() {
                   Relatórios Avulsos — On-Demand
                 </h3>
                 <p className="text-gray-300 mb-6">
-                  Gere relatórios técnicos individuais sob demanda, sem assinatura. Ideal para testar o QIVO ou emitir relatórios extras além do limite mensal.
+                  Gere relatórios técnicos individuais sob demanda — sem assinatura e com a mesma precisão dos planos profissionais. Todos seguem os padrões da família CRIRSCO (JORC, NI 43-101, PERC, SAMREC e SEC S-K 1300) e suas equivalências nacionais (ANM, ANP, CPRM, IBAMA). Cada relatório é criado pelo motor de IA do QIVO, com dados integrados e verificação automática de conformidade técnica.
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
-                    { name: "Relatório Simplificado", desc: "Visão rápida e acessível do status da operação, ideal para pequenas mineradoras ou diagnósticos iniciais.", price: "R$ 2.800", type: "simplificado" },
-                    { name: "Relatório Técnico Completo", desc: "Detalhamento técnico completo com parâmetros normativos e validações QP.", price: "R$ 6.800", type: "tecnico_completo" },
-                    { name: "Relatório Multinormativo", desc: "Compatível com múltiplos códigos internacionais (JORC, NI 43-101, PERC, SAMREC, SEC S-K 1300).", price: "R$ 9.800", type: "multinormativo" },
-                    { name: "Relatório Auditável", desc: "Rastreabilidade total, histórico de versões e validação independente.", price: "R$ 12.000", type: "auditavel" },
-                    { name: "Relatório ESG Integrado", desc: "Integra governança técnica, ambiental e social em uma estrutura pronta para certificações globais.", price: "R$ 12.800", type: "esg_integrado" },
+                    { 
+                      name: "Relatório Simplificado", 
+                      subtitle: "Diagnóstico rápido e padronizado da operação.",
+                      desc: "Apresenta um sumário técnico estruturado com as principais informações do projeto — área, substância, localização e status fundiário — integradas automaticamente às bases da ANM (SIGMINE) e CPRM (GeoSGB).", 
+                      requirements: "Estrutura mínima CRIRSCO + dados oficiais geológicos e fundiários.",
+                      benefits: "Visão objetiva e de fácil compreensão, ideal para pequenas mineradoras, consultores e estudos preliminares.",
+                      price: "R$ 2.800", 
+                      type: "simplificado" 
+                    },
+                    { 
+                      name: "Relatório Técnico Completo", 
+                      subtitle: "Documento técnico completo e pronto para revisão de um Qualified Person (QP).",
+                      desc: "Gera automaticamente todas as 27 seções padronizadas CRIRSCO, incluindo contexto geológico, recursos minerais, métodos de exploração e conformidade ambiental. Integra dados da ANM, CPRM, IBAMA e USGS, garantindo coerência técnica e terminológica.", 
+                      requirements: "Padrões JORC, NI 43-101 e ANM.",
+                      benefits: "Economiza tempo, reduz erros humanos e garante consistência entre seções, tornando o relatório apto para revisão ou submissão formal.",
+                      price: "R$ 6.800", 
+                      type: "tecnico_completo" 
+                    },
+                    { 
+                      name: "Relatório Multinormativo", 
+                      subtitle: "Relatório inteligente compatível com múltiplos padrões internacionais.",
+                      desc: "Converte automaticamente relatórios entre JORC ↔ NI ↔ ANM, preservando terminologia e estrutura técnica através da Bridge Regulatória QIVO e da Ontologia CRIRSCO Expandida.", 
+                      requirements: "Equivalências entre normas nacionais e globais; rastreabilidade de campos e metadados.",
+                      benefits: "Ideal para empresas que atuam em várias jurisdições, reduzindo retrabalho e garantindo coerência técnica global.",
+                      price: "R$ 9.800", 
+                      type: "multinormativo" 
+                    },
+                    { 
+                      name: "Relatório Auditável", 
+                      subtitle: "Verificação automatizada e rastreável da conformidade técnica.",
+                      desc: "Executa mais de 100 checagens automáticas com base nas normas CRIRSCO, ANM e IBAMA, gerando pontuação KRCI (0 a 100) e um Resumo Executivo de Conformidade com recomendações de melhoria. Inclui controle de versão e assinatura digital verificável.", 
+                      requirements: "Estrutura CRIRSCO completa + módulo KRCI + camada de rastreabilidade digital.",
+                      benefits: "Evidências objetivas de conformidade técnica e ambiental, ideais para auditorias internas, relatórios corporativos e due diligence.",
+                      price: "R$ 12.000", 
+                      type: "auditavel" 
+                    },
+                    { 
+                      name: "Relatório ESG Integrado", 
+                      subtitle: "Integra governança técnica, ambiental e social em um único documento.",
+                      desc: "Combina dados da IBAMA (licenças e condicionantes), Copernicus/NASA (imagens satelitais NDVI) e parâmetros ESG internacionais (GRI, IFRS S2, TCFD).", 
+                      requirements: "Indicadores ESG ambientais e sociais compatíveis com CRIRSCO e reguladores nacionais.",
+                      benefits: "Demonstra transparência e compromisso ambiental, reforçando a credibilidade da empresa em auditorias, certificações e relatórios de sustentabilidade.",
+                      price: "R$ 12.800", 
+                      type: "esg_integrado" 
+                    },
                   ].map((report, i) => (
                     <Card key={i} className="p-4 bg-white/5 border-white/10">
-                      <h4 className="font-bold text-white mb-2">{report.name}</h4>
-                      <p className="text-sm text-gray-400 mb-3">{report.desc}</p>
+                      <h4 className="font-bold text-white mb-1">{report.name}</h4>
+                      <p className="text-xs text-gray-500 italic mb-2">{report.subtitle}</p>
+                      <p className="text-sm text-gray-400 mb-2">{report.desc}</p>
+                      <p className="text-xs text-gray-500 mb-1"><strong>Requisitos:</strong> {report.requirements}</p>
+                      <p className="text-xs text-gray-500 mb-3"><strong>Benefícios:</strong> {report.benefits}</p>
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-2xl font-bold text-[#b96e48]">{report.price}</span>
                       </div>
