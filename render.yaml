@@ -1,56 +1,33 @@
+# ===============================
+# 🚀 QIVO Backend - Render Deploy
+# ===============================
+# Este arquivo instrui o Render sobre como construir e rodar o backend Flask.
+# Ele ignora o frontend React/Vite e usa apenas a raiz onde está o wsgi.py.
+
 services:
-  # Web Service (Backend + Frontend)
   - type: web
-    name: qivo-mining
-    runtime: node
-    plan: free
-    region: oregon
-    buildCommand: pnpm install && pnpm run build
-    startCommand: pnpm run start
+    name: qivo-backend
+    env: python
+    plan: free                         # ou "starter" se quiser mais performance
+    region: oregon                     # pode ajustar se quiser outra região
+    branch: main
+    rootDir: .                         # raiz do projeto (onde está wsgi.py)
+
+    buildCommand: |
+      pip install --upgrade pip
+      pip install -r requirements.txt
+      flask db upgrade || true
+
+    startCommand: gunicorn wsgi:app -b 0.0.0.0:10000
+
     envVars:
-      - key: NODE_VERSION
-        value: 22.13.0
-      - key: PNPM_VERSION
-        value: 10.4.1
-      - key: NODE_ENV
+      - key: FLASK_APP
+        value: wsgi:app
+      - key: FLASK_ENV
         value: production
+      - key: PORT
+        value: 10000
       - key: DATABASE_URL
-        fromDatabase:
-          name: qivo-mining-db
-          property: connectionString
-      - key: JWT_SECRET
-        generateValue: true
-      - key: VITE_APP_TITLE
-        value: QIVO Mining
-      - key: VITE_APP_LOGO
-        value: /qivo-logo.png
-      - key: BUILT_IN_FORGE_API_KEY
-        sync: false
-      - key: BUILT_IN_FORGE_API_URL
-        sync: false
-      - key: OAUTH_SERVER_URL
-        sync: false
-      - key: OWNER_NAME
-        sync: false
-      - key: OWNER_OPEN_ID
-        sync: false
-      - key: STRIPE_SECRET_KEY
-        sync: false
-      - key: STRIPE_WEBHOOK_SECRET
-        sync: false
-      - key: S3_BUCKET
-        sync: false
-      - key: S3_REGION
-        value: us-east-1
-      - key: S3_ACCESS_KEY
-        sync: false
-      - key: S3_SECRET_KEY
-        sync: false
-
-databases:
-  - name: qivo-mining-db
-    databaseName: qivo_mining
-    plan: free
-    region: oregon
-
-
+        value: sqlite:///compliance.db
+      - key: OPENAI_API_KEY
+        sync: false   # define manualmente no painel Render (por segurança)
