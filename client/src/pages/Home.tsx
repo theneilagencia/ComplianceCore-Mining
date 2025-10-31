@@ -341,7 +341,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-white mb-2">Start</h3>
                   <p className="text-gray-300 mb-4 text-sm">Consultores e pequenas mineradoras</p>
                   <div className="text-4xl font-bold text-[#b96e48] mb-4">
-                    R$ 2.500<span className="text-lg text-gray-400">/mês</span>
+                    $ 2.500<span className="text-lg text-gray-400">/mês</span>
                   </div>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-start gap-2 text-sm text-gray-300">
@@ -374,7 +374,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
                   <p className="text-gray-300 mb-4 text-sm">Consultorias regionais</p>
                   <div className="text-4xl font-bold text-[#b96e48] mb-4">
-                    R$ 12.500<span className="text-lg text-gray-400">/mês</span>
+                    $ 12.500<span className="text-lg text-gray-400">/mês</span>
                   </div>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-start gap-2 text-sm text-gray-300">
@@ -404,7 +404,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-white mb-2">Enterprise</h3>
                   <p className="text-gray-300 mb-4 text-sm">Mineradoras e órgãos reguladores</p>
                   <div className="text-4xl font-bold text-[#b96e48] mb-4">
-                    R$ 18.900<span className="text-lg text-gray-400">/mês</span>
+                    $ 18.900<span className="text-lg text-gray-400">/mês</span>
                   </div>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-start gap-2 text-sm text-gray-300">
@@ -446,7 +446,7 @@ export default function Home() {
                       desc: "Apresenta um sumário técnico estruturado com as principais informações do projeto — área, substância, localização e status fundiário — integradas automaticamente às bases da ANM (SIGMINE) e CPRM (GeoSGB).", 
                       requirements: "Estrutura mínima CRIRSCO + dados oficiais geológicos e fundiários.",
                       benefits: "Visão objetiva e de fácil compreensão, ideal para pequenas mineradoras, consultores e estudos preliminares.",
-                      price: "R$ 2.800", 
+                      price: "$ 2.800", 
                       type: "simplificado" 
                     },
                     { 
@@ -455,7 +455,7 @@ export default function Home() {
                       desc: "Gera automaticamente todas as 27 seções padronizadas CRIRSCO, incluindo contexto geológico, recursos minerais, métodos de exploração e conformidade ambiental. Integra dados da ANM, CPRM, IBAMA e USGS, garantindo coerência técnica e terminológica.", 
                       requirements: "Padrões JORC, NI 43-101 e ANM.",
                       benefits: "Economiza tempo, reduz erros humanos e garante consistência entre seções, tornando o relatório apto para revisão ou submissão formal.",
-                      price: "R$ 6.800", 
+                      price: "$ 6.800", 
                       type: "tecnico_completo" 
                     },
                     { 
@@ -464,7 +464,7 @@ export default function Home() {
                       desc: "Converte automaticamente relatórios entre JORC ↔ NI ↔ ANM, preservando terminologia e estrutura técnica através da Bridge Regulatória QIVO e da Ontologia CRIRSCO Expandida.", 
                       requirements: "Equivalências entre normas nacionais e globais; rastreabilidade de campos e metadados.",
                       benefits: "Ideal para empresas que atuam em várias jurisdições, reduzindo retrabalho e garantindo coerência técnica global.",
-                      price: "R$ 9.800", 
+                      price: "$ 9.800", 
                       type: "multinormativo" 
                     },
                     { 
@@ -473,7 +473,7 @@ export default function Home() {
                       desc: "Executa mais de 100 checagens automáticas com base nas normas CRIRSCO, ANM e IBAMA, gerando pontuação KRCI (0 a 100) e um Resumo Executivo de Conformidade com recomendações de melhoria. Inclui controle de versão e assinatura digital verificável.", 
                       requirements: "Estrutura CRIRSCO completa + módulo KRCI + camada de rastreabilidade digital.",
                       benefits: "Evidências objetivas de conformidade técnica e ambiental, ideais para auditorias internas, relatórios corporativos e due diligence.",
-                      price: "R$ 12.000", 
+                      price: "$ 12.000", 
                       type: "auditavel" 
                     },
                     { 
@@ -482,7 +482,7 @@ export default function Home() {
                       desc: "Combina dados da IBAMA (licenças e condicionantes), Copernicus/NASA (imagens satelitais NDVI) e parâmetros ESG internacionais (GRI, IFRS S2, TCFD).", 
                       requirements: "Indicadores ESG ambientais e sociais compatíveis com CRIRSCO e reguladores nacionais.",
                       benefits: "Demonstra transparência e compromisso ambiental, reforçando a credibilidade da empresa em auditorias, certificações e relatórios de sustentabilidade.",
-                      price: "R$ 12.800", 
+                      price: "$ 12.800", 
                       type: "esg_integrado" 
                     },
                   ].map((report, i) => (
