@@ -145,7 +145,7 @@ export default function Home() {
               A camada de inteligência da governança minerária
             </h1>
             
-            <p className="text-lg text-gray-300 max-w-4xl mx-auto leading-snug line-clamp-2">
+            <p className="text-lg text-gray-300 max-w-4xl mx-auto leading-snug">
               O QIVO automatiza e padroniza relatórios técnicos conforme os principais códigos internacionais da família <strong className="text-white">CRIRSCO</strong> — JORC, NI 43-101, PERC, SAMREC e SEC S-K 1300 — e suas equivalências nacionais (ANM, ANP, CPRM, IBAMA).
             </p>
 
