@@ -21,28 +21,40 @@ function getStripe(): Stripe {
   return _stripe;
 }
 
-export type ReportType = 'simplified' | 'complete' | 'multinorm' | 'auditable' | 'esg';
+export type ReportType = 'simplified' | 'complete' | 'multinorm' | 'auditable' | 'esg' | 'simplificado' | 'tecnico_completo' | 'multinormativo' | 'auditavel' | 'esg_integrado';
 
 /**
  * Report prices in cents (USD)
  */
 const REPORT_PRICES: Record<ReportType, number> = {
-  simplified: 200000,  // $2,000
-  complete: 490000,    // $4,900
-  multinorm: 750000,   // $7,500
-  auditable: 980000,   // $9,800
-  esg: 1250000,        // $12,500
+  simplified: 280000,  // R$ 2.800
+  complete: 680000,    // R$ 6.800
+  multinorm: 980000,   // R$ 9.800
+  auditable: 1200000,  // R$ 12.000
+  esg: 1280000,        // R$ 12.800
+  // Aliases em português
+  simplificado: 280000,
+  tecnico_completo: 680000,
+  multinormativo: 980000,
+  auditavel: 1200000,
+  esg_integrado: 1280000,
 };
 
 /**
  * Report names
  */
 const REPORT_NAMES: Record<ReportType, string> = {
-  simplified: 'Relatório Simplificado - Sumário técnico automatizado CRIRSCO',
-  complete: 'Relatório Técnico Completo - Validado por IA e QP',
-  multinorm: 'Relatório Multinormativo - Conversão NI ↔ JORC ↔ ANM com Loss Map',
-  auditable: 'Relatório Auditável - Com KRCI e assinatura digital verificável',
-  esg: 'Relatório ESG Integrado - Integra dados IBAMA + Copernicus + NASA',
+  simplified: 'Relatório Simplificado - Visão rápida e acessível do status da operação',
+  complete: 'Relatório Técnico Completo - Detalhamento técnico completo com parâmetros normativos',
+  multinorm: 'Relatório Multinormativo - Compatível com múltiplos códigos internacionais',
+  auditable: 'Relatório Auditável - Rastreabilidade total e validação independente',
+  esg: 'Relatório ESG Integrado - Governança técnica, ambiental e social',
+  // Aliases em português
+  simplificado: 'Relatório Simplificado - Visão rápida e acessível do status da operação',
+  tecnico_completo: 'Relatório Técnico Completo - Detalhamento técnico completo com parâmetros normativos',
+  multinormativo: 'Relatório Multinormativo - Compatível com múltiplos códigos internacionais',
+  auditavel: 'Relatório Auditável - Rastreabilidade total e validação independente',
+  esg_integrado: 'Relatório ESG Integrado - Governança técnica, ambiental e social',
 };
 
 export interface OneTimeCheckoutParams {

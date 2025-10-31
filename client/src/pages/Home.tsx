@@ -139,20 +139,11 @@ export default function Home() {
             </div>
             
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tight leading-tight text-white">
-              <strong>Governança técnica, regulatória e ambiental</strong>
-              <br />
-              <span className="bg-gradient-to-r from-[#b96e48] to-[#8d4925] bg-clip-text text-transparent">
-                para a nova mineração global
-              </span>
+              A camada de inteligência da governança minerária
             </h1>
             
-            <p className="text-xl text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              O QIVO automatiza e padroniza relatórios técnicos conforme os principais códigos internacionais da família <strong className="text-white">CRIRSCO</strong> — 
-              JORC, NI 43-101, PERC, SAMREC e SEC S-K 1300 — e suas equivalências nacionais (ANM, ANP, CPRM, IBAMA).
-            </p>
-
-            <p className="text-lg text-[#b96e48] font-medium">
-              De dados dispersos a relatórios auditáveis, de normas complexas a decisões seguras.
+            <p className="text-lg text-gray-300 max-w-4xl mx-auto leading-snug line-clamp-2">
+              O QIVO automatiza e padroniza relatórios técnicos conforme os principais códigos internacionais da família <strong className="text-white">CRIRSCO</strong> — JORC, NI 43-101, PERC, SAMREC e SEC S-K 1300 — e suas equivalências nacionais (ANM, ANP, CPRM, IBAMA).
             </p>
 
             <div className="flex flex-wrap gap-4 justify-center pt-6">
@@ -173,15 +164,9 @@ export default function Home() {
               <h2 className="text-4xl font-bold">
                 Conformidade não é burocracia. É estratégia.
               </h2>
-              <div className="text-lg text-gray-300 space-y-4 text-left">
+              <div className="text-lg text-gray-300 space-y-4 text-center">
                 <p>
-                  O QIVO foi criado para <strong className="text-white">simplificar o que sempre foi complexo</strong>: manter a mineração em conformidade com um mundo que muda todos os dias.
-                </p>
-                <p>
-                  Transformamos obrigações técnicas em inteligência operacional, dados dispersos em evidências rastreáveis e relatórios em ativos de credibilidade internacional.
-                </p>
-                <p>
-                  Nosso papel é claro: <strong className="text-white">garantir que cada operação — em qualquer país — seja transparente, verificável e compatível com os mais altos padrões globais.</strong>
+                  O QIVO foi criado para simplificar o que sempre foi complexo: manter a mineração em conformidade com um mundo que muda todos os dias. Transformamos obrigações técnicas em inteligência operacional, dados dispersos em evidências rastreáveis e relatórios em ativos de credibilidade internacional. Nosso papel é claro: garantir que cada operação — em qualquer país — seja transparente, verificável e compatível com os mais altos padrões globais.
                 </p>
               </div>
             </div>
@@ -353,7 +338,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-white mb-2">Start</h3>
                   <p className="text-gray-300 mb-4 text-sm">Consultores e pequenas mineradoras</p>
                   <div className="text-4xl font-bold text-[#b96e48] mb-4">
-                    $1,890<span className="text-lg text-gray-400">/mês</span>
+                    R$ 2.500<span className="text-lg text-gray-400">/mês</span>
                   </div>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-start gap-2 text-sm text-gray-300">
@@ -386,7 +371,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
                   <p className="text-gray-300 mb-4 text-sm">Consultorias regionais</p>
                   <div className="text-4xl font-bold text-[#b96e48] mb-4">
-                    $9,980<span className="text-lg text-gray-400">/mês</span>
+                    R$ 12.500<span className="text-lg text-gray-400">/mês</span>
                   </div>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-start gap-2 text-sm text-gray-300">
@@ -416,7 +401,7 @@ export default function Home() {
                   <h3 className="text-2xl font-bold text-white mb-2">Enterprise</h3>
                   <p className="text-gray-300 mb-4 text-sm">Mineradoras e órgãos reguladores</p>
                   <div className="text-4xl font-bold text-[#b96e48] mb-4">
-                    $14,900<span className="text-lg text-gray-400">/mês</span>
+                    R$ 18.900<span className="text-lg text-gray-400">/mês</span>
                   </div>
                   <ul className="space-y-2 mb-6">
                     <li className="flex items-start gap-2 text-sm text-gray-300">
@@ -452,18 +437,17 @@ export default function Home() {
                 </p>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
-                    { name: "Simplificado", desc: "Sumário técnico automatizado CRIRSCO", price: "$2,000", time: "15 min", type: "simplified" },
-                    { name: "Técnico Completo", desc: "Relatório validado por IA e QP", price: "$4,900", time: "30–45 min", type: "complete" },
-                    { name: "Multinormativo", desc: "Conversão NI ↔ JORC ↔ ANM com Loss Map", price: "$7,500", time: "1h", type: "multinorm" },
-                    { name: "Auditável", desc: "Com KRCI e assinatura digital verificável", price: "$9,800", time: "1–2h", type: "auditable" },
-                    { name: "ESG Integrado", desc: "Integra dados IBAMA + Copernicus + NASA", price: "$12,500", time: "2–3h", type: "esg" },
+                    { name: "Relatório Simplificado", desc: "Visão rápida e acessível do status da operação, ideal para pequenas mineradoras ou diagnósticos iniciais.", price: "R$ 2.800", type: "simplificado" },
+                    { name: "Relatório Técnico Completo", desc: "Detalhamento técnico completo com parâmetros normativos e validações QP.", price: "R$ 6.800", type: "tecnico_completo" },
+                    { name: "Relatório Multinormativo", desc: "Compatível com múltiplos códigos internacionais (JORC, NI 43-101, PERC, SAMREC, SEC S-K 1300).", price: "R$ 9.800", type: "multinormativo" },
+                    { name: "Relatório Auditável", desc: "Rastreabilidade total, histórico de versões e validação independente.", price: "R$ 12.000", type: "auditavel" },
+                    { name: "Relatório ESG Integrado", desc: "Integra governança técnica, ambiental e social em uma estrutura pronta para certificações globais.", price: "R$ 12.800", type: "esg_integrado" },
                   ].map((report, i) => (
                     <Card key={i} className="p-4 bg-white/5 border-white/10">
                       <h4 className="font-bold text-white mb-2">{report.name}</h4>
-                      <p className="text-xs text-gray-400 mb-3">{report.desc}</p>
+                      <p className="text-sm text-gray-400 mb-3">{report.desc}</p>
                       <div className="flex items-center justify-between mb-3">
                         <span className="text-2xl font-bold text-[#b96e48]">{report.price}</span>
-                        <span className="text-xs text-gray-400">{report.time}</span>
                       </div>
                       <Button 
                         size="sm" 
@@ -471,14 +455,107 @@ export default function Home() {
                         onClick={() => handleOneTimeCheckout(report.type)}
                         disabled={checkoutLoading}
                       >
-                        {checkoutLoading ? "Processando..." : "Gerar Agora"}
+                        {checkoutLoading ? "Processando..." : "Solicitar Orçamento"}
                       </Button>
                     </Card>
                   ))}
                 </div>
-                <p className="text-sm text-gray-400 mt-4 text-center">
-                  Clientes com plano ativo recebem descontos automáticos (10% / 25% / 40%)
-                </p>
+                
+                {/* Formulário de Contato */}
+                <div className="mt-8 bg-white/5 rounded-lg p-6 border border-white/10">
+                  <h4 className="text-xl font-bold text-white mb-4 text-center">
+                    Solicite um Orçamento Personalizado
+                  </h4>
+                  <p className="text-gray-300 mb-6 text-center">
+                    Entre em contato para discutir suas necessidades específicas
+                  </p>
+                  <form className="grid grid-cols-1 md:grid-cols-2 gap-4" onSubmit={(e) => {
+                    e.preventDefault();
+                    const formData = new FormData(e.currentTarget);
+                    const data = {
+                      nome: formData.get('nome'),
+                      email: formData.get('email'),
+                      empresa: formData.get('empresa'),
+                      mensagem: formData.get('mensagem')
+                    };
+                    
+                    fetch(`${API_BASE_URL}/api/contact`, {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify(data)
+                    }).then(res => {
+                      if (res.ok) {
+                        alert('Mensagem enviada com sucesso!');
+                        e.currentTarget.reset();
+                      } else {
+                        alert('Erro ao enviar mensagem. Tente novamente.');
+                      }
+                    }).catch(() => {
+                      alert('Erro ao enviar mensagem. Tente novamente.');
+                    });
+                  }}>
+                    <div>
+                      <label htmlFor="nome" className="block text-sm font-medium text-gray-300 mb-2">
+                        Nome *
+                      </label>
+                      <input
+                        type="text"
+                        id="nome"
+                        name="nome"
+                        required
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
+                        placeholder="Seu nome"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="email" className="block text-sm font-medium text-gray-300 mb-2">
+                        Email *
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
+                        placeholder="seu@email.com"
+                      />
+                    </div>
+                    <div>
+                      <label htmlFor="empresa" className="block text-sm font-medium text-gray-300 mb-2">
+                        Empresa
+                      </label>
+                      <input
+                        type="text"
+                        id="empresa"
+                        name="empresa"
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
+                        placeholder="Nome da empresa"
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <label htmlFor="mensagem" className="block text-sm font-medium text-gray-300 mb-2">
+                        Mensagem *
+                      </label>
+                      <textarea
+                        id="mensagem"
+                        name="mensagem"
+                        required
+                        rows={4}
+                        className="w-full px-4 py-2 bg-white/5 border border-white/10 rounded-md text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-[#2f2c79]"
+                        placeholder="Descreva suas necessidades..."
+                      />
+                    </div>
+                    <div className="md:col-span-2">
+                      <Button 
+                        type="submit"
+                        size="lg"
+                        className="w-full bg-[#2f2c79] hover:bg-[#b96e48] text-white"
+                      >
+                        Enviar Solicitação
+                      </Button>
+                    </div>
+                  </form>
+                </div>
               </div>
             </div>
           </div>
@@ -499,9 +576,7 @@ export default function Home() {
               <Button size="lg" className="text-lg px-8 bg-[#b96e48] hover:bg-[#8d4925] text-white shadow-lg">
                 Solicitar Demonstração
               </Button>
-              <Button size="lg" variant="outline" className="text-lg px-8 border-white/20 text-white hover:bg-white/5/10">
-                Explorar Relatórios
-              </Button>
+
             </div>
           </div>
         </section>

@@ -25,6 +25,7 @@ import diagnosticRouter from "../modules/radar/diagnosticRouter";
 import { startDiagnosticCron } from "../modules/radar/services/diagnosticCron";
 import templatesRouter from "../modules/templates/router";
 import validateRouter from "../modules/validate/router";
+import contactRouter from "../modules/contact/router";
 import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
@@ -162,6 +163,9 @@ async function startServer() {
   
   // Validation routes
   app.use("/api/validate", validateRouter);
+  
+  // Contact form routes
+  app.use("/api/contact", contactRouter);
   // tRPC API
   app.use(
     "/api/trpc",
