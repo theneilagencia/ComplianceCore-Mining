@@ -2,6 +2,7 @@ import { z } from "zod";
 import { randomUUID } from "crypto";
 import { protectedProcedure, router } from "../../_core/trpc";
 import { uploadsRouter } from "./routers/uploads";
+import { uploadsV2Router } from "./routers/uploadsV2";
 import { auditRouter } from "./routers/audit";
 import { exportsRouter } from "./routers/exports";
 import { precertificationRouter } from "./routers/precertification";
@@ -359,6 +360,7 @@ export const technicalReportsRouter = router({
 
   // ==================== UPLOADS & REVIEW (ETAPA 2) ====================
   uploads: uploadsRouter,
+  uploadsV2: uploadsV2Router,
 
   // ==================== EXPORTS (ETAPA 5) ====================
   exports: exportsRouter,
