@@ -271,3 +271,86 @@ Para suporte, envie um email para support@qivo-mining.com ou abra uma issue no G
 
 **Última Atualização**: 31 de Outubro de 2025
 
+
+---
+
+## 🧠 QIVO Intelligence Layer (Fase 3)
+
+Camada de inteligência artificial para análise automatizada de conformidade regulatória e geração de insights.
+
+### Módulos Ativos
+
+#### ✅ Validator AI
+- **Status**: Ativo
+- **Função**: Validação de conformidade regulatória
+- **Padrões**: JORC, NI 43-101, PRMS
+- **Formatos**: PDF, DOCX, TXT
+- **API**: FastAPI (porta 8001)
+- **Documentação**: `docs/ai/VALIDATOR.md`
+
+**Endpoints**:
+- `POST /ai/analyze` - Analisa arquivo para conformidade
+- `POST /ai/analyze/text` - Analisa texto direto
+- `GET /ai/health` - Health check
+- `GET /ai/capabilities` - Lista capacidades
+
+**Exemplo de Uso**:
+```bash
+# Analisar documento
+curl -X POST "http://localhost:8001/ai/analyze" \
+  -F "file=@technical_report.pdf"
+
+# Health check
+curl http://localhost:8001/ai/health
+```
+
+### Módulos em Desenvolvimento
+
+#### �� Bridge AI (Fase 4)
+- Tradução jurídico ↔ técnico
+- Explicações simplificadas
+- Adaptação por público-alvo
+
+#### 🔜 Radar AI (Fase 5)
+- Monitoramento regulatório
+- Alertas de mudanças
+- Feed de notícias do setor
+
+#### 🔜 Manus AI (Fase 6)
+- Geração automática de relatórios
+- Templates customizáveis
+- Export multi-formato
+
+### Executar API de IA
+
+```bash
+# Instalar dependências Python
+pip install -r requirements-ai.txt
+
+# Configurar variável de ambiente
+export OPENAI_API_KEY=sk-...
+
+# Iniciar API
+python main_ai.py
+
+# Ou com uvicorn
+uvicorn main_ai:app --reload --port 8001
+```
+
+### Documentação Completa
+
+- 📘 **Arquitetura**: `docs/ai/ARCHITECTURE.md`
+- 📗 **Validator AI**: `docs/ai/VALIDATOR.md`
+- 📙 **Roadmap**: `docs/ai/ROADMAP.md`
+
+### Testes
+
+```bash
+# Executar testes AI
+pytest tests/ai/ -v
+
+# Com coverage
+pytest tests/ai/ --cov=src/ai --cov-report=html
+```
+
+---
