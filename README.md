@@ -304,6 +304,43 @@ curl -X POST "http://localhost:8001/ai/analyze" \
 curl http://localhost:8001/ai/health
 ```
 
+
+#### ✅ Bridge AI (Fase 4) - NOVO!
+- **Status**: ✅ Ativo
+- **Função**: Tradução semântica entre normas regulatórias globais
+- **Normas**: ANM (Brasil), JORC (Austrália), NI 43-101 (Canadá), PERC (Rússia), SAMREC (África do Sul)
+- **Features**: Explainability, Confidence Scoring, Análise Comparativa
+- **API**: FastAPI (porta 8001)
+- **Documentação**: `docs/ai/BRIDGE.md`
+
+**Endpoints**:
+- `POST /api/bridge/translate` - Traduz texto entre normas
+- `POST /api/bridge/compare` - Compara duas normas
+- `GET /api/bridge/norms` - Lista normas suportadas
+- `GET /api/bridge/health` - Health check
+- `GET /api/bridge/capabilities` - Capacidades disponíveis
+
+**Exemplo de Uso**:
+```bash
+# Traduzir de ANM para JORC
+curl -X POST "http://localhost:8001/api/bridge/translate" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "text": "A jazida apresenta recursos medidos de 10Mt...",
+    "source_norm": "ANM",
+    "target_norm": "JORC",
+    "explain": true
+  }'
+
+# Comparar normas
+curl -X POST "http://localhost:8001/api/bridge/compare" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "norm1": "ANM",
+    "norm2": "JORC"
+  }'
+```
+
 ### Módulos em Desenvolvimento
 
 #### �� Bridge AI (Fase 4)

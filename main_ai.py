@@ -6,12 +6,13 @@ API principal para módulos de inteligência artificial
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.api.routes import ai
+from app.modules.bridge.routes import router as bridge_router
 
 # Inicializar FastAPI
 app = FastAPI(
     title="QIVO Intelligence API",
     description="API de Inteligência Artificial para análise de conformidade regulatória em mineração",
-    version="3.0.0",
+    version="4.0.0",
     docs_url="/docs",
     redoc_url="/redoc"
 )
@@ -27,6 +28,7 @@ app.add_middleware(
 
 # Registrar rotas
 app.include_router(ai.router)
+app.include_router(bridge_router)
 
 
 @app.get("/")
@@ -34,14 +36,14 @@ async def root():
     """Endpoint raiz"""
     return {
         "name": "QIVO Intelligence API",
-        "version": "3.0.0",
+        "version": "4.0.0",
         "status": "active",
         "docs": "/docs",
         "modules": [
-            "validator - Validação de conformidade",
-            "bridge - Tradução jurídico/técnico (em breve)",
-            "radar - Monitoramento regulatório (em breve)",
-            "manus - Relatórios automáticos (em breve)"
+            "✅ validator - Validação de conformidade (ATIVO)",
+            "✅ bridge - Tradução normativa cross-norm (ATIVO - NOVO!)",
+            "🔜 radar - Monitoramento regulatório (em breve)",
+            "🔜 manus - Relatórios automáticos (em breve)"
         ]
     }
 
@@ -51,7 +53,8 @@ async def health():
     """Health check geral"""
     return {
         "status": "healthy",
-        "api_version": "3.0.0"
+        "api_version": "4.0.0",
+        "active_modules": ["validator", "bridge"]
     }
 
 
