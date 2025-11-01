@@ -99,6 +99,19 @@ jobs:
           echo "test_bridge=passed" >> $GITHUB_OUTPUT
           echo "✅ Bridge AI tests passed"
       
+      - name: "🛰️ Test Radar AI Module"
+        id: test_radar
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          echo "🧪 Running Radar AI tests..."
+          pytest tests/test_radar_ai.py -v --tb=short --maxfail=3 || {
+            echo "test_radar=failed" >> $GITHUB_OUTPUT
+            exit 1
+          }
+          echo "test_radar=passed" >> $GITHUB_OUTPUT
+          echo "✅ Radar AI tests passed"
+      
       - name: "🧠 Test Validator AI Module"
         id: test_validator
         env:
@@ -126,6 +139,12 @@ jobs:
             echo "| 🌉 Bridge AI | ✅ PASSED |" >> $GITHUB_STEP_SUMMARY
           else
             echo "| 🌉 Bridge AI | ❌ FAILED |" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ steps.test_radar.outputs.test_radar }}" = "passed" ]; then
+            echo "| 🛰️ Radar AI | ✅ PASSED |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🛰️ Radar AI | ❌ FAILED |" >> $GITHUB_STEP_SUMMARY
           fi
           
           if [ "${{ steps.test_validator.outputs.test_validator }}" = "passed" ]; then
