@@ -44,6 +44,7 @@ const RegulatoryRadar = lazy(() => import("./modules/technical-reports/pages/Reg
 const HelpSupport = lazy(() => import("./pages/HelpSupport"));
 const Support = lazy(() => import("./pages/Support"));
 const RadarPage = lazy(() => import("./modules/radar/RadarPage"));
+const RadarNotificationsPage = lazy(() => import("./modules/radar/pages/NotificationsPage"));
 const ReportCreate = lazy(() => import("./pages/ReportCreate"));
 const JORCReportCreate = lazy(() => import("./pages/JORCReportCreate"));
 // ExplainabilityView removed (not in briefing)
@@ -132,6 +133,9 @@ function Router() {
         </Route>
         <Route path="/radar">
           <PrivateRoute><RadarPage /></PrivateRoute>
+        </Route>
+        <Route path="/radar/notifications">
+          <PrivateRoute><RadarNotificationsPage /></PrivateRoute>
         </Route>
         <Route path="/reports/:reportId/review">
           {(params) => (
