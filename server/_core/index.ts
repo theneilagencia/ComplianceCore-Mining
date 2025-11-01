@@ -27,8 +27,8 @@ import templatesRouter from "../modules/templates/router";
 import validateRouter from "../modules/validate/router";
 import contactRouter from "../modules/contact/router";
 import storageDownloadRouter from "../routes/storage-download";
+import fixS3UrlRouter from "../routes/fix-s3url";
 import { initStorage } from "../storage-hybrid";
-import { runAutoMigration } from "../auto-migrate";
 import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
@@ -172,6 +172,9 @@ async function startServer() {
   
   // Storage download routes
   app.use("/api/storage", storageDownloadRouter);
+  
+  // Fix s3Url migration route
+  app.use("/api", fixS3UrlRouter);
   // tRPC API
   app.use(
     "/api/trpc",
@@ -199,9 +202,6 @@ async function startServer() {
 
   server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);
-    
-    // Run auto-migration to fix database schema issues
-    await runAutoMigration();
     
     // Initialize storage
     await initStorage();
