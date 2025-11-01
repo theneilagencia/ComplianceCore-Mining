@@ -87,15 +87,39 @@ async function fetchUSGSData(): Promise<MiningOperation[]> {
  */
 async function fetchSIGMINEData(): Promise<MiningOperation[]> {
   try {
-    // ANM (Agência Nacional de Mineração) open data
-    // Note: This is a simplified example. Real implementation would use proper API endpoints
-    const response = await axios.get('https://dados.gov.br/api/publico/conjuntos-dados/sigmine', {
-      timeout: 10000,
+    const { getSIGMINEClient } = await import('../clients/sigmine');
+    const client = getSIGMINEClient();
+
+    if (!client.isEnabled()) {
+      console.log('[DataAggregator] SIGMINE client is disabled');
+      return [];
+    }
+
+    // Busca processos minerários ativos
+    const response = await client.searchProcesses({
+      situacao: 'ATIVO',
+      pageSize: 100,
     });
 
-    // Parse response and convert to MiningOperation format
-    // This is a placeholder - actual implementation depends on API structure
-    return [];
+    if (!response.success) {
+      console.error('[DataAggregator] SIGMINE API error:', response.error);
+      return [];
+    }
+
+    // Converte para formato MiningOperation
+    return response.data.map((processo) => ({
+      id: `sigmine-${processo.numero}-${processo.ano}`,
+      name: `Processo ${processo.numero}/${processo.ano}`,
+      country: 'Brazil',
+      continent: 'Americas',
+      mineral: processo.substancia || 'Unknown',
+      status: processo.situacao === 'ATIVO' ? 'active' : 'inactive',
+      operator: processo.titular || 'Unknown',
+      latitude: processo.latitude || 0,
+      longitude: processo.longitude || 0,
+      source: 'SIGMINE/ANM',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    }));
   } catch (error) {
     console.error('[DataAggregator] Error fetching SIGMINE data:', error);
     return [];
@@ -169,10 +193,38 @@ async function fetchResourceWatchData(): Promise<MiningOperation[]> {
  */
 async function fetchMapBiomasData(): Promise<MiningOperation[]> {
   try {
-    // MapBiomas API for mining infrastructure
-    // Note: Requires API key and proper authentication
-    // This is a placeholder for the actual implementation
-    return [];
+    const { getMapBiomasClient } = await import('../clients/mapbiomas');
+    const client = getMapBiomasClient();
+
+    if (!client.isEnabled()) {
+      console.log('[DataAggregator] MapBiomas client is disabled');
+      return [];
+    }
+
+    // Busca áreas de mineração do ano atual
+    const response = await client.searchMiningAreas({
+      year: new Date().getFullYear(),
+    });
+
+    if (!response.success) {
+      console.error('[DataAggregator] MapBiomas API error:', response.error);
+      return [];
+    }
+
+    // Converte para formato MiningOperation
+    return response.data.map((area, index) => ({
+      id: `mapbiomas-${area.id}`,
+      name: area.properties.name || `Mining Area ${index + 1}`,
+      country: 'Brazil',
+      continent: 'Americas',
+      mineral: area.properties.mineral || 'Unknown',
+      status: 'active',
+      operator: 'Unknown',
+      latitude: area.geometry.coordinates[0][1] || 0,
+      longitude: area.geometry.coordinates[0][0] || 0,
+      source: 'MapBiomas',
+      lastUpdate: area.properties.last_update || new Date().toISOString().split('T')[0],
+    }));
   } catch (error) {
     console.error('[DataAggregator] Error fetching MapBiomas data:', error);
     return [];
@@ -316,6 +368,22 @@ export async function aggregateAllData(): Promise<{
   } catch (error) {
     const sigmineSource = sources.find(s => s.id === 'sigmine');
     if (sigmineSource) sigmineSource.status = 'error';
+  }
+
+  // Fetch MapBiomas data
+  try {
+    const mapbiomasData = await fetchMapBiomasData();
+    operations.push(...mapbiomasData);
+    const mapbiomasSource = sources.find(s => s.id === 'mapbiomas');
+    if (mapbiomasSource) {
+      mapbiomasSource.status = mapbiomasData.length > 0 ? 'active' : 'unavailable';
+      mapbiomasSource.entriesCount = mapbiomasData.length;
+      mapbiomasSource.lastSync = new Date().toISOString();
+    }
+    console.log(`[DataAggregator] MapBiomas: ${mapbiomasData.length} operations fetched`);
+  } catch (error) {
+    const mapbiomasSource = sources.find(s => s.id === 'mapbiomas');
+    if (mapbiomasSource) mapbiomasSource.status = 'error';
   }
 
   const duration = Date.now() - startTime;

@@ -1,0 +1,158 @@
+name: DOU Scraper
+
+on:
+  schedule:
+    # Run every 12 hours
+    - cron: '0 */12 * * *'
+  
+  # Allow manual trigger
+  workflow_dispatch:
+
+jobs:
+  scrape-dou:
+    name: Scrape DOU for Mining Updates
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run DOU scraper
+        id: scrape
+        run: |
+          node -e "
+          const { DOUScraper } = require('./server/modules/radar/scrapers/dou');
+          
+          (async () => {
+            try {
+              const scraper = new DOUScraper();
+              console.log('🔍 Starting DOU scraping...');
+              
+              const results = await scraper.scrape();
+              
+              console.log('::set-output name=total::' + results.length);
+              console.log('::set-output name=relevant::' + results.filter(r => r.relevance === 'high').length);
+              
+              console.log(\`✅ DOU Scraping completed: \${results.length} entries found\`);
+              console.log(\`📊 High relevance: \${results.filter(r => r.relevance === 'high').length}\`);
+              console.log(\`📊 Medium relevance: \${results.filter(r => r.relevance === 'medium').length}\`);
+              console.log(\`📊 Low relevance: \${results.filter(r => r.relevance === 'low').length}\`);
+              
+              // Print high relevance items
+              const highRelevance = results.filter(r => r.relevance === 'high');
+              if (highRelevance.length > 0) {
+                console.log('\\n🔥 High Relevance Items:');
+                highRelevance.slice(0, 5).forEach((item, i) => {
+                  console.log(\`  \${i + 1}. [\${item.category}] \${item.title.substring(0, 80)}...\`);
+                });
+              }
+            } catch (error) {
+              console.error('❌ DOU scraping failed:', error);
+              process.exit(1);
+            }
+          })();
+          "
+
+      - name: Save results
+        if: success()
+        run: |
+          mkdir -p data/dou
+          timestamp=$(date +%Y%m%d_%H%M%S)
+          
+          node -e "
+          const { DOUScraper } = require('./server/modules/radar/scrapers/dou');
+          const fs = require('fs');
+          
+          (async () => {
+            const scraper = new DOUScraper();
+            const results = await scraper.scrape();
+            
+            fs.writeFileSync(
+              'data/dou/results_${timestamp}.json',
+              JSON.stringify(results, null, 2)
+            );
+            
+            console.log('✅ Results saved to data/dou/results_${timestamp}.json');
+          })();
+          "
+
+      - name: Upload results
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dou-results-${{ github.run_number }}
+          path: data/dou/
+          retention-days: 90
+
+      - name: Get statistics
+        if: success()
+        run: |
+          node -e "
+          const { DOUScraper } = require('./server/modules/radar/scrapers/dou');
+          
+          (async () => {
+            const scraper = new DOUScraper();
+            const stats = scraper.getStatistics();
+            
+            console.log('\\n📊 DOU Scraper Statistics:');
+            console.log('  Total requests:', stats.totalRequests);
+            console.log('  Successful:', stats.successfulRequests);
+            console.log('  Failed:', stats.failedRequests);
+            console.log('  Cache hits:', stats.cacheHits);
+            console.log('  Cache misses:', stats.cacheMisses);
+            console.log('  Items found:', stats.totalItemsFound);
+            console.log('  Last run:', new Date(stats.lastRun).toLocaleString('pt-BR'));
+          })();
+          "
+
+      - name: Send notification
+        if: success() && steps.scrape.outputs.relevant > 0
+        uses: 8398a7/action-slack@v3
+        with:
+          status: custom
+          custom_payload: |
+            {
+              text: '📰 DOU Scraping Report',
+              attachments: [{
+                color: 'good',
+                fields: [
+                  {
+                    title: 'Total Entries',
+                    value: '${{ steps.scrape.outputs.total }}',
+                    short: true
+                  },
+                  {
+                    title: 'High Relevance',
+                    value: '${{ steps.scrape.outputs.relevant }}',
+                    short: true
+                  }
+                ]
+              }]
+            }
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Send notification on failure
+        if: failure()
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          text: '🚨 DOU Scraping Failed!'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
