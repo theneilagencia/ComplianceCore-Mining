@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { randomUUID } from 'crypto';
 import { authenticateFromCookie } from '../payment/auth-helper';
 import { getDb } from '../../db';
 import { audits } from '../../../drizzle/schema';
@@ -77,7 +78,7 @@ router.post('/', requireAuth, async (req: any, res) => {
     const newAudit = await db
       .insert(audits)
       .values({
-        id: `audit_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `audit_${randomUUID()}`,
         userId,
         reportId: reportId || null,
         title: title || 'Nova Auditoria KRCI',

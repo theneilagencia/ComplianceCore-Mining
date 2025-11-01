@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { randomUUID } from 'crypto';
 import { authenticateFromCookie } from '../payment/auth-helper';
 import { getDb } from '../../db';
 import { reports, users } from '../../../drizzle/schema';
@@ -77,7 +78,7 @@ router.post('/', requireAuth, async (req: any, res) => {
     const newReport = await db
       .insert(reports)
       .values({
-        id: `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `report_${randomUUID()}`,
         userId,
         projectId: projectId || null,
         title: title || 'Novo Relatório',
@@ -146,7 +147,7 @@ router.post('/save', requireAuth, async (req: any, res) => {
     const newReport = await db
       .insert(reports)
       .values({
-        id: `report_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+        id: `report_${randomUUID()}`,
         userId,
         title: data.title || 'Novo Relatório',
         type: data.standard || 'JORC',

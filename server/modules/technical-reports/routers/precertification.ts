@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { randomUUID } from 'crypto';
 import { router, protectedProcedure } from '../../../_core/trpc';
 import { getDb } from '../../../db';
 import { reports, certifications } from '../../../../drizzle/schema';
@@ -116,7 +117,7 @@ export const precertificationRouter = router({
       const { url: pdfUrl } = await storagePut(pdfKey, pdfBuffer, 'application/pdf');
 
       // 7) Save certification record
-      const certificationId = `cert_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+      const certificationId = `cert_${randomUUID()}`;
       await db.insert(certifications).values({
         id: certificationId,
         reportId,

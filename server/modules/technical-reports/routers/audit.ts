@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { randomUUID } from "crypto";
 import { protectedProcedure, router } from "../../../_core/trpc";
 import { TRPCError } from "@trpc/server";
 import { runAudit } from "../services/audit";
@@ -120,7 +121,7 @@ export const auditRouter = router({
       );
 
       // Salvar auditoria no banco
-      const auditId = `aud_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const auditId = `aud_${randomUUID()}`;
 
       await db.insert(audits).values({
         id: auditId,
@@ -309,7 +310,7 @@ export const auditRouter = router({
       const scanResult = runKRCIScan(normalizedReport, input.mode as ScanMode);
 
       // Save audit to database
-      const auditId = `aud_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const auditId = `aud_${randomUUID()}`;
 
       await db.insert(audits).values({
         id: auditId,

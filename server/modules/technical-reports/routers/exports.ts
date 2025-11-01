@@ -4,6 +4,7 @@
  */
 
 import { z } from 'zod';
+import { randomUUID } from 'crypto';
 import { router, protectedProcedure } from '../../../_core/trpc';
 import { getDb } from '../../../db';
 import { reports, exports } from '../../../../drizzle/schema';
@@ -112,7 +113,7 @@ export const exportsRouter = router({
       );
 
       // 5) Save export record
-      const exportId = `exp_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`;
+      const exportId = `exp_${randomUUID()}`;
       await db.insert(exports).values({
         id: exportId,
         reportId,

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { randomUUID } from "crypto";
 import { protectedProcedure, router } from "../../_core/trpc";
 import { uploadsRouter } from "./routers/uploads";
 import { auditRouter } from "./routers/audit";
@@ -50,7 +51,7 @@ export const technicalReportsRouter = router({
         }
 
         const { reports } = await import("../../../drizzle/schema");
-        const reportId = `rpt_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const reportId = `rpt_${randomUUID()}`;
 
         await db.insert(reports).values({
           id: reportId,
@@ -189,7 +190,7 @@ export const technicalReportsRouter = router({
 
         return {
           reportId: input.reportId,
-          auditId: `aud_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+          auditId: `aud_${randomUUID()}`,
           totalScore,
           rulesChecked: rulesToCheck.length,
           results: auditResults,
@@ -223,7 +224,7 @@ export const technicalReportsRouter = router({
       )
       .mutation(async ({ ctx, input }) => {
         // Simular processo de pré-certificação
-        const certId = `cert_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const certId = `cert_${randomUUID()}`;
 
         return {
           certId,
@@ -279,7 +280,7 @@ export const technicalReportsRouter = router({
           });
         }
 
-        const exportId = `exp_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+        const exportId = `exp_${randomUUID()}`;
 
         return {
           exportId,

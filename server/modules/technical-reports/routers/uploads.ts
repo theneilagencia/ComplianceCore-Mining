@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { randomUUID } from "crypto";
 import { router, protectedProcedure } from "../../../_core/trpc";
 import { uploads, reports, reviewLogs } from "../../../../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
@@ -31,8 +32,8 @@ export const uploadsRouter = router({
       const db = await import("../../../db").then((m) => m.getDb());
       if (!db) throw new Error("Database not available");
 
-      const uploadId = `upl_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
-      const reportId = `EXT-${new Date().toISOString().split("T")[0].replace(/-/g, "")}-${Math.floor(Math.random() * 1000).toString().padStart(3, "0")}`;
+      const uploadId = `upl_${randomUUID()}`;
+      const reportId = `rpt_${randomUUID()}`;
 
       // Criar registro de upload
       await db.insert(uploads).values({
@@ -350,7 +351,7 @@ export const uploadsRouter = router({
 
       // Registrar logs de revisão
       for (const update of input.updates) {
-        const logId = `log_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`;
+        const logId = `log_${randomUUID()}`;
         
         await db.insert(reviewLogs).values({
           id: logId,
