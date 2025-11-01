@@ -26,18 +26,38 @@ jobs:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
           echo "🔗 Triggering Render deploy..."
+          
           if [ -z "$RENDER_DEPLOY_HOOK" ]; then
             echo "❌ ERROR: Secret RENDER_DEPLOY_HOOK is missing!"
             exit 1
           fi
-
-          RESPONSE=$(curl -s -o /tmp/render_response.json -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK")
-
-          if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 202 ]; then
-            echo "✅ Deploy triggered successfully on Render!"
+          
+          echo "📍 Deploy hook URL configured (length: ${#RENDER_DEPLOY_HOOK} chars)"
+          
+          # Fazer requisição com verbose para debug
+          HTTP_CODE=$(curl -s -w "%{http_code}" -o /tmp/render_response.json \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --max-time 30 \
+            "$RENDER_DEPLOY_HOOK" || echo "000")
+          
+          echo "📊 HTTP Response Code: $HTTP_CODE"
+          
+          if [ -f /tmp/render_response.json ]; then
+            echo "📄 Response body:"
             cat /tmp/render_response.json
           else
-            echo "❌ Failed to trigger Render deploy (HTTP $RESPONSE)"
-            cat /tmp/render_response.json
+            echo "⚠️ No response file created"
+          fi
+          
+          # Considerar 200, 201, 202 como sucesso
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "202" ]; then
+            echo "✅ Deploy triggered successfully on Render!"
+            exit 0
+          elif [ "$HTTP_CODE" = "000" ]; then
+            echo "❌ Failed to connect to Render (network/timeout error)"
+            exit 1
+          else
+            echo "❌ Failed to trigger Render deploy (HTTP $HTTP_CODE)"
             exit 1
           fi
