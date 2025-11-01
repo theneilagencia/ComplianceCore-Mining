@@ -19,5 +19,8 @@ pnpm vite build
 echo "🚀 Building server..."
 pnpm esbuild server/_core/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
 
+echo "🗄️  Running database migrations..."
+bash migrate.sh || echo "⚠️  Migrations skipped or failed"
+
 echo "✅ Build completed successfully!"
 
