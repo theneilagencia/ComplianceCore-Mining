@@ -14,8 +14,17 @@ fi
 echo "✅ DATABASE_URL detected"
 echo "📊 Running database migrations..."
 
-# Run Drizzle migrations
-pnpm drizzle-kit push --force
+# Run Drizzle migrations with verbose output
+echo "Executing: pnpm drizzle-kit push"
+pnpm drizzle-kit push 2>&1 || {
+  echo "❌ Migration failed with exit code $?"
+  echo "Trying alternative method..."
+  npx drizzle-kit push 2>&1 || {
+    echo "❌ Alternative method also failed"
+    echo "DATABASE_URL: ${DATABASE_URL:0:30}..."
+    exit 1
+  }
+}
 
 echo "✅ Migrations completed successfully!"
 
