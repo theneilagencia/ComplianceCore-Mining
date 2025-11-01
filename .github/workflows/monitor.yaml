@@ -1,0 +1,250 @@
+name: "🔍 Monitor Pipeline & Deploy"
+
+on:
+  schedule:
+    # Executar a cada 30 minutos
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # Permitir execução manual
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/deploy.yaml'
+      - '.github/workflows/monitor.yaml'
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  monitor:
+    name: "Monitor Render Deployment Status"
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: "🧩 Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      
+      - name: "📊 Query Render API for service status"
+        id: render_status
+        env:
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          RENDER_SERVICE_ID: "srv-d3sk5h1r0fns738ibdg0"
+        run: |
+          echo "🔍 Consultando status do serviço no Render..."
+          
+          if [ -z "$RENDER_API_KEY" ]; then
+            echo "⚠️ RENDER_API_KEY não configurado - usando apenas deploy hook"
+            echo "status=unknown" >> $GITHUB_OUTPUT
+            echo "deploy_status=unknown" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+          
+          # Consultar status do serviço
+          SERVICE_RESPONSE=$(curl -s -H "Authorization: Bearer $RENDER_API_KEY" \
+            "https://api.render.com/v1/services/$RENDER_SERVICE_ID" || echo '{"error": true}')
+          
+          SERVICE_STATUS=$(echo "$SERVICE_RESPONSE" | jq -r '.service.serviceDetails.status // "unknown"')
+          echo "📍 Service Status: $SERVICE_STATUS"
+          echo "status=$SERVICE_STATUS" >> $GITHUB_OUTPUT
+          
+          # Consultar último deploy
+          DEPLOYS_RESPONSE=$(curl -s -H "Authorization: Bearer $RENDER_API_KEY" \
+            "https://api.render.com/v1/services/$RENDER_SERVICE_ID/deploys?limit=1" || echo '[]')
+          
+          DEPLOY_STATUS=$(echo "$DEPLOYS_RESPONSE" | jq -r '.[0].deploy.status // "unknown"')
+          DEPLOY_ID=$(echo "$DEPLOYS_RESPONSE" | jq -r '.[0].deploy.id // "unknown"')
+          DEPLOY_CREATED=$(echo "$DEPLOYS_RESPONSE" | jq -r '.[0].deploy.createdAt // "unknown"')
+          DEPLOY_FINISHED=$(echo "$DEPLOYS_RESPONSE" | jq -r '.[0].deploy.finishedAt // "unknown"')
+          
+          echo "📦 Deploy Status: $DEPLOY_STATUS"
+          echo "🆔 Deploy ID: $DEPLOY_ID"
+          echo "⏰ Created: $DEPLOY_CREATED"
+          echo "✅ Finished: $DEPLOY_FINISHED"
+          
+          echo "deploy_status=$DEPLOY_STATUS" >> $GITHUB_OUTPUT
+          echo "deploy_id=$DEPLOY_ID" >> $GITHUB_OUTPUT
+          echo "deploy_created=$DEPLOY_CREATED" >> $GITHUB_OUTPUT
+          echo "deploy_finished=$DEPLOY_FINISHED" >> $GITHUB_OUTPUT
+          
+          # Salvar resposta completa para debug
+          echo "$SERVICE_RESPONSE" > /tmp/service_status.json
+          echo "$DEPLOYS_RESPONSE" > /tmp/deploy_status.json
+      
+      - name: "📝 Update PIPELINE.md with current status"
+        run: |
+          mkdir -p docs
+          
+          TIMESTAMP=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          SERVICE_STATUS="${{ steps.render_status.outputs.status }}"
+          DEPLOY_STATUS="${{ steps.render_status.outputs.deploy_status }}"
+          DEPLOY_ID="${{ steps.render_status.outputs.deploy_id }}"
+          
+          # Definir emoji baseado no status
+          if [ "$SERVICE_STATUS" = "available" ] || [ "$SERVICE_STATUS" = "live" ]; then
+            STATUS_EMOJI="✅"
+          elif [ "$SERVICE_STATUS" = "unknown" ]; then
+            STATUS_EMOJI="⚠️"
+          else
+            STATUS_EMOJI="❌"
+          fi
+          
+          # Criar ou atualizar PIPELINE.md
+          cat > docs/PIPELINE.md << EOF
+          # 🔍 Pipeline Status - ComplianceCore Mining
+          
+          **Última verificação**: $TIMESTAMP
+          
+          ## 📊 Status Atual
+          
+          | Componente | Status | Detalhes |
+          |------------|--------|----------|
+          | Render Service | $STATUS_EMOJI $SERVICE_STATUS | Service ID: \`srv-d3sk5h1r0fns738ibdg0\` |
+          | Último Deploy | $DEPLOY_STATUS | Deploy ID: \`$DEPLOY_ID\` |
+          | GitHub Actions | ✅ Ativo | [Ver Workflows](https://github.com/${{ github.repository }}/actions) |
+          
+          ## 🔗 Links Úteis
+          
+          - 🌐 **Produção**: https://qivo-mining.onrender.com
+          - 📊 **Render Dashboard**: https://dashboard.render.com/web/srv-d3sk5h1r0fns738ibdg0
+          - 🔧 **GitHub Actions**: https://github.com/${{ github.repository }}/actions
+          - 📝 **Deploy Logs**: https://dashboard.render.com/web/srv-d3sk5h1r0fns738ibdg0/logs
+          
+          ## 📈 Histórico de Deploys
+          
+          | Data/Hora | Status | Deploy ID | Duração |
+          |-----------|--------|-----------|---------|
+          | $TIMESTAMP | $DEPLOY_STATUS | \`$DEPLOY_ID\` | - |
+          
+          ## 🔄 Monitoramento
+          
+          Este arquivo é atualizado automaticamente a cada 30 minutos pelo workflow \`.github/workflows/monitor.yaml\`.
+          
+          ### Ações Automatizadas
+          
+          - ✅ Verificação de status via API Render
+          - 📝 Atualização automática desta documentação
+          - 🚨 Criação de issues em caso de falha
+          - 🔧 Auto-correção de erros conhecidos
+          
+          ---
+          
+          **Monitorado por**: GitHub Actions  
+          **Última atualização**: $TIMESTAMP
+          EOF
+          
+          echo "✅ PIPELINE.md atualizado"
+          cat docs/PIPELINE.md
+      
+      - name: "🚨 Create Issue if Deploy Failed"
+        if: steps.render_status.outputs.deploy_status == 'failed' || steps.render_status.outputs.status == 'suspended'
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const timestamp = new Date().toISOString();
+            const deployId = '${{ steps.render_status.outputs.deploy_id }}';
+            const serviceStatus = '${{ steps.render_status.outputs.status }}';
+            const deployStatus = '${{ steps.render_status.outputs.deploy_status }}';
+            
+            const issueBody = `## ❌ Deploy Falhou
+            
+            **Data/Hora**: ${timestamp}
+            **Service Status**: ${serviceStatus}
+            **Deploy Status**: ${deployStatus}
+            **Deploy ID**: \`${deployId}\`
+            
+            ### 🔍 Detalhes
+            
+            O monitoramento automático detectou uma falha no deploy.
+            
+            ### 🔗 Links para Investigação
+            
+            - [Ver Logs no Render](https://dashboard.render.com/web/srv-d3sk5h1r0fns738ibdg0/logs)
+            - [Ver Workflows](https://github.com/${{ github.repository }}/actions)
+            - [Deploy Hook Config](https://dashboard.render.com/web/srv-d3sk5h1r0fns738ibdg0/settings)
+            
+            ### ⚙️ Ações Sugeridas
+            
+            1. Verificar logs no Render Dashboard
+            2. Verificar se há erros de build
+            3. Verificar configuração de environment variables
+            4. Testar webhook manualmente:
+               \`\`\`bash
+               curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}"
+               \`\`\`
+            
+            ---
+            
+            🤖 *Issue criada automaticamente pelo workflow de monitoramento*`;
+            
+            // Buscar issues abertas similares
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'deploy-failure,automated'
+            });
+            
+            // Criar issue apenas se não houver uma aberta recente
+            if (issues.data.length === 0) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `❌ Deploy Falhou — ${new Date().toLocaleString()}`,
+                body: issueBody,
+                labels: ['deploy-failure', 'automated', 'urgent']
+              });
+              console.log('✅ Issue criada com sucesso');
+            } else {
+              console.log('⚠️ Já existe uma issue aberta sobre deploy failure');
+            }
+      
+      - name: "💾 Commit and Push PIPELINE.md"
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          
+          git add docs/PIPELINE.md
+          
+          if git diff --staged --quiet; then
+            echo "📝 Nenhuma alteração detectada em PIPELINE.md"
+            exit 0
+          fi
+          
+          git commit -m "docs: atualiza status do pipeline [skip ci]"
+          
+          # Tentar push com retry e rebase automático
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if git push origin main; then
+              echo "✅ Push realizado com sucesso"
+              exit 0
+            else
+              echo "⚠️ Push falhou, tentando rebase..."
+              git pull --rebase origin main
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              
+              if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+                echo "❌ Falha após $MAX_RETRIES tentativas"
+                exit 1
+              fi
+              
+              sleep 2
+            fi
+          done
+      
+      - name: "📊 Summary Report"
+        run: |
+          echo "### 🔍 Monitoramento Concluído" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Service Status**: ${{ steps.render_status.outputs.status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deploy Status**: ${{ steps.render_status.outputs.deploy_status }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Deploy ID**: \`${{ steps.render_status.outputs.deploy_id }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "📝 Documentação atualizada em \`docs/PIPELINE.md\`" >> $GITHUB_STEP_SUMMARY

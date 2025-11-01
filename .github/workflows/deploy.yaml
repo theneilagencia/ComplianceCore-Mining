@@ -22,6 +22,7 @@ jobs:
           echo "✅ Repository: ${{ github.repository }}"
 
       - name: "🚀 Trigger Render deploy"
+        id: deploy
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
         run: |
@@ -29,6 +30,7 @@ jobs:
           
           if [ -z "$RENDER_DEPLOY_HOOK" ]; then
             echo "❌ ERROR: Secret RENDER_DEPLOY_HOOK is missing!"
+            echo "error_type=missing_secret" >> $GITHUB_OUTPUT
             exit 1
           fi
           
@@ -42,6 +44,7 @@ jobs:
             "$RENDER_DEPLOY_HOOK" || echo "000")
           
           echo "📊 HTTP Response Code: $HTTP_CODE"
+          echo "http_code=$HTTP_CODE" >> $GITHUB_OUTPUT
           
           if [ -f /tmp/render_response.json ]; then
             echo "📄 Response body:"
@@ -53,11 +56,41 @@ jobs:
           # Considerar 200, 201, 202 como sucesso
           if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "201" ] || [ "$HTTP_CODE" = "202" ]; then
             echo "✅ Deploy triggered successfully on Render!"
+            echo "deploy_status=success" >> $GITHUB_OUTPUT
             exit 0
           elif [ "$HTTP_CODE" = "000" ]; then
             echo "❌ Failed to connect to Render (network/timeout error)"
+            echo "error_type=network_error" >> $GITHUB_OUTPUT
+            echo "deploy_status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          elif [ "$HTTP_CODE" -ge 400 ] && [ "$HTTP_CODE" -lt 500 ]; then
+            echo "❌ Client error (HTTP $HTTP_CODE) - webhook configuration issue"
+            echo "error_type=webhook_config" >> $GITHUB_OUTPUT
+            echo "deploy_status=failed" >> $GITHUB_OUTPUT
+            exit 1
+          elif [ "$HTTP_CODE" -ge 500 ]; then
+            echo "❌ Server error (HTTP $HTTP_CODE) - Render API issue"
+            echo "error_type=server_error" >> $GITHUB_OUTPUT
+            echo "deploy_status=failed" >> $GITHUB_OUTPUT
             exit 1
           else
             echo "❌ Failed to trigger Render deploy (HTTP $HTTP_CODE)"
+            echo "error_type=unknown" >> $GITHUB_OUTPUT
+            echo "deploy_status=failed" >> $GITHUB_OUTPUT
             exit 1
           fi
+      
+      - name: "📊 Deploy Summary"
+        if: always()
+        run: |
+          echo "### 🚀 Deploy Status" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**HTTP Code**: ${{ steps.deploy.outputs.http_code }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Status**: ${{ steps.deploy.outputs.deploy_status }}" >> $GITHUB_STEP_SUMMARY
+          
+          if [ "${{ steps.deploy.outputs.error_type }}" != "" ]; then
+            echo "**Error Type**: ${{ steps.deploy.outputs.error_type }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "🔗 [Ver no Render Dashboard](https://dashboard.render.com/web/srv-d3sk5h1r0fns738ibdg0)" >> $GITHUB_STEP_SUMMARY

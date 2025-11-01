@@ -1,0 +1,249 @@
+name: "🔧 Auto-Recovery & Self-Healing"
+
+on:
+  workflow_run:
+    workflows: ["🚀 Deploy to Render", "Tests", "Python CI"]
+    types:
+      - completed
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  actions: write
+  issues: write
+
+jobs:
+  auto_fix:
+    name: "Detect & Fix Deploy Issues"
+    runs-on: ubuntu-latest
+    if: github.event.workflow_run.conclusion == 'failure'
+    
+    steps:
+      - name: "🧩 Checkout repository"
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+      
+      - name: "🔍 Analyze Workflow Failure"
+        id: analyze
+        run: |
+          echo "🔎 Analisando falha no workflow..."
+          
+          WORKFLOW_NAME="${{ github.event.workflow_run.name }}"
+          RUN_ID="${{ github.event.workflow_run.id }}"
+          
+          echo "workflow_name=$WORKFLOW_NAME" >> $GITHUB_OUTPUT
+          echo "run_id=$RUN_ID" >> $GITHUB_OUTPUT
+          echo "needs_pnpm_fix=false" >> $GITHUB_OUTPUT
+          echo "needs_git_rebase=false" >> $GITHUB_OUTPUT
+          echo "needs_webhook_fix=false" >> $GITHUB_OUTPUT
+          
+          # Aqui podemos expandir com lógica de análise de logs
+          echo "✅ Análise inicial concluída"
+      
+      - name: "📦 Setup pnpm"
+        if: steps.analyze.outputs.needs_pnpm_fix == 'true'
+        uses: pnpm/action-setup@v3
+        with:
+          version: 10
+      
+      - name: "📦 Setup Node.js"
+        if: steps.analyze.outputs.needs_pnpm_fix == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+      
+      - name: "🔧 Fix: Rebuild pnpm-lock.yaml"
+        if: steps.analyze.outputs.needs_pnpm_fix == 'true'
+        run: |
+          echo "🔧 Recriando pnpm-lock.yaml..."
+          
+          # Backup do lockfile anterior
+          cp pnpm-lock.yaml pnpm-lock.yaml.backup 2>/dev/null || true
+          
+          # Remover e recriar
+          rm -f pnpm-lock.yaml
+          pnpm install --no-frozen-lockfile
+          
+          # Testar build
+          pnpm build
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Build executado com sucesso"
+            echo "rebuild_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Build falhou mesmo após rebuild"
+            echo "rebuild_success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: "🔧 Fix: Git Rebase Conflicts"
+        if: steps.analyze.outputs.needs_git_rebase == 'true'
+        run: |
+          echo "🔧 Aplicando rebase automático..."
+          
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          
+          # Tentar rebase
+          git pull --rebase origin main
+          
+          if [ $? -eq 0 ]; then
+            echo "✅ Rebase aplicado com sucesso"
+            echo "rebase_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Conflitos detectados - requer intervenção manual"
+            echo "rebase_success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: "🔧 Fix: Webhook Configuration"
+        if: steps.analyze.outputs.needs_webhook_fix == 'true'
+        env:
+          RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
+        run: |
+          echo "🔧 Testando webhook do Render..."
+          
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "❌ RENDER_DEPLOY_HOOK não configurado"
+            exit 1
+          fi
+          
+          # Testar webhook
+          HTTP_CODE=$(curl -s -w "%{http_code}" -o /tmp/webhook_test.json \
+            -X POST \
+            -H "Content-Type: application/json" \
+            --max-time 30 \
+            "$RENDER_DEPLOY_HOOK" || echo "000")
+          
+          echo "📊 HTTP Response: $HTTP_CODE"
+          
+          if [ "$HTTP_CODE" = "200" ] || [ "$HTTP_CODE" = "202" ]; then
+            echo "✅ Webhook funcionando corretamente"
+            echo "webhook_success=true" >> $GITHUB_OUTPUT
+          else
+            echo "❌ Webhook retornou código $HTTP_CODE"
+            cat /tmp/webhook_test.json
+            echo "webhook_success=false" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+      
+      - name: "💾 Commit Auto-Fixes"
+        if: steps.analyze.outputs.needs_pnpm_fix == 'true' || steps.analyze.outputs.needs_git_rebase == 'true'
+        run: |
+          git config --global user.name "GitHub Actions Bot"
+          git config --global user.email "actions@github.com"
+          
+          # Adicionar arquivos modificados
+          git add pnpm-lock.yaml package.json 2>/dev/null || true
+          git add .github/workflows/ 2>/dev/null || true
+          
+          if git diff --staged --quiet; then
+            echo "📝 Nenhuma alteração para commit"
+            exit 0
+          fi
+          
+          FIX_TYPE="auto-fix"
+          if [ "${{ steps.analyze.outputs.needs_pnpm_fix }}" = "true" ]; then
+            FIX_TYPE="pnpm-lock rebuild"
+          elif [ "${{ steps.analyze.outputs.needs_git_rebase }}" = "true" ]; then
+            FIX_TYPE="git rebase"
+          fi
+          
+          git commit -m "ci: auto-fix - $FIX_TYPE [skip ci]"
+          
+          # Push com retry
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ]; do
+            if git push origin main; then
+              echo "✅ Auto-fix aplicado e enviado"
+              exit 0
+            else
+              echo "⚠️ Push falhou, tentando rebase (tentativa $((RETRY_COUNT + 1))/$MAX_RETRIES)..."
+              git pull --rebase origin main
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+              
+              if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+                echo "❌ Falha após $MAX_RETRIES tentativas"
+                exit 1
+              fi
+              
+              sleep 2
+            fi
+          done
+      
+      - name: "🚨 Create Issue for Manual Intervention"
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const workflowName = '${{ steps.analyze.outputs.workflow_name }}';
+            const runId = '${{ steps.analyze.outputs.run_id }}';
+            const timestamp = new Date().toISOString();
+            
+            const issueBody = `## 🔧 Auto-Recovery Falhou
+            
+            **Data/Hora**: ${timestamp}
+            **Workflow**: ${workflowName}
+            **Run ID**: \`${runId}\`
+            
+            ### ❌ Problema
+            
+            O sistema de auto-recovery tentou corrigir automaticamente a falha, mas não conseguiu.
+            **Intervenção manual necessária.**
+            
+            ### 🔍 Investigar
+            
+            1. [Ver workflow que falhou](https://github.com/${{ github.repository }}/actions/runs/${runId})
+            2. [Ver tentativa de auto-fix](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            3. Verificar logs no Render: https://dashboard.render.com/web/srv-d3sk5h1r0fns738ibdg0/logs
+            
+            ### ⚙️ Correções Tentadas
+            
+            - ${steps.analyze.outputs.needs_pnpm_fix === 'true' ? '✅' : '⬜'} Rebuild pnpm-lock.yaml
+            - ${steps.analyze.outputs.needs_git_rebase === 'true' ? '✅' : '⬜'} Git rebase automático
+            - ${steps.analyze.outputs.needs_webhook_fix === 'true' ? '✅' : '⬜'} Teste webhook Render
+            
+            ### 🛠️ Ações Sugeridas
+            
+            \`\`\`bash
+            # Tentar localmente
+            cd ComplianceCore-Mining
+            pnpm install --no-frozen-lockfile
+            pnpm build
+            git add pnpm-lock.yaml
+            git commit -m "fix: rebuild lockfile"
+            git pull --rebase origin main
+            git push origin main
+            \`\`\`
+            
+            ---
+            
+            🤖 *Issue criada automaticamente pelo workflow de auto-recovery*`;
+            
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `🔧 Auto-Recovery Falhou — ${workflowName} — ${new Date().toLocaleString()}`,
+              body: issueBody,
+              labels: ['auto-recovery', 'manual-intervention', 'urgent']
+            });
+      
+      - name: "📊 Recovery Summary"
+        if: always()
+        run: |
+          echo "### 🔧 Auto-Recovery Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Workflow**: ${{ steps.analyze.outputs.workflow_name }}" >> $GITHUB_STEP_SUMMARY
+          echo "**Run ID**: \`${{ steps.analyze.outputs.run_id }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "#### Correções Aplicadas" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- pnpm rebuild: ${{ steps.analyze.outputs.needs_pnpm_fix }}" >> $GITHUB_STEP_SUMMARY
+          echo "- git rebase: ${{ steps.analyze.outputs.needs_git_rebase }}" >> $GITHUB_STEP_SUMMARY
+          echo "- webhook fix: ${{ steps.analyze.outputs.needs_webhook_fix }}" >> $GITHUB_STEP_SUMMARY

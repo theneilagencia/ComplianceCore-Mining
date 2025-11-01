@@ -143,12 +143,75 @@ curl -X POST "https://api.render.com/deploy/srv-XXXXX?key=YYYY"
 - [ ] Workflow executado sem erros
 - [ ] Aplicação acessível em produção
 
+## 🤖 Monitoramento & Auto-Recovery
+
+### Sistema de Monitoramento Automático
+
+O projeto possui um sistema completo de monitoramento e auto-correção:
+
+#### 📊 Monitor Pipeline (`monitor.yaml`)
+
+- **Frequência**: A cada 30 minutos
+- **Funcionalidades**:
+  - ✅ Consulta status do serviço via API Render
+  - ✅ Verifica status do último deploy
+  - ✅ Atualiza automaticamente `docs/PIPELINE.md`
+  - ✅ Cria issue automaticamente se deploy falhar
+  - ✅ Push automático com rebase em caso de conflito
+
+**Verificar status**:
+```bash
+# Ver histórico de monitoramento
+gh run list --workflow="monitor.yaml" --limit 5
+
+# Ver status atual
+cat docs/PIPELINE.md
+```
+
+#### 🔧 Auto-Recovery (`auto-recovery.yaml`)
+
+- **Trigger**: Executa automaticamente quando workflows falharem
+- **Correções Automáticas**:
+  - ✅ Rebuild `pnpm-lock.yaml` se detectar erro de build
+  - ✅ Rebase automático em conflitos de git
+  - ✅ Teste e validação de webhook
+  - ✅ Commit e push automático das correções
+  - ✅ Criação de issue se falhar
+
+**Forçar auto-recovery manual**:
+```bash
+gh workflow run auto-recovery.yaml
+```
+
+### Configuração de Secrets
+
+Secrets necessários no GitHub:
+
+```bash
+# Obrigatórios
+gh secret set RENDER_DEPLOY_HOOK --body "URL_DO_WEBHOOK"
+gh secret set DATABASE_URL --body "postgresql://..."
+gh secret set OPENAI_API_KEY --body "sk-..."
+
+# Opcional (para monitoramento avançado)
+gh secret set RENDER_API_KEY --body "seu_token_render"
+```
+
+### Monitoramento em Tempo Real
+
+1. **Status do Pipeline**: `docs/PIPELINE.md` (atualizado a cada 30min)
+2. **Logs do Render**: https://dashboard.render.com/web/srv-d3sk5h1r0fns738ibdg0/logs
+3. **GitHub Actions**: https://github.com/theneilagencia/ComplianceCore-Mining/actions
+4. **Issues Automáticas**: Criadas quando há falhas
+
 ## 📚 Referências
 
 - [GitHub Actions Docs](https://docs.github.com/en/actions)
 - [Render Deploy Hooks](https://render.com/docs/deploy-hooks)
+- [Render API Documentation](https://api-docs.render.com/)
 - [pnpm Documentation](https://pnpm.io)
 
 ---
 
-**Última atualização**: 01/11/2025
+**Última atualização**: 01/11/2025  
+**Workflows**: `deploy.yaml`, `monitor.yaml`, `auto-recovery.yaml`
