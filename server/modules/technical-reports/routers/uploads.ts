@@ -32,11 +32,29 @@ export const uploadsRouter = router({
       const db = await import("../../../db").then((m) => m.getDb());
       if (!db) throw new Error("Database not available");
 
+      // Validação e logging detalhado
+      console.log('[Upload] Starting upload initiation');
+      console.log('[Upload] User context:', JSON.stringify({
+        userId: ctx.user?.id,
+        tenantId: ctx.user?.tenantId,
+        email: ctx.user?.email,
+        name: ctx.user?.name,
+      }, null, 2));
+      console.log('[Upload] Input:', JSON.stringify(input, null, 2));
+
+      if (!ctx.user || !ctx.user.id || !ctx.user.tenantId) {
+        const errorMsg = `Invalid user context: user=${ctx.user?.id}, tenant=${ctx.user?.tenantId}`;
+        console.error('[Upload] ERROR:', errorMsg);
+        throw new Error(errorMsg);
+      }
+
       const uploadId = `upl_${randomUUID()}`;
       const reportId = `rpt_${randomUUID()}`;
+      
+      console.log('[Upload] Generated IDs:', { uploadId, reportId });
 
       // Criar registro de upload
-      await db.insert(uploads).values({
+      const uploadData = {
         id: uploadId,
         tenantId: ctx.user.tenantId,
         userId: ctx.user.id,
@@ -44,19 +62,44 @@ export const uploadsRouter = router({
         fileName: input.fileName,
         fileSize: input.fileSize,
         mimeType: input.fileType,
-        status: "uploading",
-      });
+        status: "uploading" as const,
+      };
+      
+      console.log('[Upload] Inserting upload record:', JSON.stringify(uploadData, null, 2));
+      
+      try {
+        await db.insert(uploads).values(uploadData);
+        console.log('[Upload] Upload record inserted successfully');
+      } catch (error: any) {
+        console.error('[Upload] Database insert failed:', error);
+        console.error('[Upload] Error details:', {
+          message: error.message,
+          code: error.code,
+          stack: error.stack,
+        });
+        throw new Error(`Failed to create upload record: ${error.message}`);
+      }
 
       // Criar relatório com status parsing
-      await db.insert(reports).values({
+      const reportData = {
         id: reportId,
         tenantId: ctx.user.tenantId,
         userId: ctx.user.id,
-        sourceType: "external",
-        standard: "JORC_2012", // Será detectado no parsing
+        sourceType: "external" as const,
+        standard: "JORC_2012" as const, // Será detectado no parsing
         title: input.fileName,
-        status: "parsing",
-      });
+        status: "parsing" as const,
+      };
+      
+      console.log('[Upload] Inserting report record:', JSON.stringify(reportData, null, 2));
+      
+      try {
+        await db.insert(reports).values(reportData);
+        console.log('[Upload] Report record inserted successfully');
+      } catch (error: any) {
+        console.error('[Upload] Report insert failed:', error);
+        throw new Error(`Failed to create report record: ${error.message}`);
+      }
 
       return {
         uploadId,
