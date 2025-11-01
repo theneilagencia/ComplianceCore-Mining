@@ -13,19 +13,48 @@ import { v2 as cloudinary } from 'cloudinary';
 // CONFIGURAÇÃO
 // ============================================================================
 
+// Suporta duas formas de configuração:
+// 1. CLOUDINARY_URL (mais simples): cloudinary://api_key:api_secret@cloud_name
+// 2. Variáveis separadas: CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET
+
+const CLOUDINARY_URL = process.env.CLOUDINARY_URL || '';
 const CLOUDINARY_CLOUD_NAME = process.env.CLOUDINARY_CLOUD_NAME || '';
 const CLOUDINARY_API_KEY = process.env.CLOUDINARY_API_KEY || '';
 const CLOUDINARY_API_SECRET = process.env.CLOUDINARY_API_SECRET || '';
 
 let isConfigured = false;
+let configuredCloudName = '';
 
 // ============================================================================
 // INICIALIZAÇÃO
 // ============================================================================
 
 export function initCloudinary() {
+  // Tentar configurar via CLOUDINARY_URL primeiro (mais simples)
+  if (CLOUDINARY_URL) {
+    try {
+      cloudinary.config({
+        cloudinary_url: CLOUDINARY_URL,
+        secure: true,
+      });
+      
+      // Extrair cloud_name da URL para logging
+      const match = CLOUDINARY_URL.match(/@([^/]+)/);
+      configuredCloudName = match ? match[1] : 'configured';
+      
+      isConfigured = true;
+      console.log('✅ Cloudinary configured via CLOUDINARY_URL:', configuredCloudName);
+      return true;
+    } catch (error) {
+      console.error('❌ Failed to configure Cloudinary via URL:', error);
+      return false;
+    }
+  }
+  
+  // Fallback: tentar configurar via variáveis separadas
   if (!CLOUDINARY_CLOUD_NAME || !CLOUDINARY_API_KEY || !CLOUDINARY_API_SECRET) {
     console.warn('⚠️  Cloudinary not configured (missing credentials)');
+    console.warn('    Set CLOUDINARY_URL or (CLOUDINARY_CLOUD_NAME + CLOUDINARY_API_KEY + CLOUDINARY_API_SECRET)');
     return false;
   }
 
@@ -36,6 +65,7 @@ export function initCloudinary() {
     secure: true,
   });
 
+  configuredCloudName = CLOUDINARY_CLOUD_NAME;
   isConfigured = true;
   console.log('✅ Cloudinary configured:', CLOUDINARY_CLOUD_NAME);
   return true;
