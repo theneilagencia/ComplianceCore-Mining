@@ -1,6 +1,7 @@
 FROM node:22-alpine
 
-# Install pnpm
+# Install bash and pnpm
+RUN apk add --no-cache bash
 RUN npm install -g pnpm@10.4.1
 
 # Set working directory
