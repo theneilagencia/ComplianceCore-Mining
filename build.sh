@@ -8,7 +8,7 @@ echo "=========================================="
 export NODE_OPTIONS="--max-old-space-size=4096"
 
 echo "📦 Installing dependencies..."
-pnpm install --frozen-lockfile
+pnpm install
 
 echo "🧹 Cleaning old build..."
 rm -rf dist/
