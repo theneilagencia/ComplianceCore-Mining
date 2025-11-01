@@ -1,4 +1,4 @@
-import { storagePut, storageGet } from "../../../storage";
+import { storagePut, storageGet } from "../../../storage-hybrid";
 
 /**
  * ETAPA 2: Serviço de Parsing e Normalização

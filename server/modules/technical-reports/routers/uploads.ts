@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 import { router, protectedProcedure } from "../../../_core/trpc";
 import { uploads, reports, reviewLogs } from "../../../../drizzle/schema";
 import { eq, and, desc } from "drizzle-orm";
-import { storagePut } from "../../../storage";
+import { storagePut } from "../../../storage-hybrid";
 import {
   parseAndNormalize,
   saveNormalizedToS3,
