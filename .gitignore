@@ -109,3 +109,4 @@ temp/
 .vercel
 *.pyc
 __pycache__/
+.copilot/
