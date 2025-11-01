@@ -1,18 +1,13 @@
 #!/bin/bash
 set -e
 
-echo "🔧 ComplianceCore Mining™ - Optimized Build Script"
+echo "🔧 ComplianceCore Mining™ - Build Script"
 echo "=========================================="
 
 # Limitar memória do Node.js para evitar out of memory
 export NODE_OPTIONS="--max-old-space-size=4096"
 
-# FORÇA LIMPEZA COMPLETA - Remove cache e node_modules
-echo "🧹 Cleaning cache and node_modules..."
-rm -rf node_modules/ || true
-rm -rf .pnpm-store/ || true
-
-echo "📦 Installing dependencies (clean install)..."
+echo "📦 Installing dependencies..."
 pnpm install --frozen-lockfile
 
 echo "🧹 Cleaning old build..."
