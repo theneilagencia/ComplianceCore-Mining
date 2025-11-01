@@ -205,3 +205,18 @@ async def get_capabilities():
             'audit': 'Integrado com Audit/KRCI'
         }
     }
+
+
+# Flask Blueprint para compatibilidade (app/__init__.py ainda usa Flask)
+from flask import Blueprint as FlaskBlueprint, jsonify as flask_jsonify
+
+bridge_bp = FlaskBlueprint("bridge", __name__)
+
+@bridge_bp.route("/status")
+def bridge_status():
+    """Endpoint Flask para compatibilidade"""
+    return flask_jsonify({
+        "module": "Bridge AI",
+        "status": "ativo ✅",
+        "api": "FastAPI em /api/bridge/*"
+    })

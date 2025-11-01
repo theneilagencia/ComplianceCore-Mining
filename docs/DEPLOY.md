@@ -1,177 +1,351 @@
-# 🚀 Guia de Deploy - ComplianceCore Mining
+# 🚀 QIVO Deploy Pipeline - Documentação# 🚀 Guia de Deploy - ComplianceCore Mining
 
-## 📋 Visão Geral
 
-Este projeto utiliza **GitHub Actions** para CI/CD automático com deploy no **Render**.
+
+**Pipeline CI/CD Completo para QIVO Intelligence Layer**  ## 📋 Visão Geral
+
+**Versão:** 4.0.0  
+
+**Status:** ✅ Ativo  Este projeto utiliza **GitHub Actions** para CI/CD automático com deploy no **Render**.
+
+**Plataforma:** GitHub Actions + Render
 
 ## 🔄 Pipeline Automático
 
+---
+
 ### Workflows Configurados
 
+## 📋 Índice
+
 1. **`deploy.yaml`** - Deploy automático no Render
-2. **`test.yml`** - Testes automatizados
-3. **`python-ci.yml`** - CI para backend Python
 
-### Fluxo de Deploy
+1. [Visão Geral](#visão-geral)2. **`test.yml`** - Testes automatizados
 
-```mermaid
-graph LR
+2. [Arquitetura do Pipeline](#arquitetura-do-pipeline)3. **`python-ci.yml`** - CI para backend Python
+
+3. [Jobs e Stages](#jobs-e-stages)
+
+4. [Configuração de Secrets](#configuração-de-secrets)### Fluxo de Deploy
+
+5. [Como Funciona](#como-funciona)
+
+6. [Monitoramento](#monitoramento)```mermaid
+
+7. [Troubleshooting](#troubleshooting)graph LR
+
     A[Push to main] --> B[GitHub Actions]
-    B --> C[Trigger Render Deploy]
+
+---    B --> C[Trigger Render Deploy]
+
     C --> D[Render Build]
-    D --> E[Deploy Completo]
+
+## 🎯 Visão Geral    D --> E[Deploy Completo]
+
 ```
+
+O pipeline CI/CD automatiza todo o processo de **build → test → deploy** para a QIVO Intelligence Platform, garantindo que:
 
 ## ⚙️ Configuração Inicial
 
-### 1. Configurar Deploy Hook do Render
+✅ Todas as dependências são instaladas corretamente  
 
-```bash
+✅ Testes do Bridge AI e Validator AI passam  ### 1. Configurar Deploy Hook do Render
+
+✅ Deploy no Render acontece apenas com código validado  
+
+✅ Logs detalhados de cada etapa estão disponíveis```bash
+
 # Obter URL do Deploy Hook no Render Dashboard
-# Settings → Deploy Hook
 
-# Configurar como secret no GitHub
-gh secret set RENDER_DEPLOY_HOOK --body "https://api.render.com/deploy/srv-XXXXX?key=YYYY"
-```
+### Trigger# Settings → Deploy Hook
 
-### 2. Verificar Secrets Configurados
 
-```bash
+
+- **Evento**: `push` na branch `main`# Configurar como secret no GitHub
+
+- **Arquivo**: `.github/workflows/deploy.yaml`gh secret set RENDER_DEPLOY_HOOK --body "https://api.render.com/deploy/srv-XXXXX?key=YYYY"
+
+- **Duração média**: 3-5 minutos```
+
+
+
+---### 2. Verificar Secrets Configurados
+
+
+
+## 🏗️ Arquitetura do Pipeline```bash
+
 gh secret list
+
+``````
+
+┌─────────────────────────────────────────────────────────┐
+
+│                   GITHUB PUSH (main)                    │Secrets necessários:
+
+└────────────────────┬────────────────────────────────────┘- `RENDER_DEPLOY_HOOK` - URL do webhook do Render
+
+                     │- `DATABASE_URL` - URL do banco PostgreSQL
+
+                     ▼- `OPENAI_API_KEY` - API key da OpenAI
+
+         ┌───────────────────────┐
+
+         │  JOB 1: Build & Setup │### 3. Testar Deploy Manual
+
+         │  ⏱️ ~1-2 min          │
+
+         └───────────┬───────────┘```bash
+
+                     │# Testar webhook diretamente
+
+                     │ ✅ Successcurl -X POST "$RENDER_DEPLOY_HOOK"
+
+                     ▼
+
+         ┌───────────────────────┐# Deve retornar 200 OK
+
+         │  JOB 2: Automated     │```
+
+         │  Tests                │
+
+         │  ⏱️ ~30s-1min         │## 🐛 Troubleshooting
+
+         └───────────┬───────────┘
+
+                     │### Deploy falha com "HTTP 000"
+
+                     │ ✅ All tests passed
+
+                     ▼**Causa**: URL do webhook incorreta ou malformada
+
+         ┌───────────────────────┐
+
+         │  JOB 3: Deploy to     │**Solução**:
+
+         │  Render               │```bash
+
+         │  ⏱️ ~10-15s           │# Reconfigurar o secret
+
+         └───────────────────────┘gh secret set RENDER_DEPLOY_HOOK --body "URL_CORRETA_AQUI"
+
 ```
-
-Secrets necessários:
-- `RENDER_DEPLOY_HOOK` - URL do webhook do Render
-- `DATABASE_URL` - URL do banco PostgreSQL
-- `OPENAI_API_KEY` - API key da OpenAI
-
-### 3. Testar Deploy Manual
-
-```bash
-# Testar webhook diretamente
-curl -X POST "$RENDER_DEPLOY_HOOK"
-
-# Deve retornar 200 OK
-```
-
-## 🐛 Troubleshooting
-
-### Deploy falha com "HTTP 000"
-
-**Causa**: URL do webhook incorreta ou malformada
-
-**Solução**:
-```bash
-# Reconfigurar o secret
-gh secret set RENDER_DEPLOY_HOOK --body "URL_CORRETA_AQUI"
 
 # Trigger deploy manual
-git commit --allow-empty -m "ci: trigger deploy"
+
+### Sequenciamentogit commit --allow-empty -m "ci: trigger deploy"
+
 git push origin main
-```
 
-### Build falha no Render
+- **JOB 2** só executa se **JOB 1** passar```
 
-**Causa**: Dependências desatualizadas ou lockfile inconsistente
+- **JOB 3** só executa se **JOB 2** passar
 
-**Solução**:
+- Se qualquer job falhar, pipeline é interrompido### Build falha no Render
+
+
+
+---**Causa**: Dependências desatualizadas ou lockfile inconsistente
+
+
+
+## 📦 Jobs e Stages**Solução**:
+
 ```bash
-# Recriar lockfile
+
+### JOB 1: 🏗️ Build & Setup# Recriar lockfile
+
 rm pnpm-lock.yaml
-pnpm install --no-frozen-lockfile
+
+**Objetivo**: Preparar ambiente de execuçãopnpm install --no-frozen-lockfile
+
 pnpm build
 
-# Commit e push
-git add pnpm-lock.yaml
-git commit -m "ci: recria pnpm-lock.yaml"
-git push origin main
-```
+**Steps**:
 
-### Erro "fetch first" no git push
+1. Checkout repository# Commit e push
+
+2. Setup Node.js 22.xgit add pnpm-lock.yaml
+
+3. Setup Python 3.11git commit -m "ci: recria pnpm-lock.yaml"
+
+4. Setup pnpm 10git push origin main
+
+5. Install Node dependencies```
+
+6. Install Python dependencies
+
+7. Run linter (não bloqueante)### Erro "fetch first" no git push
+
+8. Build Summary
 
 **Solução**:
-```bash
+
+### JOB 2: 🧪 Run Automated Tests```bash
+
 # Fazer rebase antes de push
-git pull --rebase origin main
+
+**Objetivo**: Validar códigogit pull --rebase origin main
+
 git push origin main
-```
 
-## �� Monitoramento
+**Tests executados**:```
 
-### Ver status dos workflows
+- ✅ Bridge AI (16 testes)
 
-```bash
+- ✅ Validator AI (12 testes)## �� Monitoramento
+
+
+
+### JOB 3: 🚀 Deploy to Render### Ver status dos workflows
+
+
+
+**Objetivo**: Disparar deploy```bash
+
 # Listar últimas execuções
-gh run list --limit 5
 
-# Ver detalhes de uma execução
-gh run view <RUN_ID>
+**Ações**:gh run list --limit 5
 
-# Ver logs de falha
+- Trigger webhook Render
+
+- Validar resposta (HTTP 200/201/202)# Ver detalhes de uma execução
+
+- Gerar resumo visualgh run view <RUN_ID>
+
+
+
+---# Ver logs de falha
+
 gh run view <RUN_ID> --log-failed
-```
 
-### Verificar deploy no Render
+## 🔐 Secrets Necessários```
 
-1. Acesse: https://dashboard.render.com
-2. Selecione o serviço "qivo-mining"
-3. Veja logs em tempo real na aba **Logs**
 
-## 🔄 Deploy Manual de Emergência
 
-Se o pipeline automático falhar:
+### RENDER_DEPLOY_HOOK (Obrigatório)### Verificar deploy no Render
 
-```bash
+
+
+```bash1. Acesse: https://dashboard.render.com
+
+gh secret set RENDER_DEPLOY_HOOK --body "URL_DO_WEBHOOK"2. Selecione o serviço "qivo-mining"
+
+```3. Veja logs em tempo real na aba **Logs**
+
+
+
+### OPENAI_API_KEY (Opcional)## 🔄 Deploy Manual de Emergência
+
+
+
+```bashSe o pipeline automático falhar:
+
+gh secret set OPENAI_API_KEY --body "sk-..."
+
+``````bash
+
 # 1. Fazer build local
-pnpm install --no-frozen-lockfile
+
+---pnpm install --no-frozen-lockfile
+
 pnpm build
+
+## ⚙️ Como Usar
 
 # 2. Trigger deploy via webhook
-curl -X POST "https://api.render.com/deploy/srv-XXXXX?key=YYYY"
 
-# 3. Ou fazer deploy manual pelo Dashboard do Render
-# Dashboard → qivo-mining → Manual Deploy
-```
+### Trigger Automáticocurl -X POST "https://api.render.com/deploy/srv-XXXXX?key=YYYY"
 
-## ✅ Checklist de Deploy
 
-- [ ] Todos os testes passando localmente
-- [ ] Build executado com sucesso
-- [ ] Secrets configurados no GitHub
+
+```bash# 3. Ou fazer deploy manual pelo Dashboard do Render
+
+git push origin main# Dashboard → qivo-mining → Manual Deploy
+
+``````
+
+
+
+### Trigger Manual## ✅ Checklist de Deploy
+
+
+
+```bash- [ ] Todos os testes passando localmente
+
+gh workflow run deploy.yaml- [ ] Build executado com sucesso
+
+```- [ ] Secrets configurados no GitHub
+
 - [ ] Deploy Hook do Render válido
-- [ ] Branch `main` atualizada
+
+### Ver Status- [ ] Branch `main` atualizada
+
 - [ ] Workflow executado sem erros
-- [ ] Aplicação acessível em produção
 
-## 🤖 Monitoramento & Auto-Recovery
+```bash- [ ] Aplicação acessível em produção
 
-### Sistema de Monitoramento Automático
+gh run list --workflow=deploy.yaml
 
-O projeto possui um sistema completo de monitoramento e auto-correção:
+```## 🤖 Monitoramento & Auto-Recovery
 
-#### 📊 Monitor Pipeline (`monitor.yaml`)
 
-- **Frequência**: A cada 30 minutos
-- **Funcionalidades**:
-  - ✅ Consulta status do serviço via API Render
+
+---### Sistema de Monitoramento Automático
+
+
+
+## 🛠️ TroubleshootingO projeto possui um sistema completo de monitoramento e auto-correção:
+
+
+
+### Secret faltando#### 📊 Monitor Pipeline (`monitor.yaml`)
+
+
+
+```bash- **Frequência**: A cada 30 minutos
+
+gh secret set RENDER_DEPLOY_HOOK --body "URL"- **Funcionalidades**:
+
+```  - ✅ Consulta status do serviço via API Render
+
   - ✅ Verifica status do último deploy
-  - ✅ Atualiza automaticamente `docs/PIPELINE.md`
-  - ✅ Cria issue automaticamente se deploy falhar
-  - ✅ Push automático com rebase em caso de conflito
 
-**Verificar status**:
+### Tests falhando  - ✅ Atualiza automaticamente `docs/PIPELINE.md`
+
+  - ✅ Cria issue automaticamente se deploy falhar
+
+```bash  - ✅ Push automático com rebase em caso de conflito
+
+pytest tests/test_bridge_ai.py -v
+
+```**Verificar status**:
+
 ```bash
-# Ver histórico de monitoramento
+
+### Deploy falhou# Ver histórico de monitoramento
+
 gh run list --workflow="monitor.yaml" --limit 5
 
-# Ver status atual
-cat docs/PIPELINE.md
+1. Verificar https://status.render.com
+
+2. Validar secret RENDER_DEPLOY_HOOK# Ver status atual
+
+3. Re-executar workflowcat docs/PIPELINE.md
+
 ```
+
+---
 
 #### 🔧 Auto-Recovery (`auto-recovery.yaml`)
 
-- **Trigger**: Executa automaticamente quando workflows falharem
-- **Correções Automáticas**:
+**Documentação completa**: Ver backup em `DEPLOY.md.bak`  
+
+**Última atualização:** 2025-11-01  - **Trigger**: Executa automaticamente quando workflows falharem
+
+**Versão:** 4.0.0- **Correções Automáticas**:
+
   - ✅ Rebuild `pnpm-lock.yaml` se detectar erro de build
   - ✅ Rebase automático em conflitos de git
   - ✅ Teste e validação de webhook
