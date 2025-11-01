@@ -1,49 +1,43 @@
-name: 🚀 QIVO Backend (Render Auto-Deploy + Copilot Assist)
+name: "🚀 Deploy to Render"
 
 on:
   push:
     branches:
       - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
 
 jobs:
-  ci_cd_pipeline:
-    name: 🔁 Build, Validate & Deploy
+  deploy:
+    name: "Trigger Render Deployment"
     runs-on: ubuntu-latest
 
     steps:
-      - name: 📦 Checkout repository
+      - name: "🧩 Checkout repository"
         uses: actions/checkout@v4
 
-      - name: 🐍 Setup Python 3.11
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: ⚙️ Install dependencies
+      - name: "🧠 Show Git info"
         run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          echo "✅ Branch: ${{ github.ref }}"
+          echo "✅ Commit: ${{ github.sha }}"
+          echo "✅ Actor: ${{ github.actor }}"
+          echo "✅ Repository: ${{ github.repository }}"
 
-      - name: 🧪 Run basic tests
-        run: |
-          pytest || echo "⚠️ Some tests failed, continuing..."
-
-      - name: 🧹 Lint code (Copilot helper)
-        run: |
-          pip install ruff
-          ruff check app || echo "Lint warnings ignored"
-
-      - name: 🚀 Deploy to Render
-        run: |
-          echo "Triggering Render deploy..."
-          curl -X POST "$RENDER_DEPLOY_HOOK"
+      - name: "🚀 Trigger Render deploy"
         env:
           RENDER_DEPLOY_HOOK: ${{ secrets.RENDER_DEPLOY_HOOK }}
-
-      - name: 🤖 Copilot assist log
         run: |
-          echo "✅ Deploy completed. Copilot ready for post-deploy analysis."
+          echo "🔗 Triggering Render deploy..."
+          if [ -z "$RENDER_DEPLOY_HOOK" ]; then
+            echo "❌ ERROR: Secret RENDER_DEPLOY_HOOK is missing!"
+            exit 1
+          fi
+
+          RESPONSE=$(curl -s -o /tmp/render_response.json -w "%{http_code}" -X POST "$RENDER_DEPLOY_HOOK")
+
+          if [ "$RESPONSE" -eq 200 ] || [ "$RESPONSE" -eq 202 ]; then
+            echo "✅ Deploy triggered successfully on Render!"
+            cat /tmp/render_response.json
+          else
+            echo "❌ Failed to trigger Render deploy (HTTP $RESPONSE)"
+            cat /tmp/render_response.json
+            exit 1
+          fi
