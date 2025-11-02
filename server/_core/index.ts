@@ -101,6 +101,30 @@ async function startServer() {
   // Cookie parser for reading cookies
   app.use(cookieParser());
   
+  // Health check endpoint
+  app.get('/api/health', async (req, res) => {
+    try {
+      const { getDb } = await import('../db');
+      const db = await getDb();
+      
+      res.json({
+        status: 'healthy',
+        version: '2.0.0',
+        timestamp: new Date().toISOString(),
+        environment: process.env.NODE_ENV || 'development',
+        database: !!db ? 'connected' : 'disconnected',
+        uptime: process.uptime(),
+        service: 'QIVO Mining Platform'
+      });
+    } catch (error) {
+      res.status(500).json({
+        status: 'unhealthy',
+        error: error instanceof Error ? error.message : 'Unknown error',
+        timestamp: new Date().toISOString()
+      });
+    }
+  });
+  
   // Initialize Passport
   app.use(passport.initialize());
   // OAuth callback under /api/oauth/callback

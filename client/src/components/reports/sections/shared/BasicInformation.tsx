@@ -24,7 +24,7 @@ export const BasicInformation: React.FC<BasicInformationProps> = ({
         name="reportTitle"
         type="text"
         value={data.reportTitle}
-        onChange={(e) => onChange('reportTitle', e.target.value)}
+        onChange={(value) => onChange('reportTitle', value)}
         error={errors.reportTitle}
         required
         placeholder="Ex: Mineral Resource Estimate for Gedabek Gold-Copper Project"
@@ -38,7 +38,7 @@ export const BasicInformation: React.FC<BasicInformationProps> = ({
           name="projectName"
           type="text"
           value={data.projectName}
-          onChange={(e) => onChange('projectName', e.target.value)}
+          onChange={(value) => onChange('projectName', value)}
           error={errors.projectName}
           required
           placeholder="Ex: Gedabek Gold-Copper Project"
@@ -50,7 +50,7 @@ export const BasicInformation: React.FC<BasicInformationProps> = ({
           name="location"
           type="text"
           value={data.location}
-          onChange={(e) => onChange('location', e.target.value)}
+          onChange={(value) => onChange('location', value)}
           error={errors.location}
           required
           placeholder="Ex: Gadabay District, Azerbaijan"
@@ -62,9 +62,9 @@ export const BasicInformation: React.FC<BasicInformationProps> = ({
       <FormField
         label="Data Efetiva"
         name="effectiveDate"
-        type="date"
+        type="text"
         value={data.effectiveDate}
-        onChange={(e) => onChange('effectiveDate', e.target.value)}
+        onChange={(value) => onChange('effectiveDate', value)}
         error={errors.effectiveDate}
         required
         helpText="Data de referência dos dados do relatório (formato: AAAA-MM-DD)"
