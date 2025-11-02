@@ -174,14 +174,27 @@ export const uploadsRouter = router({
       try {
         // Atualizar status do upload
         console.log('[Complete] Updating upload status to parsing');
-        console.log('[Complete] s3Key:', input.s3Key);
-        console.log('[Complete] s3Url:', input.s3Url);
+        console.log('[Complete] Input received:', {
+          uploadId: input.uploadId,
+          s3Key: input.s3Key,
+          s3Url: input.s3Url,
+          hasS3Url: !!input.s3Url,
+          hasS3Key: !!input.s3Key,
+        });
+        
+        // Validar que temos os dados necessários
+        if (!input.s3Url && !input.s3Key) {
+          throw new Error('Neither s3Url nor s3Key provided');
+        }
+        
+        const s3UrlToSave = input.s3Url || `/api/storage/download/${encodeURIComponent(input.s3Key)}`;
+        console.log('[Complete] s3Url to save:', s3UrlToSave);
         
         await db
           .update(uploads)
           .set({
             status: "parsing",
-            s3Url: input.s3Key, // Salvar a key, não a URL relativa
+            s3Url: s3UrlToSave,
           })
           .where(eq(uploads.id, input.uploadId));
 
