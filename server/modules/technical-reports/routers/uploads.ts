@@ -104,6 +104,26 @@ export const uploadsRouter = router({
         throw new Error(`Failed to create records: ${error.message}`);
       }
 
+      // VERIFICAÇÃO ADICIONAL: Confirmar que o registro foi criado
+      try {
+        const [uploadCheck] = await db.select().from(uploads).where(eq(uploads.id, uploadId)).limit(1);
+        const [reportCheck] = await db.select().from(reports).where(eq(reports.id, reportId)).limit(1);
+        
+        if (!uploadCheck) {
+          console.error('[Upload] CRITICAL: Upload record not found after transaction!');
+          throw new Error('Upload record was not created in database');
+        }
+        if (!reportCheck) {
+          console.error('[Upload] CRITICAL: Report record not found after transaction!');
+          throw new Error('Report record was not created in database');
+        }
+        
+        console.log('[Upload] Verification passed: Both records exist in database');
+      } catch (verifyError: any) {
+        console.error('[Upload] Verification failed:', verifyError);
+        throw new Error(`Database verification failed: ${verifyError.message}`);
+      }
+
       return {
         uploadId,
         reportId,
