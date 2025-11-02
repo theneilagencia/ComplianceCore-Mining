@@ -20,12 +20,12 @@ export function OfficialSourcesValidation({
   const [isValidating, setIsValidating] = useState(false);
   const [validationResult, setValidationResult] = useState<any>(null);
 
-  const validateMutation = trpc.audit.validateOfficial.useMutation({
-    onSuccess: (data) => {
+  const validateMutation = trpc.technicalReports.audit.validateOfficial.useMutation({
+    onSuccess: (data: any) => {
       setValidationResult(data);
       setIsValidating(false);
     },
-    onError: (error) => {
+    onError: (error: any) => {
       console.error("Validation error:", error);
       setIsValidating(false);
     },

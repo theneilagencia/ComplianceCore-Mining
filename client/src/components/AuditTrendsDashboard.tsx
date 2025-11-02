@@ -33,11 +33,11 @@ interface AuditTrendsDashboardProps {
 export function AuditTrendsDashboard({ reportId }: AuditTrendsDashboardProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "trends" | "categories">("overview");
 
-  const { data: trends, isLoading, error } = trpc.audit.getTrends.useQuery({
+  const { data: trends, isLoading, error } = trpc.technicalReports.audit.getTrends.useQuery({
     reportId,
   });
 
-  const { data: statistics } = trpc.audit.getStatistics.useQuery({
+  const { data: statistics } = trpc.technicalReports.audit.getStatistics.useQuery({
     reportId,
   });
 
@@ -216,7 +216,7 @@ export function AuditTrendsDashboard({ reportId }: AuditTrendsDashboardProps) {
                     Melhorias Identificadas
                   </h3>
                   <div className="space-y-2">
-                    {trends.improvements.map((improvement, idx) => (
+                    {trends.improvements.map((improvement: { category: string; improvement: number; message: string }, idx: number) => (
                       <div
                         key={idx}
                         className="bg-green-50 border border-green-200 rounded-lg p-3"
@@ -246,7 +246,7 @@ export function AuditTrendsDashboard({ reportId }: AuditTrendsDashboardProps) {
                     Áreas que Precisam Atenção
                   </h3>
                   <div className="space-y-2">
-                    {trends.regressions.map((regression, idx) => (
+                    {trends.regressions.map((regression: { category: string; regression: number; message: string }, idx: number) => (
                       <div
                         key={idx}
                         className="bg-red-50 border border-red-200 rounded-lg p-3"
@@ -276,7 +276,7 @@ export function AuditTrendsDashboard({ reportId }: AuditTrendsDashboardProps) {
                     Recomendações
                   </h3>
                   <div className="space-y-2">
-                    {trends.recommendations.map((rec, idx) => (
+                    {trends.recommendations.map((rec: string, idx: number) => (
                       <div
                         key={idx}
                         className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-blue-900"
@@ -339,7 +339,7 @@ export function AuditTrendsDashboard({ reportId }: AuditTrendsDashboardProps) {
           {/* Categories Tab */}
           {activeTab === "categories" && (
             <div className="space-y-6">
-              {trends.categoryTrends.map((categoryTrend) => (
+              {trends.categoryTrends.map((categoryTrend: { category: string; data: any[] }) => (
                 <div key={categoryTrend.category}>
                   <h3 className="text-lg font-semibold text-gray-900 mb-4 capitalize">
                     {categoryTrend.category}
