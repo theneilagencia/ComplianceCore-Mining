@@ -1,0 +1,6 @@
+This is a simple text file used for negative testing.
+
+It should NOT be accepted as a valid PDF upload.
+
+The E2E tests will use this to verify that the application
+properly validates file types and rejects non-PDF files.
