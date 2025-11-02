@@ -35,7 +35,7 @@ export const technicalReportsRouter = router({
     create: protectedProcedure
       .input(
         z.object({
-          standard: z.enum(["JORC_2012", "NI_43_101", "PERC", "SAMREC", "CRIRSCO"]),
+          standard: z.enum(["JORC_2012", "NI_43_101", "PERC", "SAMREC", "CRIRSCO", "SEC_SK_1300"]),
           title: z.string().min(5, "Título deve ter no mínimo 5 caracteres"),
           projectName: z.string().optional(),
           location: z.string().optional(),
