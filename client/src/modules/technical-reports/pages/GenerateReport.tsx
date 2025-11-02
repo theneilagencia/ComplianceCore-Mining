@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/select";
 import { trpc } from "@/lib/trpc";
 import { FileText, Upload as UploadIcon, Download, AlertCircle, CheckCircle } from "lucide-react";
-import UploadModal from "../components/UploadModal";
+import UploadModalAtomic from "../components/UploadModalAtomic";
 import { Badge } from "@/components/ui/badge";
 import { useLocation } from "wouter";
 import { useState } from "react";
@@ -444,7 +444,7 @@ export default function GenerateReport() {
  </div>
 
 	{showUploadModal && (
-		<UploadModal open={showUploadModal} onClose={() => setShowUploadModal(false)} />
+		<UploadModalAtomic open={showUploadModal} onClose={() => setShowUploadModal(false)} />
 	)}
  </DashboardLayout>
  );
