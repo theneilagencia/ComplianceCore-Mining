@@ -7,7 +7,10 @@
  * Authentication: Bearer Token (JWT)
  */
 
-import { metrics } from '../../../monitoring/metrics';
+import { db } from '../../../../db';
+import { technicalReports, reportFields } from '../../../../db/schema';
+import { eq } from 'drizzle-orm';
+import { metrics } from '../../../../monitoring/metrics';
 
 export interface ANMProcessResponse {
   numero: string; // "48226.800153/2023"
@@ -46,31 +49,36 @@ export interface ValidationResult {
 export async function validateWithANM_Real(
   miningTitleNumber: string
 ): Promise<ValidationResult> {
+  const startTime = Date.now();
+  
   try {
     const apiKey = process.env.ANM_API_KEY;
-    
-    // Fallback to mock if API key not configured
+
+    // If no API key, return warning
     if (!apiKey) {
-      console.warn('[ANM] API Key not configured (ANM_API_KEY), using mock validation');
-      return validateWithANM_Mock(miningTitleNumber);
+      console.warn('[ANM] API key not configured');
+      return {
+        source: 'ANM',
+        field: 'miningTitleNumber',
+        status: 'error',
+        message: 'API Key da ANM não configurada. Configure ANM_API_KEY no .env',
+        reportValue: miningTitleNumber,
+      };
     }
 
-    // Validate format first (quick check)
-    const anmPattern = /^\d{5}\.\d{6}\/\d{4}$/;
-    if (!anmPattern.test(miningTitleNumber)) {
+    // Basic validation
+    if (!miningTitleNumber || typeof miningTitleNumber !== 'string') {
       return {
         source: 'ANM',
         field: 'miningTitleNumber',
         status: 'invalid',
-        message: 'Formato de processo ANM inválido. Esperado: XXXXX.XXXXXX/XXXX (Ex: 48226.800153/2023)',
+        message: 'Número de processo ANM inválido',
         reportValue: miningTitleNumber,
       };
     }
 
     // Make real API request
     console.log('[ANM] Validating process:', miningTitleNumber);
-    
-    const startTime = Date.now();
     const response = await fetch(
       `https://sistemas.anm.gov.br/SCM/api/v2/processos/${miningTitleNumber}`,
       {
