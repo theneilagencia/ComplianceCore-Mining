@@ -1,9 +1,11 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { PWAInstallPrompt } from "./components/PWAInstallPrompt";
+import { NotificationCenter } from "./components/NotificationCenter";
+import { setupWebhookListener } from "./hooks/useWebhooks";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
 // import { LocaleProvider } from "./contexts/LocaleContext"; // Temporarily disabled
@@ -154,6 +156,11 @@ function Router() {
 }
 
 function App() {
+  // Setup webhook listener on app mount
+  useEffect(() => {
+    setupWebhookListener();
+  }, []);
+
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light" switchable={true}>
@@ -161,6 +168,7 @@ function App() {
           <TooltipProvider>
             <Toaster />
             <PWAInstallPrompt />
+            <NotificationCenter />
             <Router />
           </TooltipProvider>
         </AuthProvider>
