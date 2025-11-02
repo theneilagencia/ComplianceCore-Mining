@@ -170,42 +170,32 @@ export const uploadsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
-      console.log('[Complete] Starting upload completion');
-      console.log('[Complete] Upload ID:', input.uploadId);
-      console.log('[Complete] S3 URL:', input.s3Url);
-      
       const db = await import("../../../db").then((m) => m.getDb());
       if (!db) throw new Error("Database not available");
 
       try {
-        // Atualizar status do upload
-        console.log('[Complete] Updating upload status to parsing');
-        console.log('[Complete] Input received:', JSON.stringify({
-          uploadId: input.uploadId,
-          s3Key: input.s3Key,
-          s3Url: input.s3Url,
-          s3UrlType: typeof input.s3Url,
-          s3KeyType: typeof input.s3Key,
-        }, null, 2));
-        
-        // Validar que temos os dados necessários
+        // CRITICAL FIX: Sempre construir URL a partir do s3Key, NUNCA usar input.s3Url
+        // O input.s3Url pode vir errado do frontend ou de cache
         if (!input.s3Key) {
-          throw new Error('s3Key is required');
+          throw new Error('s3Key is required for upload completion');
         }
         
-        // SOLUÇÃO DEFINITIVA: Sempre construir a URL a partir do s3Key
-        // Isso garante que sempre salvamos uma URL válida, não um path
-        const s3UrlToSave = `/api/storage/download/${encodeURIComponent(input.s3Key)}`;
+        // Construir URL válida - essa é a ÚNICA forma de gerar s3Url
+        const finalS3Url = `/api/storage/download/${encodeURIComponent(input.s3Key)}`;
         
-        console.log('[Complete] s3Key received:', input.s3Key);
-        console.log('[Complete] s3Url constructed:', s3UrlToSave);
-        console.log('[Complete] Executing update query...');
+        // Log para debug - será visível no terminal
+        console.log('='.repeat(80));
+        console.log('[UPLOAD-FIX] Upload ID:', input.uploadId);
+        console.log('[UPLOAD-FIX] s3Key recebido:', input.s3Key);
+        console.log('[UPLOAD-FIX] s3Url CONSTRUÍDO:', finalS3Url);
+        console.log('[UPLOAD-FIX] Salvando no banco...');
+        console.log('='.repeat(80));
         
         await db
           .update(uploads)
           .set({
             status: "parsing",
-            s3Url: s3UrlToSave,
+            s3Url: finalS3Url, // USA A VARIÁVEL CONSTRUÍDA, NÃO O INPUT
           })
           .where(eq(uploads.id, input.uploadId));
 
