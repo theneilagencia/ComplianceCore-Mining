@@ -1,10 +1,9 @@
 """
 QIVO Intelligence Layer - Bridge AI Routes
-Endpoints FastAPI para tradução normativa
+Endpoints Flask para tradução normativa
 """
 
-from fastapi import APIRouter, HTTPException
-from fastapi.responses import JSONResponse
+from flask import Blueprint, jsonify, request
 from typing import Dict, Any
 
 from app.modules.bridge.schemas import (
@@ -17,7 +16,7 @@ from app.modules.bridge.schemas import (
 from src.ai.core.bridge import BridgeAI
 
 
-router = APIRouter(prefix="/api/bridge", tags=["Bridge AI"])
+bridge_bp = Blueprint("bridge", __name__, url_prefix="/api/bridge")
 
 # Instância global do Bridge
 bridge = None
@@ -31,8 +30,8 @@ def get_bridge():
     return bridge
 
 
-@router.post("/translate", response_model=BridgeResponse)
-async def translate_normative(request: BridgeRequest):
+@bridge_bp.route("/translate", methods=["POST"])
+def translate_normative():
     """
     Traduz texto técnico entre normas regulatórias
     
@@ -48,85 +47,71 @@ async def translate_normative(request: BridgeRequest):
         source_norm: Norma de origem
         target_norm: Norma de destino
         explain: Se True, retorna justificativa
-        
-    Returns:
-        BridgeResponse com texto traduzido e metadados
-        
-    Raises:
-        HTTPException: Se validação falhar ou erro no GPT
     """
     try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Request body is required"}), 400
+        
         ai = get_bridge()
         
-        result = await ai.translate_normative(
-            text=request.text,
-            source_norm=request.source_norm,
-            target_norm=request.target_norm,
-            explain=request.explain
-        )
+        import asyncio
+        result = asyncio.run(ai.translate_normative(
+            text=data.get('text'),
+            source_norm=data.get('source_norm'),
+            target_norm=data.get('target_norm'),
+            explain=data.get('explain', False)
+        ))
         
         # Se houve erro no engine, retornar com status apropriado
         if result.get('status') == 'error':
-            return JSONResponse(
-                status_code=500,
-                content=result
-            )
+            return jsonify(result), 500
         
-        return JSONResponse(
-            status_code=200,
-            content=result
-        )
+        return jsonify(result), 200
     
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro no processamento: {str(e)}")
+        return jsonify({"error": f"Erro no processamento: {str(e)}"}), 500
 
 
-@router.post("/compare", response_model=NormComparisonResponse)
-async def compare_norms(request: NormComparisonRequest):
+@bridge_bp.route("/compare", methods=["POST"])
+def compare_norms():
     """
     Compara diferenças conceituais entre duas normas
     
     Args:
         norm1: Primeira norma
         norm2: Segunda norma
-        
-    Returns:
-        Análise comparativa detalhada
     """
     try:
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Request body is required"}), 400
+        
         ai = get_bridge()
         
-        result = await ai.explain_norm_difference(
-            norm1=request.norm1,
-            norm2=request.norm2
-        )
+        import asyncio
+        result = asyncio.run(ai.explain_norm_difference(
+            norm1=data.get('norm1'),
+            norm2=data.get('norm2')
+        ))
         
         if result.get('status') == 'error':
-            return JSONResponse(
-                status_code=500,
-                content=result
-            )
+            return jsonify(result), 500
         
-        return JSONResponse(
-            status_code=200,
-            content=result
-        )
+        return jsonify(result), 200
     
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return jsonify({"error": str(e)}), 400
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro na comparação: {str(e)}")
+        return jsonify({"error": f"Erro na comparação: {str(e)}"}), 500
 
 
-@router.get("/norms", response_model=SupportedNormsResponse)
-async def get_supported_norms():
+@bridge_bp.route("/norms", methods=["GET"])
+def get_supported_norms():
     """
     Retorna lista de normas regulatórias suportadas
-    
-    Returns:
-        Dicionário com metadados de cada norma
     """
     try:
         ai = get_bridge()
@@ -134,18 +119,18 @@ async def get_supported_norms():
         
         from datetime import datetime, timezone
         
-        return {
+        return jsonify({
             'norms': norms,
             'total': len(norms),
             'timestamp': datetime.now(timezone.utc).isoformat()
-        }
+        }), 200
     
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Erro ao listar normas: {str(e)}")
+        return jsonify({"error": f"Erro ao listar normas: {str(e)}"}), 500
 
 
-@router.get("/health")
-async def health_check():
+@bridge_bp.route("/health", methods=["GET"])
+def health_check():
     """Health check do módulo Bridge AI"""
     try:
         import os
@@ -153,25 +138,25 @@ async def health_check():
         
         from datetime import datetime, timezone
         
-        return {
+        return jsonify({
             'status': 'healthy',
             'module': 'Bridge AI',
             'version': '1.0.0',
             'openai_configured': bool(api_key),
             'supported_norms': ['ANM', 'JORC', 'NI43-101', 'PERC', 'SAMREC'],
             'timestamp': datetime.now(timezone.utc).isoformat()
-        }
+        }), 200
     except Exception as e:
-        return {
+        return jsonify({
             'status': 'unhealthy',
             'error': str(e)
-        }
+        }), 500
 
 
-@router.get("/capabilities")
-async def get_capabilities():
+@bridge_bp.route("/capabilities", methods=["GET"])
+def get_capabilities():
     """Retorna capacidades do Bridge AI"""
-    return {
+    return jsonify({
         'module': 'Bridge AI - Tradução Normativa',
         'version': '1.0.0',
         'features': {
@@ -204,19 +189,14 @@ async def get_capabilities():
             'report_generator': 'Compatível com Report Generator',
             'audit': 'Integrado com Audit/KRCI'
         }
-    }
+    }), 200
 
 
-# Flask Blueprint para compatibilidade (app/__init__.py ainda usa Flask)
-from flask import Blueprint as FlaskBlueprint, jsonify as flask_jsonify
-
-bridge_bp = FlaskBlueprint("bridge", __name__)
-
-@bridge_bp.route("/status")
+@bridge_bp.route("/status", methods=["GET"])
 def bridge_status():
-    """Endpoint Flask para compatibilidade"""
-    return flask_jsonify({
+    """Endpoint para status simplificado do módulo"""
+    return jsonify({
         "module": "Bridge AI",
         "status": "ativo ✅",
-        "api": "FastAPI em /api/bridge/*"
-    })
+        "version": "1.0.0"
+    }), 200
