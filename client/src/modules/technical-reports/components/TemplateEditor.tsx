@@ -12,6 +12,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { 
   Eye, 
   Save, 
@@ -20,7 +26,9 @@ import {
   GripVertical,
   ChevronDown,
   ChevronUp,
+  FileText,
 } from 'lucide-react';
+import LazyPDFViewer from '@/components/PDFViewer.lazy';
 
 // Type definition local (will be synced with shared schema)
 export interface Template {
@@ -93,6 +101,8 @@ export default function TemplateEditor({
   onPreview,
 }: TemplateEditorProps) {
   const [activeTab, setActiveTab] = useState<'general' | 'styling' | 'sections'>('general');
+  const [showPreviewDialog, setShowPreviewDialog] = useState(false);
+  const [previewPdfUrl, setPreviewPdfUrl] = useState<string | null>(null);
 
   const updateStyling = (key: string, value: any) => {
     onChange({
@@ -160,6 +170,14 @@ export default function TemplateEditor({
     });
   };
 
+  const handlePreview = () => {
+    // Call parent preview function to generate PDF
+    onPreview();
+    // In a real scenario, this would return a URL
+    // For now, we'll show a placeholder
+    setShowPreviewDialog(true);
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -171,7 +189,7 @@ export default function TemplateEditor({
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={onPreview}>
+          <Button variant="outline" onClick={handlePreview}>
             <Eye className="h-4 w-4 mr-2" />
             Preview
           </Button>
@@ -575,6 +593,40 @@ export default function TemplateEditor({
           </div>
         </div>
       )}
+
+      {/* Preview Dialog with PDF Viewer */}
+      <Dialog open={showPreviewDialog} onOpenChange={setShowPreviewDialog}>
+        <DialogContent className="max-w-5xl max-h-[90vh]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5" />
+              Preview: {template.name}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="mt-4">
+            {previewPdfUrl ? (
+              <LazyPDFViewer
+                url={previewPdfUrl}
+                title={template.name}
+                maxHeight="70vh"
+                enableDownload={true}
+                enableFullscreen={true}
+              />
+            ) : (
+              <div className="text-center py-12 bg-gray-50 rounded-lg border-2 border-dashed">
+                <FileText className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                <p className="text-gray-600 font-medium mb-2">Preview do Template</p>
+                <p className="text-sm text-gray-500 mb-4">
+                  O preview seria gerado aqui com base nas configurações do template
+                </p>
+                <Button onClick={() => setShowPreviewDialog(false)}>
+                  Fechar
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
