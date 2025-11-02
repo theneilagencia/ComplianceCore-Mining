@@ -4,6 +4,7 @@
  */
 
 import { SEC_SK_1300_SCHEMA } from './sec-sk-1300-schema';
+import { BRAZILIAN_COMPLIANCE_SECTION } from './brazilian-compliance-fields';
 
 export interface FieldDefinition {
   name: string;
@@ -1223,19 +1224,45 @@ export const NI_43_101_SCHEMA_EXPANDED: StandardSchema = {
   ],
 };
 
+/**
+ * Add Brazilian compliance section to a schema
+ * Automatically adds Brazilian regulatory fields to international standards
+ */
+function addBrazilianCompliance(schema: StandardSchema): StandardSchema {
+  return {
+    ...schema,
+    sections: [
+      ...schema.sections,
+      BRAZILIAN_COMPLIANCE_SECTION, // Add Brazilian section at the end
+    ],
+  };
+}
+
 // Export function to get schema by standard code
-export function getSchemaByStandard(standardCode: string): StandardSchema {
+export function getSchemaByStandard(standardCode: string, includeBrazilianCompliance: boolean = true): StandardSchema {
+  let baseSchema: StandardSchema;
+  
   switch (standardCode) {
     case 'JORC_2012':
-      return JORC_SCHEMA_EXPANDED;
+      baseSchema = JORC_SCHEMA_EXPANDED;
+      break;
     case 'NI_43_101':
-      return NI_43_101_SCHEMA_EXPANDED;
+      baseSchema = NI_43_101_SCHEMA_EXPANDED;
+      break;
     case 'SEC_SK_1300':
-      return SEC_SK_1300_SCHEMA;
+      baseSchema = SEC_SK_1300_SCHEMA;
+      break;
     // PERC and SAMREC can use the original schemas for now
     default:
-      return JORC_SCHEMA_EXPANDED;
+      baseSchema = JORC_SCHEMA_EXPANDED;
   }
+  
+  // Add Brazilian compliance section for all standards (optional)
+  if (includeBrazilianCompliance) {
+    return addBrazilianCompliance(baseSchema);
+  }
+  
+  return baseSchema;
 }
 
 export function getAllStandards() {
