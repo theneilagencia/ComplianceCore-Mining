@@ -137,17 +137,25 @@ export const uploadsRouter = router({
         console.log('[UploadFile] Storage key:', s3Key);
         
         const uploadResult = await storagePut(s3Key, buffer, input.contentType);
-        console.log('[UploadFile] Upload result:', JSON.stringify(uploadResult, null, 2));
-        console.log('[UploadFile] uploadResult.url:', uploadResult.url);
-        console.log('[UploadFile] uploadResult.key:', uploadResult.key);
+        
+        // CRITICAL FIX: SEMPRE retornar URL construída, NUNCA confiar em uploadResult.url
+        // Se uploadResult.url vier errado (path ao invés de URL), isso vai corrigir
+        const correctUrl = uploadResult.url?.startsWith('http') || uploadResult.url?.startsWith('/')
+          ? uploadResult.url
+          : `/api/storage/download/${encodeURIComponent(uploadResult.key)}`;
 
         const returnValue = {
-          s3Url: uploadResult.url,
-          s3Key: uploadResult.key,
+          s3Url: correctUrl,  // URL CORRIGIDA
+          s3Key: uploadResult.key,  // Key original
           provider: uploadResult.provider,
         };
         
-        console.log('[UploadFile] Returning:', JSON.stringify(returnValue, null, 2));
+        console.log('█'.repeat(80));
+        console.log('[UPLOAD-FILE-FIX] s3Key:', uploadResult.key);
+        console.log('[UPLOAD-FILE-FIX] url original:', uploadResult.url);
+        console.log('[UPLOAD-FILE-FIX] url CORRIGIDA:', correctUrl);
+        console.log('[UPLOAD-FILE-FIX] Retornando:', JSON.stringify(returnValue, null, 2));
+        console.log('█'.repeat(80));
         
         return returnValue;
       } catch (error: any) {
