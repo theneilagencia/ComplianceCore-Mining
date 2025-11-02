@@ -50,7 +50,7 @@ export async function validateWithANP_Real(
 ): Promise<ValidationResult> {
   try {
     // Validate format (block code pattern)
-    const anpPattern = /^[A-Z]{2,3}-[A-Z]-\d{1,3}$/; // Ex: BM-S-11, ES-T-19
+    const anpPattern = /^[A-Z]{2,3}-[A-Z]{1,4}-\d{1,3}$/; // Ex: BM-S-11, ES-T-19, BM-SEAL-10
     if (!anpPattern.test(concessionNumber)) {
       return {
         source: 'ANP',
@@ -140,7 +140,7 @@ export async function validateWithANP_Real(
       source: 'ANP',
       field: 'concessionNumber',
       status: 'valid',
-      message: `Bloco ${data.fase} válido - Bacia ${data.bacia} - Operador: ${data.operador.nome}`,
+      message: `Bloco ${data.fase} válido - Bacia ${data.bacia || 'N/A'}${data.operador?.nome ? ` - Operador: ${data.operador.nome}` : ''}`,
       reportValue: concessionNumber,
       officialValue: {
         bloco: data.bloco,
@@ -175,7 +175,7 @@ export async function validateWithANP_Real(
 function validateWithANP_Mock(concessionNumber: string): ValidationResult {
   console.log('[ANP] Using MOCK validation');
   
-  const anpPattern = /^[A-Z]{2,3}-[A-Z]-\d{1,3}$/;
+  const anpPattern = /^[A-Z]{2,3}-[A-Z]{1,4}-\d{1,3}$/;
   if (!anpPattern.test(concessionNumber)) {
     return {
       source: 'ANP',
