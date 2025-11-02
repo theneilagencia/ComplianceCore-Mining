@@ -174,21 +174,34 @@ export const uploadsRouter = router({
       try {
         // Atualizar status do upload
         console.log('[Complete] Updating upload status to parsing');
-        console.log('[Complete] Input received:', {
+        console.log('[Complete] Input received:', JSON.stringify({
           uploadId: input.uploadId,
           s3Key: input.s3Key,
           s3Url: input.s3Url,
-          hasS3Url: !!input.s3Url,
-          hasS3Key: !!input.s3Key,
-        });
+          s3UrlType: typeof input.s3Url,
+          s3KeyType: typeof input.s3Key,
+        }, null, 2));
         
         // Validar que temos os dados necessários
         if (!input.s3Url && !input.s3Key) {
           throw new Error('Neither s3Url nor s3Key provided');
         }
         
-        const s3UrlToSave = input.s3Url || `/api/storage/download/${encodeURIComponent(input.s3Key)}`;
+        // Garantir que s3Url seja uma URL válida, não um path
+        let s3UrlToSave: string;
+        if (input.s3Url && input.s3Url.startsWith('/')) {
+          // Já é uma URL relativa válida
+          s3UrlToSave = input.s3Url;
+        } else if (input.s3Url && (input.s3Url.startsWith('http://') || input.s3Url.startsWith('https://'))) {
+          // URL absoluta (Cloudinary, S3, etc)
+          s3UrlToSave = input.s3Url;
+        } else {
+          // Construir URL a partir do s3Key
+          s3UrlToSave = `/api/storage/download/${encodeURIComponent(input.s3Key)}`;
+        }
+        
         console.log('[Complete] s3Url to save:', s3UrlToSave);
+        console.log('[Complete] Executing update query...');
         
         await db
           .update(uploads)
