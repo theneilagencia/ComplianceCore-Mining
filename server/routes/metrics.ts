@@ -6,8 +6,32 @@
 import { Router } from 'express';
 import { metrics } from '../monitoring/metrics';
 import { featureFlags } from '../config/feature-flags';
+import { authenticateFromCookie } from '../modules/payment/auth-helper';
 
 const router = Router();
+
+// Middleware to check if user is admin
+async function requireAdmin(req: any, res: any, next: any) {
+  try {
+    const user = await authenticateFromCookie(req);
+    
+    if (!user) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    if (user.role !== 'admin') {
+      console.log('[Metrics] Access denied for user:', user.email, 'role:', user.role);
+      return res.status(403).json({ error: 'Forbidden - Admin access required' });
+    }
+    
+    console.log('[Metrics] Access granted for admin:', user.email);
+    req.user = user;
+    next();
+  } catch (error) {
+    console.error('[Metrics] Auth error:', error);
+    res.status(401).json({ error: 'Unauthorized' });
+  }
+}
 
 /**
  * GET /api/metrics
@@ -165,9 +189,8 @@ router.get('/feature-flags', (req, res) => {
  * POST /api/metrics/reset
  * Reset all metrics (admin only)
  */
-router.post('/reset', (req, res) => {
+router.post('/reset', requireAdmin, (req, res) => {
   try {
-    // TODO: Add admin authentication
     metrics.reset();
     
     res.json({
