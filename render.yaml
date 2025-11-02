@@ -5,7 +5,7 @@
 
 services:
   - type: web
-    name: compliancecore-mining
+    name: qivo-mining
     runtime: node
     env: node
     plan: free
