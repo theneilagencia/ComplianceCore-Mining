@@ -158,7 +158,8 @@ export const uploadsRouter = router({
     .input(
       z.object({
         uploadId: z.string(),
-        s3Url: z.string(),
+        s3Url: z.string().optional(), // URL ou path relativo
+        s3Key: z.string(), // Storage key usado para download
         fileContent: z.string().optional(), // Para demonstração, em produção viria do S3
       })
     )
@@ -173,11 +174,14 @@ export const uploadsRouter = router({
       try {
         // Atualizar status do upload
         console.log('[Complete] Updating upload status to parsing');
+        console.log('[Complete] s3Key:', input.s3Key);
+        console.log('[Complete] s3Url:', input.s3Url);
+        
         await db
           .update(uploads)
           .set({
             status: "parsing",
-            s3Url: input.s3Url,
+            s3Url: input.s3Key, // Salvar a key, não a URL relativa
           })
           .where(eq(uploads.id, input.uploadId));
 
@@ -198,10 +202,11 @@ export const uploadsRouter = router({
         let fileContent = input.fileContent;
         
         if (!fileContent) {
-          console.log('[Complete] Attempting to download file from storage');
+          console.log('[Complete] Attempting to download file from storage using key:', input.s3Key);
           try {
             const { storageGet } = await import("../../../storage-hybrid");
-            const downloadResult = await storageGet(input.s3Url);
+            // Usar s3Key para fazer o download
+            const downloadResult = await storageGet(input.s3Key);
             
             if (downloadResult.buffer) {
               fileContent = downloadResult.buffer.toString('utf-8');
