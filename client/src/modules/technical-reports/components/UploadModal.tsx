@@ -53,10 +53,40 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
       return;
     }
 
+    // Validar tamanho do arquivo (50MB max)
+    const maxSize = 50 * 1024 * 1024; // 50MB
+    if (file.size > maxSize) {
+      toast.error("Arquivo muito grande", {
+        description: `Tamanho máximo: 50MB. Seu arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
+      });
+      return;
+    }
+
+    // Validar tipo de arquivo
+    const allowedTypes = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      'text/csv',
+      'application/zip',
+      'application/x-zip-compressed',
+    ];
+    
+    if (file.type && !allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|docx|xlsx|csv|zip)$/i)) {
+      toast.error("Tipo de arquivo não suportado", {
+        description: "Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP",
+      });
+      return;
+    }
+
     try {
       setUploading(true);
+      console.log('[Upload] Starting upload process');
+      console.log('[Upload] File:', file.name, file.size, file.type);
 
-      // Iniciar upload
+      // Passo 1: Iniciar upload
+      toast.loading("Iniciando upload...", { id: 'upload-process' });
+      
       const initResult = await initiateUpload.mutateAsync({
         fileName: file.name,
         fileSize: file.size,
@@ -65,23 +95,25 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
 
       setUploadId(initResult.uploadId);
       setReportId(initResult.reportId);
+      
+      console.log('[Upload] Upload initiated:', initResult);
 
-      toast.success("Upload iniciado", {
-        description: `Arquivo: ${file.name}`,
-      });
+      toast.loading("Enviando arquivo...", { id: 'upload-process' });
 
-      // Converter arquivo para base64
+      // Passo 2: Converter arquivo para base64
       const fileData = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
           const base64 = (reader.result as string).split(",")[1];
           resolve(base64);
         };
-        reader.onerror = reject;
+        reader.onerror = () => reject(new Error("Erro ao ler arquivo"));
         reader.readAsDataURL(file);
       });
+      
+      console.log('[Upload] File converted to base64, size:', fileData.length);
 
-      // Upload real para S3
+      // Passo 3: Upload real para storage
       const uploadResult = await uploadFile.mutateAsync({
         uploadId: initResult.uploadId,
         fileData,
@@ -89,31 +121,37 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
         contentType: file.type || "application/pdf",
       });
 
+      console.log('[Upload] File uploaded:', uploadResult);
+      
       const s3Url = uploadResult.s3Url;
 
-      // Completar upload e iniciar parsing
+      // Passo 4: Completar upload e iniciar parsing
       setParsing(true);
       setUploading(false);
 
-      toast.info("Analisando arquivo...", {
-        description: "Isso pode levar alguns segundos",
-      });
+      toast.loading("Analisando conteúdo...", { id: 'upload-process' });
 
       const completeResult = await completeUpload.mutateAsync({
         uploadId: initResult.uploadId,
         s3Url: s3Url,
-        fileContent: undefined, // Backend vai baixar do S3 real
+        fileContent: undefined, // Backend vai processar
       });
 
       setParsing(false);
+      
+      console.log('[Upload] Upload completed:', completeResult);
 
       // Invalidar queries
       utils.technicalReports.generate.list.invalidate();
       utils.technicalReports.uploads.list.invalidate();
 
+      // Exibir resultado
+      toast.dismiss('upload-process');
+      
       if (completeResult.status === "needs_review") {
         toast.warning("Revisão necessária", {
           description: `${completeResult.summary.uncertainFields} campos precisam de validação`,
+          duration: 5000,
           action: {
             label: "Revisar agora",
             onClick: () => {
@@ -123,8 +161,9 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
           },
         });
       } else {
-        toast.success("Relatório pronto!", {
-          description: "O relatório está pronto para auditoria",
+        toast.success("Relatório processado com sucesso!", {
+          description: `Padrão detectado: ${completeResult.summary.detectedStandard}`,
+          duration: 3000,
         });
       }
 
@@ -136,10 +175,15 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
         setReportId(null);
       }, 2000);
     } catch (error: any) {
+      console.error('[Upload] Error:', error);
+      
       setUploading(false);
       setParsing(false);
+      
+      toast.dismiss('upload-process');
       toast.error("Erro no upload", {
-        description: error.message || "Tente novamente",
+        description: error.message || "Tente novamente ou entre em contato com o suporte",
+        duration: 5000,
       });
     }
   };
