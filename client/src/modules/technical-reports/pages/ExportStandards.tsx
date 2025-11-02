@@ -93,13 +93,15 @@ export default function ExportStandards() {
     loadExports();
   }, []);
 
+  const utils = trpc.useUtils();
+
   const loadReports = async () => {
     try {
       setLoadingReports(true);
       setError('');
       
       const data = await retryWithBackoff(async () => {
-        return await trpc.technicalReports.generate.list.query();
+        return await utils.client.technicalReports.generate.list.query();
       });
       
       setReports(data || []);
@@ -119,7 +121,7 @@ export default function ExportStandards() {
       setLoadingExports(true);
       
       const data = await retryWithBackoff(async () => {
-        return await trpc.technicalReports.export.list.query();
+        return await utils.client.technicalReports.export.list.query();
       });
       
       setExports(data || []);

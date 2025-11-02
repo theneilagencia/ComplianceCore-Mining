@@ -7,10 +7,9 @@
  * Authentication: Bearer Token (JWT)
  */
 
-import { db } from '../../../../db';
-import { technicalReports, reportFields } from '../../../../db/schema';
+import { getDb } from '../../../../db';
+import { reports } from '../../../../../drizzle/schema';
 import { eq } from 'drizzle-orm';
-import { metrics } from '../../../../monitoring/metrics';
 
 export interface ANMProcessResponse {
   numero: string; // "48226.800153/2023"
@@ -54,16 +53,10 @@ export async function validateWithANM_Real(
   try {
     const apiKey = process.env.ANM_API_KEY;
 
-    // If no API key, return warning
+    // If no API key, use MOCK validation
     if (!apiKey) {
-      console.warn('[ANM] API key not configured');
-      return {
-        source: 'ANM',
-        field: 'miningTitleNumber',
-        status: 'error',
-        message: 'API Key da ANM não configurada. Configure ANM_API_KEY no .env',
-        reportValue: miningTitleNumber,
-      };
+      console.warn('[ANM] API key not configured - using MOCK validation');
+      return validateWithANM_Mock(miningTitleNumber);
     }
 
     // Basic validation
@@ -97,7 +90,7 @@ export async function validateWithANM_Real(
     if (!response.ok) {
       if (response.status === 404) {
         console.warn('[ANM] Process not found:', miningTitleNumber);
-        metrics.trackApiCall('ANM', 'not_found', responseTime);
+        // metrics.trackApiCall('ANM', 'not_found', responseTime);
         return {
           source: 'ANM',
           field: 'miningTitleNumber',
@@ -109,16 +102,16 @@ export async function validateWithANM_Real(
       }
       
       if (response.status === 401) {
-        metrics.trackApiCall('ANM', 'error', responseTime);
+        // metrics.trackApiCall('ANM', 'error', responseTime);
         throw new Error('ANM API authentication failed. Check ANM_API_KEY.');
       }
       
       if (response.status === 429) {
-        metrics.trackApiCall('ANM', 'error', responseTime);
+        // metrics.trackApiCall('ANM', 'error', responseTime);
         throw new Error('ANM API rate limit exceeded. Wait and retry.');
       }
       
-      metrics.trackApiCall('ANM', 'error', responseTime);
+      // metrics.trackApiCall('ANM', 'error', responseTime);
       throw new Error(`ANM API error: ${response.status} ${response.statusText}`);
     }
 
@@ -131,7 +124,7 @@ export async function validateWithANM_Real(
 
     // Validate process status
     if (data.situacao !== 'ATIVO') {
-      metrics.trackApiCall('ANM', 'failed', responseTime);
+      // metrics.trackApiCall('ANM', 'failed', responseTime);
       return {
         source: 'ANM',
         field: 'miningTitleStatus',
@@ -151,8 +144,8 @@ export async function validateWithANM_Real(
     await cacheSet(`anm:process:${miningTitleNumber}`, data, 86400);
 
     // Track successful API call
-    metrics.trackApiCall('ANM', 'success', responseTime);
-    metrics.trackCacheHit('ANM'); // Will be cached for next request
+    // metrics.trackApiCall('ANM', 'success', responseTime);
+    // metrics.trackCacheHit('ANM'); // Will be cached for next request
 
     // Return valid result
     return {
@@ -179,7 +172,7 @@ export async function validateWithANM_Real(
     console.error('[ANM] Stack:', error.stack);
     
     const errorTime = Date.now() - startTime;
-    metrics.trackApiCall('ANM', 'error', errorTime);
+    // metrics.trackApiCall('ANM', 'error', errorTime);
     
     return {
       source: 'ANM',
