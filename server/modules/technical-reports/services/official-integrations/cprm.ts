@@ -2,11 +2,13 @@
  * CPRM (Serviço Geológico do Brasil) Integration
  * Real API integration for geological data validation
  * 
- * API: https://geosgb.cprm.gov.br/api/v1/
+ * API: https://geosgb.cprm.gov.br/api/v2
  * Rate Limit: 60 requests/minute
  */
 
-export interface CPRMGeologyResponse {
+import { metrics } from '../../../monitoring/metrics';
+
+export interface ValidationResult {
   latitude: number;
   longitude: number;
   formacao_geologica: string;

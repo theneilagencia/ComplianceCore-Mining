@@ -7,6 +7,8 @@
  * Authentication: Bearer Token (JWT)
  */
 
+import { metrics } from '../../../monitoring/metrics';
+
 export interface ANMProcessResponse {
   numero: string; // "48226.800153/2023"
   situacao: 'ATIVO' | 'SUSPENSO' | 'CANCELADO' | 'ARQUIVADO';
@@ -68,6 +70,7 @@ export async function validateWithANM_Real(
     // Make real API request
     console.log('[ANM] Validating process:', miningTitleNumber);
     
+    const startTime = Date.now();
     const response = await fetch(
       `https://sistemas.anm.gov.br/SCM/api/v2/processos/${miningTitleNumber}`,
       {
@@ -80,11 +83,13 @@ export async function validateWithANM_Real(
         signal: AbortSignal.timeout(10000), // 10s timeout
       }
     );
+    const responseTime = Date.now() - startTime;
 
     // Handle different response codes
     if (!response.ok) {
       if (response.status === 404) {
         console.warn('[ANM] Process not found:', miningTitleNumber);
+        metrics.trackApiCall('ANM', 'not_found', responseTime);
         return {
           source: 'ANM',
           field: 'miningTitleNumber',
@@ -96,13 +101,16 @@ export async function validateWithANM_Real(
       }
       
       if (response.status === 401) {
+        metrics.trackApiCall('ANM', 'error', responseTime);
         throw new Error('ANM API authentication failed. Check ANM_API_KEY.');
       }
       
       if (response.status === 429) {
+        metrics.trackApiCall('ANM', 'error', responseTime);
         throw new Error('ANM API rate limit exceeded. Wait and retry.');
       }
       
+      metrics.trackApiCall('ANM', 'error', responseTime);
       throw new Error(`ANM API error: ${response.status} ${response.statusText}`);
     }
 
@@ -115,6 +123,7 @@ export async function validateWithANM_Real(
 
     // Validate process status
     if (data.situacao !== 'ATIVO') {
+      metrics.trackApiCall('ANM', 'failed', responseTime);
       return {
         source: 'ANM',
         field: 'miningTitleStatus',
@@ -132,6 +141,10 @@ export async function validateWithANM_Real(
 
     // Cache result (Redis - 24h)
     await cacheSet(`anm:process:${miningTitleNumber}`, data, 86400);
+
+    // Track successful API call
+    metrics.trackApiCall('ANM', 'success', responseTime);
+    metrics.trackCacheHit('ANM'); // Will be cached for next request
 
     // Return valid result
     return {
@@ -156,6 +169,9 @@ export async function validateWithANM_Real(
   } catch (error: any) {
     console.error('[ANM] Validation error:', error.message);
     console.error('[ANM] Stack:', error.stack);
+    
+    const errorTime = Date.now() - startTime;
+    metrics.trackApiCall('ANM', 'error', errorTime);
     
     return {
       source: 'ANM',
