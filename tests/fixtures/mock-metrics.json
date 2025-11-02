@@ -1,0 +1,41 @@
+{
+  "ocrStats": {
+    "totalDocuments": 1250,
+    "averageConfidence": 94.5,
+    "successRate": 98.2,
+    "processingTime": 1200,
+    "languagesDetected": {
+      "pt-BR": 650,
+      "en-US": 450,
+      "es-ES": 100,
+      "fr-FR": 50
+    }
+  },
+  "parsingStats": {
+    "totalReports": 856,
+    "averageParseTime": 2500,
+    "fieldsExtracted": 15420,
+    "standardsDistribution": {
+      "JORC_2012": 450,
+      "NI_43_101": 250,
+      "SAMREC_2016": 100,
+      "PERC_2021": 56
+    }
+  },
+  "systemStats": {
+    "responseTime": 125,
+    "uptime": 99.8,
+    "cacheHitRate": 87.5,
+    "memoryUsage": "342MB",
+    "cpuUsage": 45.2,
+    "diskUsage": "12.5GB"
+  },
+  "cacheStats": {
+    "hitRate": 87.5,
+    "totalHits": 8750,
+    "totalMisses": 1250,
+    "memoryUsage": "256MB",
+    "keysStored": 1250,
+    "avgResponseTime": 12
+  }
+}

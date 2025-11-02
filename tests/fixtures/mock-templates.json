@@ -1,0 +1,232 @@
+{
+  "templates": [
+    {
+      "id": "jorc_2012",
+      "name": "JORC 2012",
+      "code": "JORC_2012",
+      "description": "Australasian Joint Ore Reserves Committee Code - The industry standard for reporting of mineral resources and ore reserves in Australia and internationally.",
+      "fullName": "JORC Code 2012 Edition",
+      "region": "Australia, Asia-Pacific",
+      "regulator": "JORC",
+      "country": "Australia",
+      "type": "international",
+      "sections": [
+        {
+          "id": 1,
+          "title": "Sampling Techniques and Data",
+          "code": "section_1",
+          "required": true
+        },
+        {
+          "id": 2,
+          "title": "Reporting of Exploration Results",
+          "code": "section_2",
+          "required": true
+        },
+        {
+          "id": 3,
+          "title": "Estimation and Reporting of Mineral Resources",
+          "code": "section_3",
+          "required": true
+        },
+        {
+          "id": 4,
+          "title": "Estimation and Reporting of Ore Reserves",
+          "code": "section_4",
+          "required": true
+        },
+        {
+          "id": 5,
+          "title": "Competent Person's Statement",
+          "code": "section_5",
+          "required": true
+        }
+      ],
+      "requiredFields": [
+        "competentPerson",
+        "samplingMethod",
+        "drillingTechnique",
+        "resourceEstimation",
+        "oreReserves"
+      ],
+      "reportsCreated": 450,
+      "lastUsed": "2025-11-01T10:30:00Z",
+      "popularity": 95,
+      "version": "2012",
+      "published": "2012-12-20",
+      "updated": "2012-12-20"
+    },
+    {
+      "id": "ni_43_101",
+      "name": "NI 43-101",
+      "code": "NI_43_101",
+      "description": "National Instrument 43-101 Standards of Disclosure for Mineral Projects - Canadian standard for disclosure of scientific and technical information about mineral projects.",
+      "fullName": "National Instrument 43-101",
+      "region": "Canada, Americas",
+      "regulator": "CSA",
+      "country": "Canada",
+      "type": "international",
+      "sections": [
+        {
+          "id": 1,
+          "title": "Summary",
+          "code": "section_1",
+          "required": true
+        },
+        {
+          "id": 2,
+          "title": "Introduction",
+          "code": "section_2",
+          "required": true
+        },
+        {
+          "id": 3,
+          "title": "Property Description and Location",
+          "code": "section_3",
+          "required": true
+        },
+        {
+          "id": 4,
+          "title": "Geology and Mineralization",
+          "code": "section_4",
+          "required": true
+        },
+        {
+          "id": 5,
+          "title": "Mineral Resource Estimates",
+          "code": "section_5",
+          "required": true
+        },
+        {
+          "id": 6,
+          "title": "Mineral Reserve Estimates",
+          "code": "section_6",
+          "required": true
+        },
+        {
+          "id": 7,
+          "title": "Qualified Person's Certificate",
+          "code": "section_7",
+          "required": true
+        }
+      ],
+      "requiredFields": [
+        "qualifiedPerson",
+        "propertyLocation",
+        "mineralResources",
+        "mineralReserves",
+        "qualityAssurance"
+      ],
+      "reportsCreated": 250,
+      "lastUsed": "2025-10-28T14:20:00Z",
+      "popularity": 85,
+      "version": "2016",
+      "published": "2001-02-01",
+      "updated": "2016-06-30"
+    },
+    {
+      "id": "samrec_2016",
+      "name": "SAMREC 2016",
+      "code": "SAMREC",
+      "description": "South African Code for the Reporting of Exploration Results, Mineral Resources and Mineral Reserves - The primary standard for South Africa.",
+      "fullName": "SAMREC Code 2016 Edition",
+      "region": "South Africa, Africa",
+      "regulator": "SAMCODES",
+      "country": "South Africa",
+      "type": "international",
+      "sections": [
+        {
+          "id": 1,
+          "title": "Exploration Results",
+          "code": "section_1",
+          "required": true
+        },
+        {
+          "id": 2,
+          "title": "Mineral Resources",
+          "code": "section_2",
+          "required": true
+        },
+        {
+          "id": 3,
+          "title": "Mineral Reserves",
+          "code": "section_3",
+          "required": true
+        },
+        {
+          "id": 4,
+          "title": "Competent Person's Report",
+          "code": "section_4",
+          "required": true
+        }
+      ],
+      "requiredFields": [
+        "competentPerson",
+        "explorationResults",
+        "mineralResources",
+        "mineralReserves"
+      ],
+      "reportsCreated": 100,
+      "lastUsed": "2025-10-15T09:45:00Z",
+      "popularity": 65,
+      "version": "2016",
+      "published": "2009-07-01",
+      "updated": "2016-05-07"
+    },
+    {
+      "id": "perc_2021",
+      "name": "PERC 2021",
+      "code": "PERC",
+      "description": "Pan-European Reserves and Resources Reporting Committee - European standard for public reporting.",
+      "fullName": "PERC Reporting Standard 2021",
+      "region": "Europe",
+      "regulator": "PERC",
+      "country": "Pan-European",
+      "type": "international",
+      "sections": [
+        {
+          "id": 1,
+          "title": "Introduction and Overview",
+          "code": "section_1",
+          "required": true
+        },
+        {
+          "id": 2,
+          "title": "Exploration Results",
+          "code": "section_2",
+          "required": true
+        },
+        {
+          "id": 3,
+          "title": "Mineral Resources",
+          "code": "section_3",
+          "required": true
+        },
+        {
+          "id": 4,
+          "title": "Mineral Reserves",
+          "code": "section_4",
+          "required": true
+        },
+        {
+          "id": 5,
+          "title": "Competent Person's Declaration",
+          "code": "section_5",
+          "required": true
+        }
+      ],
+      "requiredFields": [
+        "competentPerson",
+        "explorationData",
+        "resourceEstimation",
+        "reserveEstimation"
+      ],
+      "reportsCreated": 56,
+      "lastUsed": "2025-09-20T16:00:00Z",
+      "popularity": 45,
+      "version": "2021",
+      "published": "2021-06-01",
+      "updated": "2021-06-01"
+    }
+  ]
+}
