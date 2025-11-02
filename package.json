@@ -1,6 +1,7 @@
 {
-  "name": "jorc-intelligence-v2",
-  "version": "1.0.0",
+  "name": "qivo-mining-intelligence",
+  "version": "2.0.0",
+  "description": "QIVO Mining Intelligence Platform - Regulatory Compliance & AI-Powered Reports",
   "type": "module",
   "license": "MIT",
   "scripts": {

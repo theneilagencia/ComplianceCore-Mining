@@ -1,0 +1,72 @@
+╔════════════════════════════════════════════════════════════════╗
+║          QIVO - Status dos Ambientes Render                   ║
+║                  Data: 2025-11-02 18:42                       ║
+╚════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🟢 AMBIENTE PRODUÇÃO (OFICIAL)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+URL: https://qivo-mining.onrender.com
+Status: ✅ ONLINE e FUNCIONAL
+Stack: Node.js 24.x + TypeScript + Express + React 19
+Build: pnpm install && bash build.sh
+Start: node dist/index.js
+Deploy: Automático (push to main)
+Último Deploy: 2025-11-02 18:37 (commit 14d92ad)
+Validação QA: 100% (3/3 rotas)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  AMBIENTE LEGADO (DESATUALIZADO)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+URL: https://jorc-intelligence.onrender.com
+Status: 🟡 ONLINE mas com deploy falhando
+Stack: Flask 3.0.3 + Python 3.13 (landing page antiga)
+Build: pip install -r requirements.txt
+Start: cd src && uvicorn main:app ❌ (uvicorn not found)
+Último Deploy: 2025-11-02 18:38 (FALHOU - exit 127)
+Versão: Código antigo/desatualizado (não é React SPA)
+
+PROBLEMA:
+- Deploy configurado para FastAPI/Uvicorn
+- Build instala Flask (sem uvicorn)
+- Comando start falha: "uvicorn: command not found"
+- Site online é deploy ANTERIOR que ainda funciona
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 AÇÃO RECOMENDADA: Desativar jorc-intelligence
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+MOTIVO:
+1. ❌ Deploy falhando constantemente
+2. ❌ Stack desatualizada (Flask landing page)
+3. ❌ Código não sincronizado com repositório atual
+4. ✅ qivo-mining.onrender.com é o ambiente oficial
+
+PASSOS PARA DESATIVAR:
+1. Acessar: https://dashboard.render.com
+2. Selecionar serviço: "jorc-intelligence"
+3. Settings → Suspend Service (pausar)
+   OU
+   Settings → Delete Service (deletar permanentemente)
+
+ALTERNATIVA - Configurar Redirect:
+Se quiser manter domínio, configurar redirect 301:
+  jorc-intelligence.onrender.com → qivo-mining.onrender.com
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✅ CONCLUSÃO
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+PRODUÇÃO OFICIAL: qivo-mining.onrender.com ✅
+- Deploy: Funcionando
+- Stack: Atualizada (Node.js/React)
+- QA: 100% validado
+
+AMBIENTE LEGADO: jorc-intelligence.onrender.com ⚠️
+- Deploy: Falhando
+- Stack: Desatualizada (Flask)
+- Recomendação: DESATIVAR
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
