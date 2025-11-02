@@ -39,3 +39,6 @@ export const appRouter = router({
 });
 
 export type AppRouter = typeof appRouter;
+
+// Module load detection
+console.log('MODULE LOAD: server/routers.ts loaded -', new Date().toISOString());

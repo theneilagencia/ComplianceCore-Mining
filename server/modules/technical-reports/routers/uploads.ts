@@ -16,6 +16,9 @@ import {
  * ETAPA 2: Router de Uploads e Revisão Humana
  */
 
+// Indicate module load to detect which code is executed at runtime
+console.log('MODULE LOAD: server/modules/technical-reports/routers/uploads.ts (source) -', new Date().toISOString());
+
 export const uploadsRouter = router({
   /**
    * Iniciar upload de arquivo externo
@@ -201,12 +204,14 @@ export const uploadsRouter = router({
         const finalS3Url = `/api/storage/download/${encodeURIComponent(input.s3Key)}`;
         
         // Log para debug - será visível no terminal
+        console.log('🚨🚨🚨 COMPLETE MUTATION EXECUTANDO 🚨🚨🚨');
         console.log('='.repeat(80));
-        console.log('[UPLOAD-FIX] Upload ID:', input.uploadId);
-        console.log('[UPLOAD-FIX] s3Key recebido:', input.s3Key);
-        console.log('[UPLOAD-FIX] s3Url CONSTRUÍDO:', finalS3Url);
-        console.log('[UPLOAD-FIX] Salvando no banco...');
+        console.log('[UPLOAD-FIX-v2] Upload ID:', input.uploadId);
+        console.log('[UPLOAD-FIX-v2] s3Key recebido:', input.s3Key);
+        console.log('[UPLOAD-FIX-v2] s3Url CONSTRUÍDO:', finalS3Url);
+        console.log('[UPLOAD-FIX-v2] Salvando no banco...');
         console.log('='.repeat(80));
+        console.log('🚨🚨🚨 COMPLETE MUTATION EXECUTANDO 🚨🚨🚨');
         
         await db
           .update(uploads)
