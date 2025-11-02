@@ -1,25 +1,17 @@
 """
-Radar AI - FastAPI Routes
-==========================
+Radar AI - Flask Routes
+========================
 Endpoints REST para monitoramento regulatório global.
 
 Author: QIVO Intelligence Platform
-Version: 5.0.0
-Date: 2025-11-01
+Version: 5.1.0
+Date: 2025-11-02
 """
 
 import time
 from datetime import datetime, timezone
 from typing import Optional
-from fastapi import APIRouter, HTTPException, status
-from fastapi.responses import JSONResponse
-
-# Flask imports para compatibilidade
-try:
-    from flask import Blueprint as FlaskBlueprint, jsonify as flask_jsonify
-    FLASK_AVAILABLE = True
-except ImportError:
-    FLASK_AVAILABLE = False
+from flask import Blueprint, jsonify, request
 
 # Imports locais
 from app.modules.radar.schemas import (
@@ -46,33 +38,20 @@ def get_radar():
             from src.ai.core.radar.engine import get_radar_engine
             _radar_engine = get_radar_engine()
         except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail=f"Erro ao inicializar Radar Engine: {str(e)}"
-            )
+            raise RuntimeError(f"Erro ao inicializar Radar Engine: {str(e)}")
     return _radar_engine
 
 
 # ============================================
-# FASTAPI ROUTER
+# FLASK BLUEPRINT
 # ============================================
 
-router = APIRouter(
-    prefix="/api/radar",
-    tags=["Radar AI"],
-    responses={
-        500: {"description": "Internal server error"},
-        400: {"description": "Bad request"}
-    }
-)
+radar_bp = Blueprint("radar", __name__, url_prefix="/api/radar")
 
 
-@router.post(
-    "/analyze",
-    response_model=RadarResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Executar análise de monitoramento regulatório",
-    description="""
+@radar_bp.route("/analyze", methods=["POST"])
+def analyze_regulatory_changes():
+    """
     Executa ciclo completo de monitoramento regulatório:
     - Busca dados de fontes oficiais (ANM, JORC, NI43-101, PERC, SAMREC)
     - Detecta mudanças e riscos emergentes
@@ -81,37 +60,33 @@ router = APIRouter(
     - Opcional: análise profunda com GPT-4o
     - Opcional: resumo executivo
     
-    **Performance esperada:**
+    Performance esperada:
     - Sem deep: ~1-2 segundos
     - Com deep: ~3-7 segundos
     - Com summarize: +2-4 segundos
     """
-)
-async def analyze_regulatory_changes(request: RadarRequest):
-    """
-    Endpoint principal para análise de mudanças regulatórias.
-    
-    Args:
-        request: RadarRequest com sources, deep, summarize
-        
-    Returns:
-        RadarResponse com timestamp, alerts, e opcional executive_summary
-        
-    Raises:
-        HTTPException 400: Requisição inválida
-        HTTPException 500: Erro interno
-    """
     start_time = time.time()
     
     try:
+        # Parse request JSON
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Request body is required"}), 400
+        
         radar = get_radar()
         
-        # Executa ciclo de monitoramento
-        result = await radar.run_cycle(
-            sources=request.sources,
-            deep=request.deep,
-            summarize=request.summarize
-        )
+        # Extrai parâmetros do request
+        sources = data.get("sources", None)
+        deep = data.get("deep", False)
+        summarize = data.get("summarize", False)
+        
+        # Executa ciclo de monitoramento (síncron se engine não for async)
+        import asyncio
+        result = asyncio.run(radar.run_cycle(
+            sources=sources,
+            deep=deep,
+            summarize=summarize
+        ))
         
         # Calcula tempo de processamento
         processing_time = round(time.time() - start_time, 2)
@@ -130,27 +105,18 @@ async def analyze_regulatory_changes(request: RadarRequest):
         if "executive_summary" in result:
             response_data["executive_summary"] = result["executive_summary"]
         
-        return RadarResponse(**response_data)
+        return jsonify(response_data), 200
         
     except ValueError as e:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Dados inválidos: {str(e)}"
-        )
+        return jsonify({"error": f"Dados inválidos: {str(e)}"}), 400
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erro ao executar análise: {str(e)}"
-        )
+        return jsonify({"error": f"Erro ao executar análise: {str(e)}"}), 500
 
 
-@router.get(
-    "/sources",
-    response_model=AllSourcesResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Listar todas as fontes regulatórias suportadas",
-    description="""
-    Retorna lista completa de fontes regulatórias monitoradas:
+@radar_bp.route("/sources", methods=["GET"])
+def list_sources():
+    """
+    Lista todas as fontes regulatórias suportadas:
     - ANM (Brasil)
     - JORC (Austrália)
     - NI43-101 (Canadá)
@@ -158,14 +124,6 @@ async def analyze_regulatory_changes(request: RadarRequest):
     - SAMREC (África do Sul)
     
     Cada fonte inclui metadados completos, versão atual e data da última atualização.
-    """
-)
-async def list_sources():
-    """
-    Lista todas as fontes regulatórias suportadas com metadados.
-    
-    Returns:
-        AllSourcesResponse com lista de fontes e metadados
     """
     try:
         radar = get_radar()
@@ -176,116 +134,86 @@ async def list_sources():
             metadata_dict = radar.get_source_metadata(source_name)
             
             if metadata_dict:
-                # Converte dict para SourceMetadata
-                metadata = SourceMetadata(**metadata_dict)
-                
                 # Busca versão atual (simulada)
                 version = radar._get_source_version(source_name)
                 
-                source_info = SourceInfoResponse(
-                    source=source_name,
-                    metadata=metadata,
-                    current_version=version,
-                    last_update=None  # Seria obtido de cache real
-                )
+                source_info = {
+                    "source": source_name,
+                    "metadata": metadata_dict,
+                    "current_version": version,
+                    "last_update": None  # Seria obtido de cache real
+                }
                 sources_info.append(source_info)
         
-        return AllSourcesResponse(
-            total=len(sources_info),
-            sources=sources_info
-        )
+        return jsonify({
+            "total": len(sources_info),
+            "sources": sources_info
+        }), 200
         
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erro ao listar fontes: {str(e)}"
-        )
+        return jsonify({"error": f"Erro ao listar fontes: {str(e)}"}), 500
 
 
-@router.get(
-    "/sources/{source_name}",
-    response_model=SourceInfoResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Obter informações de uma fonte específica",
-    description="Retorna metadados detalhados de uma fonte regulatória específica."
-)
-async def get_source_info(source_name: str):
+@radar_bp.route("/sources/<source_name>", methods=["GET"])
+def get_source_info(source_name: str):
     """
     Retorna informações detalhadas sobre uma fonte específica.
     
     Args:
         source_name: Nome da fonte (ANM, JORC, NI43-101, PERC, SAMREC)
-        
-    Returns:
-        SourceInfoResponse com metadados completos
-        
-    Raises:
-        HTTPException 404: Fonte não encontrada
     """
     try:
         radar = get_radar()
         metadata_dict = radar.get_source_metadata(source_name)
         
         if not metadata_dict:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail=f"Fonte '{source_name}' não encontrada. Fontes válidas: {radar.get_supported_sources()}"
-            )
+            return jsonify({
+                "error": f"Fonte '{source_name}' não encontrada. Fontes válidas: {radar.get_supported_sources()}"
+            }), 404
         
-        metadata = SourceMetadata(**metadata_dict)
         version = radar._get_source_version(source_name)
         
-        return SourceInfoResponse(
-            source=source_name,
-            metadata=metadata,
-            current_version=version,
-            last_update=None
-        )
+        return jsonify({
+            "source": source_name,
+            "metadata": metadata_dict,
+            "current_version": version,
+            "last_update": None
+        }), 200
         
-    except HTTPException:
-        raise
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erro ao obter informações: {str(e)}"
-        )
+        return jsonify({"error": f"Erro ao obter informações: {str(e)}"}), 500
 
 
-@router.post(
-    "/compare",
-    response_model=ComparisonResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Comparar duas fontes regulatórias",
-    description="""
+@radar_bp.route("/compare", methods=["POST"])
+def compare_sources():
+    """
     Compara duas fontes regulatórias identificando:
     - Diferenças principais
     - Similaridades
     - Score de compatibilidade (0-1)
     - Opcional: análise detalhada com GPT-4o
     """
-)
-async def compare_sources(request: ComparisonRequest):
-    """
-    Compara duas fontes regulatórias.
-    
-    Args:
-        request: ComparisonRequest com source1, source2, deep
-        
-    Returns:
-        ComparisonResponse com diferenças, similaridades, score
-    """
     try:
+        # Parse request JSON
+        data = request.get_json()
+        if not data:
+            return jsonify({"error": "Request body is required"}), 400
+        
+        source1 = data.get("source1")
+        source2 = data.get("source2")
+        deep = data.get("deep", False)
+        
+        if not source1 or not source2:
+            return jsonify({"error": "source1 and source2 are required"}), 400
+        
         radar = get_radar()
         
         # Valida que as fontes existem
-        meta1 = radar.get_source_metadata(request.source1)
-        meta2 = radar.get_source_metadata(request.source2)
+        meta1 = radar.get_source_metadata(source1)
+        meta2 = radar.get_source_metadata(source2)
         
         if not meta1 or not meta2:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Uma ou ambas as fontes não foram encontradas"
-            )
+            return jsonify({"error": "Uma ou ambas as fontes não foram encontradas"}), 404
         
         # Análise básica de diferenças
         differences = []
@@ -319,20 +247,21 @@ async def compare_sources(request: ComparisonRequest):
             compatibility = 0.0
         
         response_data = {
-            "source1": request.source1,
-            "source2": request.source2,
+            "source1": source1,
+            "source2": source2,
             "differences": differences if differences else ["Nenhuma diferença significativa detectada"],
             "similarities": similarities if similarities else ["Nenhuma similaridade detectada"],
             "compatibility_score": round(compatibility, 2)
         }
         
         # Análise profunda com GPT se solicitado
-        if request.deep and radar.client:
+        if deep and radar.client:
             try:
                 import json
+                import asyncio
                 context = json.dumps({
-                    "source1": {"name": request.source1, **meta1},
-                    "source2": {"name": request.source2, **meta2}
+                    "source1": {"name": source1, **meta1},
+                    "source2": {"name": source2, **meta2}
                 }, indent=2, ensure_ascii=False)
                 
                 prompt = f"""Você é um especialista em regulamentação de mineração internacional.
@@ -348,7 +277,7 @@ Inclua:
 
 Seja técnico e objetivo (2-3 parágrafos)."""
 
-                response = await radar.client.chat.completions.create(
+                gpt_response = asyncio.run(radar.client.chat.completions.create(
                     model="gpt-4o",
                     messages=[
                         {"role": "system", "content": "Você é um analista de compliance regulatório."},
@@ -356,37 +285,24 @@ Seja técnico e objetivo (2-3 parágrafos)."""
                     ],
                     temperature=0.3,
                     max_tokens=600
-                )
+                ))
                 
-                response_data["analysis"] = response.choices[0].message.content.strip()
+                response_data["analysis"] = gpt_response.choices[0].message.content.strip()
                 
             except Exception as e:
                 response_data["analysis"] = f"Erro ao gerar análise GPT: {str(e)}"
         
-        return ComparisonResponse(**response_data)
+        return jsonify(response_data), 200
         
-    except HTTPException:
-        raise
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erro ao comparar fontes: {str(e)}"
-        )
+        return jsonify({"error": f"Erro ao comparar fontes: {str(e)}"}), 500
 
 
-@router.get(
-    "/health",
-    response_model=HealthResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Verificar status do Radar AI",
-    description="Health check com status de componentes e disponibilidade de recursos."
-)
-async def health_check():
+@radar_bp.route("/health", methods=["GET"])
+def health_check():
     """
     Verifica saúde do módulo Radar AI.
-    
-    Returns:
-        HealthResponse com status, versão, componentes disponíveis
+    Health check com status de componentes e disponibilidade de recursos.
     """
     try:
         radar = get_radar()
@@ -402,46 +318,39 @@ async def health_check():
         else:
             overall_status = "unhealthy"
         
-        return HealthResponse(
-            module="Radar AI",
-            status=overall_status,
-            version="5.0.0",
-            sources_available=sources_count,
-            gpt_enabled=gpt_available,
-            uptime=None,  # Seria calculado com start time
-            last_check=datetime.now(timezone.utc).isoformat()
-        )
+        return jsonify({
+            "module": "Radar AI",
+            "status": overall_status,
+            "version": "5.1.0",
+            "sources_available": sources_count,
+            "gpt_enabled": gpt_available,
+            "uptime": None,  # Seria calculado com start time
+            "last_check": datetime.now(timezone.utc).isoformat()
+        }), 200
         
     except Exception as e:
-        return HealthResponse(
-            module="Radar AI",
-            status="unhealthy",
-            version="5.0.0",
-            sources_available=0,
-            gpt_enabled=False,
-            last_check=datetime.now(timezone.utc).isoformat()
-        )
+        return jsonify({
+            "module": "Radar AI",
+            "status": "unhealthy",
+            "version": "5.1.0",
+            "sources_available": 0,
+            "gpt_enabled": False,
+            "error": str(e),
+            "last_check": datetime.now(timezone.utc).isoformat()
+        }), 500
 
 
-@router.get(
-    "/capabilities",
-    response_model=CapabilitiesResponse,
-    status_code=status.HTTP_200_OK,
-    summary="Listar capacidades do Radar AI",
-    description="Retorna lista completa de features, fontes suportadas e limites."
-)
-async def get_capabilities():
+@radar_bp.route("/capabilities", methods=["GET"])
+def get_capabilities():
     """
     Lista todas as capacidades e features do Radar AI.
-    
-    Returns:
-        CapabilitiesResponse com features, fontes, níveis de severidade
+    Retorna lista completa de features, fontes suportadas e limites.
     """
     try:
         radar = get_radar()
         
-        return CapabilitiesResponse(
-            features=[
+        return jsonify({
+            "features": [
                 "Monitoramento multi-fonte em tempo real",
                 "Detecção automática de mudanças regulatórias",
                 "Análise semântica com GPT-4o",
@@ -452,58 +361,31 @@ async def get_capabilities():
                 "Cache inteligente de versões",
                 "Recomendações de ação automatizadas"
             ],
-            supported_sources=radar.get_supported_sources(),
-            severity_levels=["Low", "Medium", "High", "Critical"],
-            max_sources_per_request=5,
-            deep_analysis_available=radar.client is not None
-        )
+            "supported_sources": radar.get_supported_sources(),
+            "severity_levels": ["Low", "Medium", "High", "Critical"],
+            "max_sources_per_request": 5,
+            "deep_analysis_available": radar.client is not None
+        }), 200
         
     except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Erro ao obter capabilities: {str(e)}"
-        )
+        return jsonify({"error": f"Erro ao obter capabilities: {str(e)}"}), 500
 
 
 # ============================================
-# FLASK BLUEPRINT (Compatibilidade)
+# STATUS ENDPOINT (Compatibilidade)
 # ============================================
 
-if FLASK_AVAILABLE:
-    radar_bp = FlaskBlueprint("radar", __name__)
-    
-    @radar_bp.route("/status", methods=["GET"])
-    def radar_status():
-        """Endpoint Flask para compatibilidade com app/__init__.py"""
-        return flask_jsonify({
-            "module": "Radar AI",
-            "status": "ativo ✅",
-            "version": "5.0.0",
-            "features": [
-                "Monitoramento multi-fonte",
-                "Análise GPT-4o",
-                "Classificação de severidade",
-                "Resumos executivos"
-            ]
-        })
-    
-    @radar_bp.route("/health", methods=["GET"])
-    def radar_health_flask():
-        """Health check para Flask"""
-        try:
-            radar = get_radar()
-            sources = len(radar.get_supported_sources())
-            gpt = radar.client is not None
-            
-            return flask_jsonify({
-                "module": "Radar AI",
-                "status": "healthy" if (sources == 5 and gpt) else "degraded",
-                "sources_available": sources,
-                "gpt_enabled": gpt
-            })
-        except Exception as e:
-            return flask_jsonify({
-                "module": "Radar AI",
-                "status": "unhealthy",
-                "error": str(e)
-            }), 500
+@radar_bp.route("/status", methods=["GET"])
+def radar_status():
+    """Endpoint para status simplificado do módulo"""
+    return jsonify({
+        "module": "Radar AI",
+        "status": "ativo ✅",
+        "version": "5.1.0",
+        "features": [
+            "Monitoramento multi-fonte",
+            "Análise GPT-4o",
+            "Classificação de severidade",
+            "Resumos executivos"
+        ]
+    }), 200
