@@ -1,10 +1,12 @@
 # QIVO Mining Platform
 
-[![Tests](https://github.com/theneilagencia/ComplianceCore-Mining/actions/workflows/test.yml/badge.svg)](https://github.com/theneilagencia/ComplianceCore-Mining/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/theneilagencia/ComplianceCore-Mining/branch/main/graph/badge.svg)](https://codecov.io/gh/theneilagencia/ComplianceCore-Mining)
+[![CI Tests](https://github.com/theneilagencia/ComplianceCore-Mining/actions/workflows/ci-tests.yml/badge.svg)](https://github.com/theneilagencia/ComplianceCore-Mining/actions/workflows/ci-tests.yml)
+[![E2E Tests](https://github.com/theneilagencia/ComplianceCore-Mining/actions/workflows/e2e-tests.yml/badge.svg)](https://github.com/theneilagencia/ComplianceCore-Mining/actions/workflows/e2e-tests.yml)
+[![codecov](https://codecov.io/gh/theneilagencia/ComplianceCore-Mining/branch/main/graph/badge.svg?token=YOUR_TOKEN)](https://codecov.io/gh/theneilagencia/ComplianceCore-Mining)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js Version](https://img.shields.io/badge/node-22.x-brightgreen.svg)](https://nodejs.org/)
+[![Node.js Version](https://img.shields.io/badge/node-20.x-brightgreen.svg)](https://nodejs.org/)
 [![pnpm](https://img.shields.io/badge/pnpm-10.x-orange.svg)](https://pnpm.io/)
+[![Playwright](https://img.shields.io/badge/tested%20with-Playwright-45ba4b.svg)](https://playwright.dev/)
 
 Plataforma inteligente para geração de relatórios técnicos de mineração conforme padrões internacionais (JORC, NI 43-101, CBRR).
 
@@ -36,13 +38,39 @@ Plataforma inteligente para geração de relatórios técnicos de mineração co
 
 ## 📊 Status de Testes
 
-| Suite de Testes | Testes | Status |
-|-----------------|--------|--------|
+### Testes Unitários
+| Suite | Testes | Status |
+|-------|--------|--------|
+| **Audit (KRCI)** | 71 | ✅ 100% |
 | **JORC Mapper** | 26 | ✅ 100% |
 | **Standard Conversion** | 22 | ✅ 100% |
-| **Document Parsing** | 24 | ✅ 100% |
 | **PDF Generation** | 22 | ✅ 100% |
-| **Total** | **94** | ✅ **100%** |
+| **Radar - Data Aggregator** | 20 | ✅ 100% |
+| **Radar - Notifications** | 22 | ✅ 100% |
+| **Radar - Scheduler** | 21 | ✅ 100% |
+| **Radar - SIGMINE Client** | 21 | ✅ 100% |
+| **Radar - MapBiomas Client** | 27 | ✅ 100% |
+| **Radar - DOU Scraper** | 29 | ✅ 100% |
+| **Total Unitários** | **333** | ✅ **100%** |
+
+### Testes E2E (Playwright)
+| Suite | Testes | Browsers |
+|-------|--------|----------|
+| **Authentication** | 8 | 5 |
+| **Upload** | 9 | 5 |
+| **Reports** | 15 | 5 |
+| **Dashboard** | 15 | 5 |
+| **Download** | 13 | 5 |
+| **Total E2E** | **60** × **5** = **295** | ✅ |
+
+### Cobertura de Código
+- **Lines**: ~10%
+- **Functions**: ~14%
+- **Branches**: ~9%
+- **Statements**: ~10%
+- **Meta Sprint 2**: 15-20% (baseline) ✅
+- **Meta Sprint 3**: 40-50% (integração)
+- **Meta Sprint 4**: 70-80% (completo)
 
 ---
 
