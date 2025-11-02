@@ -138,12 +138,18 @@ export const uploadsRouter = router({
         
         const uploadResult = await storagePut(s3Key, buffer, input.contentType);
         console.log('[UploadFile] Upload result:', JSON.stringify(uploadResult, null, 2));
+        console.log('[UploadFile] uploadResult.url:', uploadResult.url);
+        console.log('[UploadFile] uploadResult.key:', uploadResult.key);
 
-        return {
+        const returnValue = {
           s3Url: uploadResult.url,
           s3Key: uploadResult.key,
           provider: uploadResult.provider,
         };
+        
+        console.log('[UploadFile] Returning:', JSON.stringify(returnValue, null, 2));
+        
+        return returnValue;
       } catch (error: any) {
         console.error('[UploadFile] Error:', error);
         console.error('[UploadFile] Stack:', error.stack);
