@@ -133,6 +133,14 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
       
       const s3Url = uploadResult.s3Url;
       const s3Key = uploadResult.s3Key;
+      
+      console.log('[Upload] Preparing completeUpload with:', {
+        uploadId: initResult.uploadId,
+        s3Url,
+        s3Key,
+        s3UrlType: typeof s3Url,
+        s3KeyType: typeof s3Key,
+      });
 
       // Passo 4: Completar upload e iniciar parsing
       setParsing(true);
@@ -143,9 +151,11 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
       const completeResult = await completeUpload.mutateAsync({
         uploadId: initResult.uploadId,
         s3Url: s3Url,
-        s3Key: s3Key, // Adicionar s3Key
-        fileContent: undefined, // Backend vai processar
+        s3Key: s3Key,
+        fileContent: undefined,
       });
+      
+      console.log('[Upload] completeUpload successful');
 
       setParsing(false);
       
