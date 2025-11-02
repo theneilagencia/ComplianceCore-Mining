@@ -384,7 +384,7 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: audit.krcisJson as any[],
+        krcis: audit.krcisJsonJson as any[],
         categoryScores: {},
         recommendations: audit.recommendationsJson as string[],
         executionTime: 0,
@@ -440,7 +440,7 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: audit.krcisJson as any[],
+        krcis: audit.krcisJsonJson as any[],
         categoryScores: {},
         recommendations: audit.recommendationsJson as string[],
         executionTime: 0,
@@ -494,12 +494,15 @@ export const auditRouter = router({
         });
       }
 
-      // Parse report data
+      // Parse report data from parsingSummary
+      const { getParsingSummary } = await import("../types/parsing");
+      const parsingSummary = getParsingSummary(report.parsingSummary);
+      
       const reportData = {
         title: report.title,
-        location: report.location,
-        commodity: report.commodity,
-        sections: report.sectionsJson as any,
+        location: parsingSummary?.location,
+        commodity: parsingSummary?.commodity,
+        sections: parsingSummary?.sections,
       };
 
       // Run AI comparison
@@ -556,8 +559,12 @@ export const auditRouter = router({
         });
       }
 
-      // Parse KRCI results
-      const krcis = (audit.krcis as any) || [];
+      // Parse KRCI results (use krcisJson from schema)
+      const krcis = (audit.krcisJsonJson as any) || [];
+      
+      // Get parsed report summary
+      const { getParsingSummary } = await import("../types/parsing");
+      const parsingSummary = getParsingSummary(report.parsingSummary);
 
       // Generate executive summary
       const summary = await generateExecutiveSummary(
@@ -567,8 +574,8 @@ export const auditRouter = router({
         {
           standard: report.standard,
           title: report.title,
-          location: report.location,
-          commodity: report.commodity,
+          location: parsingSummary?.location,
+          commodity: parsingSummary?.commodity,
         }
       );
 
@@ -623,6 +630,10 @@ export const auditRouter = router({
         });
       }
 
+      // Get parsed report summary
+      const { getParsingSummary } = await import("../types/parsing");
+      const parsingSummary = getParsingSummary(report.parsingSummary);
+
       // Prepare audit data
       const auditData = {
         reportId: audit.reportId,
@@ -631,13 +642,13 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: (audit.krcis as any) || [],
+        krcis: (audit.krcisJsonJson as any) || [],
         createdAt: audit.createdAt,
         reportData: {
           title: report.title,
           standard: report.standard,
-          location: report.location,
-          commodity: report.commodity,
+          location: parsingSummary?.location,
+          commodity: parsingSummary?.commodity,
         },
       };
 
@@ -694,17 +705,21 @@ export const auditRouter = router({
         });
       }
 
-      // Prepare report data for validation
+      // Get parsed report summary
+      const { getParsingSummary } = await import("../types/parsing");
+      const parsingSummary = getParsingSummary(report.parsingSummary);
+
+      // Prepare report data for validation from parsingSummary
       const reportData = {
-        miningTitleNumber: report.miningTitleNumber,
-        commodity: report.commodity,
-        location: report.location,
-        geologicalFormation: report.geologicalFormation,
-        geologicalAge: report.geologicalAge,
-        coordinates: report.coordinates,
-        environmentalLicense: report.environmentalLicense,
-        licenseType: report.licenseType,
-        hasEIA: report.hasEIA,
+        miningTitleNumber: parsingSummary?.miningTitleNumber,
+        commodity: parsingSummary?.commodity,
+        location: parsingSummary?.location,
+        geologicalFormation: parsingSummary?.geologicalFormation,
+        geologicalAge: parsingSummary?.geologicalAge,
+        coordinates: parsingSummary?.coordinates,
+        environmentalLicense: parsingSummary?.environmentalLicense,
+        licenseType: parsingSummary?.licenseType,
+        hasEIA: parsingSummary?.hasEIA,
       };
 
       // Run validation
@@ -732,7 +747,7 @@ export const auditRouter = router({
         });
       }
 
-      const { reports, auditResults } = await import("../../../../drizzle/schema");
+      const { reports, audits: auditsTable } = await import("../../../../drizzle/schema");
 
       // Verify report access
       const [report] = await db
@@ -755,11 +770,11 @@ export const auditRouter = router({
         });
       }
 
-      // Get all audits for this report
+      // Get all audits for this report (using audits table, not auditResults)
       const audits = await db
         .select()
-        .from(auditResults)
-        .where(eq(auditResults.reportId, input.reportId));
+        .from(auditsTable)
+        .where(eq(auditsTable.reportId, input.reportId));
 
       if (audits.length === 0) {
         throw new TRPCError({
@@ -776,7 +791,7 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: audit.krcis || [],
+        krcis: audit.krcisJson || [],
         createdAt: audit.createdAt,
       }));
 
@@ -802,7 +817,7 @@ export const auditRouter = router({
         });
       }
 
-      const { reports, auditResults } = await import("../../../../drizzle/schema");
+      const { reports, audits: auditsTable } = await import("../../../../drizzle/schema");
 
       // Verify report access
       const [report] = await db
@@ -825,11 +840,11 @@ export const auditRouter = router({
         });
       }
 
-      // Get all audits
+      // Get all audits (using audits table, not auditResults)
       const allAudits = await db
         .select()
-        .from(auditResults)
-        .where(eq(auditResults.reportId, input.reportId));
+        .from(auditsTable)
+        .where(eq(auditsTable.reportId, input.reportId));
 
       const previousAudit = allAudits.find((a) => a.id === input.previousAuditId);
       const currentAudit = allAudits.find((a) => a.id === input.currentAuditId);
@@ -849,7 +864,7 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: audit.krcis || [],
+        krcis: audit.krcisJson || [],
         createdAt: audit.createdAt,
       }));
 
@@ -901,7 +916,7 @@ export const auditRouter = router({
         });
       }
 
-      const { reports, auditResults } = await import("../../../../drizzle/schema");
+      const { reports, audits: auditsTable } = await import("../../../../drizzle/schema");
 
       // Verify report access
       const [report] = await db
@@ -924,11 +939,11 @@ export const auditRouter = router({
         });
       }
 
-      // Get all audits
+      // Get all audits (using audits table, not auditResults)
       const audits = await db
         .select()
-        .from(auditResults)
-        .where(eq(auditResults.reportId, input.reportId));
+        .from(auditsTable)
+        .where(eq(auditsTable.reportId, input.reportId));
 
       const historyItems = audits.map((audit) => ({
         auditId: audit.id,
@@ -937,7 +952,7 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: audit.krcis || [],
+        krcis: audit.krcisJson || [],
         createdAt: audit.createdAt,
       }));
 
