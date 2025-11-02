@@ -134,27 +134,26 @@ export const uploadsRouter = router({
 
         // Fazer upload real para storage
         const s3Key = `tenants/${ctx.user.tenantId}/uploads/${input.uploadId}/${input.fileName}`;
-        console.log('[UploadFile] Storage key:', s3Key);
         
         const uploadResult = await storagePut(s3Key, buffer, input.contentType);
         
-        // CRITICAL FIX: SEMPRE retornar URL construída, NUNCA confiar em uploadResult.url
-        // Se uploadResult.url vier errado (path ao invés de URL), isso vai corrigir
-        const correctUrl = uploadResult.url?.startsWith('http') || uploadResult.url?.startsWith('/')
-          ? uploadResult.url
-          : `/api/storage/download/${encodeURIComponent(uploadResult.key)}`;
+        // SOLUÇÃO DEFINITIVA: Usar o s3Key que criamos, não o que vem do storagePut
+        // Construir a URL sempre a partir do s3Key garantido
+        const finalS3Key = s3Key;  // Usar o que criamos, não uploadResult.key
+        const finalS3Url = `/api/storage/download/${encodeURIComponent(finalS3Key)}`;
 
         const returnValue = {
-          s3Url: correctUrl,  // URL CORRIGIDA
-          s3Key: uploadResult.key,  // Key original
-          provider: uploadResult.provider,
+          s3Url: finalS3Url,      // URL construída do s3Key
+          s3Key: finalS3Key,      // Key que criamos
+          provider: uploadResult.provider || 'render-disk',
         };
         
         console.log('█'.repeat(80));
-        console.log('[UPLOAD-FILE-FIX] s3Key:', uploadResult.key);
-        console.log('[UPLOAD-FILE-FIX] url original:', uploadResult.url);
-        console.log('[UPLOAD-FILE-FIX] url CORRIGIDA:', correctUrl);
-        console.log('[UPLOAD-FILE-FIX] Retornando:', JSON.stringify(returnValue, null, 2));
+        console.log('[UPLOAD-FIX-DEFINITIVO] s3Key criado:', finalS3Key);
+        console.log('[UPLOAD-FIX-DEFINITIVO] s3Url construída:', finalS3Url);
+        console.log('[UPLOAD-FIX-DEFINITIVO] uploadResult.key:', uploadResult.key);
+        console.log('[UPLOAD-FIX-DEFINITIVO] uploadResult.url:', uploadResult.url);
+        console.log('[UPLOAD-FIX-DEFINITIVO] RETORNANDO:', JSON.stringify(returnValue, null, 2));
         console.log('█'.repeat(80));
         
         return returnValue;
@@ -172,9 +171,19 @@ export const uploadsRouter = router({
     .input(
       z.object({
         uploadId: z.string(),
-        s3Key: z.string(), // Storage key - URL será construída a partir dele
-        s3Url: z.string().optional(), // Mantido para compatibilidade, mas será ignorado
-        fileContent: z.string().optional(), // Para demonstração, em produção viria do S3
+        s3Key: z.string(), // Storage key obrigatório
+        s3Url: z.string().optional(), // Será ignorado
+        fileContent: z.string().optional(),
+      }).transform((data) => {
+        // TRANSFORM FORÇADO: Sempre construir s3Url a partir do s3Key
+        // Isso garante que mesmo que s3Url venha errado, será corrigido
+        const forcedS3Url = `/api/storage/download/${encodeURIComponent(data.s3Key)}`;
+        console.log('🔧 [TRANSFORM] s3Key:', data.s3Key);
+        console.log('🔧 [TRANSFORM] s3Url FORÇADA:', forcedS3Url);
+        return {
+          ...data,
+          s3Url: forcedS3Url,  // SOBRESCREVER com URL correta
+        };
       })
     )
     .mutation(async ({ ctx, input }) => {
@@ -569,4 +578,5 @@ export const uploadsRouter = router({
       return logs;
     }),
 });
+
 
