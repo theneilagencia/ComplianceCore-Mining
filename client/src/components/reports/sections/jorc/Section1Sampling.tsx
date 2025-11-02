@@ -33,7 +33,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={4}
         value={data.samplingTechniques}
-        onChange={(e) => onChange('section1.samplingTechniques', e.target.value)}
+        onChange={(value) => onChange('section1.samplingTechniques', value)}
         error={errors['section1.samplingTechniques']}
         required
         placeholder="Descreva a natureza e qualidade da amostragem (ex: canais de corte, chips aleatórios, ferramentas especializadas)..."
@@ -47,7 +47,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={3}
         value={data.drillingTechniques}
-        onChange={(e) => onChange('section1.drillingTechniques', e.target.value)}
+        onChange={(value) => onChange('section1.drillingTechniques', value)}
         error={errors['section1.drillingTechniques']}
         required
         placeholder="Tipo de perfuração (ex: core, RC, open-hole hammer, rotary air blast) e detalhes (diâmetro, profundidade, orientação)..."
@@ -60,7 +60,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={3}
         value={data.drillSampleRecovery}
-        onChange={(e) => onChange('section1.drillSampleRecovery', e.target.value)}
+        onChange={(value) => onChange('section1.drillSampleRecovery', value)}
         error={errors['section1.drillSampleRecovery']}
         required
         placeholder="Método de registro e avaliação da recuperação de amostras. Medidas para maximizar a recuperação..."
@@ -74,7 +74,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={3}
         value={data.logging}
-        onChange={(e) => onChange('section1.logging', e.target.value)}
+        onChange={(value) => onChange('section1.logging', value)}
         error={errors['section1.logging']}
         required
         placeholder="Descreva se as amostras foram registradas geologicamente e geotecnicamente com detalhe suficiente..."
@@ -88,7 +88,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={4}
         value={data.subSamplingTechniques}
-        onChange={(e) => onChange('section1.subSamplingTechniques', e.target.value)}
+        onChange={(value) => onChange('section1.subSamplingTechniques', value)}
         error={errors['section1.subSamplingTechniques']}
         required
         placeholder="Se core: cortado ou serrado, quarter/half core. Se non-core: riffled, tube sampled, rotary split. Procedimentos de controle de qualidade..."
@@ -102,7 +102,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={4}
         value={data.qualityOfAssayData}
-        onChange={(e) => onChange('section1.qualityOfAssayData', e.target.value)}
+        onChange={(value) => onChange('section1.qualityOfAssayData', value)}
         error={errors['section1.qualityOfAssayData']}
         required
         placeholder="Natureza, qualidade e adequação dos procedimentos de ensaio e laboratório. Técnica parcial ou total..."
@@ -116,7 +116,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={3}
         value={data.verificationOfSampling}
-        onChange={(e) => onChange('section1.verificationOfSampling', e.target.value)}
+        onChange={(value) => onChange('section1.verificationOfSampling', value)}
         error={errors['section1.verificationOfSampling']}
         required
         placeholder="Verificação de resultados significativos por pessoa independente ou diferente. Uso de gêmeos. Procedimentos de validação de dados..."
@@ -129,7 +129,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={3}
         value={data.locationOfDataPoints}
-        onChange={(e) => onChange('section1.locationOfDataPoints', e.target.value)}
+        onChange={(value) => onChange('section1.locationOfDataPoints', value)}
         error={errors['section1.locationOfDataPoints']}
         required
         placeholder="Precisão e qualidade das pesquisas usadas para localizar furos de sondagem, trincheiras, pontos de amostragem. Sistema de coordenadas..."
@@ -143,7 +143,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={3}
         value={data.dataSpacingAndDistribution}
-        onChange={(e) => onChange('section1.dataSpacingAndDistribution', e.target.value)}
+        onChange={(value) => onChange('section1.dataSpacingAndDistribution', value)}
         error={errors['section1.dataSpacingAndDistribution']}
         required
         placeholder="Espaçamento de dados para relatório de Resultados de Exploração. Se os dados são suficientes para estabelecer continuidade..."
@@ -157,7 +157,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={3}
         value={data.orientationOfData}
-        onChange={(e) => onChange('section1.orientationOfData', e.target.value)}
+        onChange={(value) => onChange('section1.orientationOfData', value)}
         error={errors['section1.orientationOfData']}
         required
         placeholder="Orientação da amostragem em relação à estrutura geológica. Se a orientação introduz viés de amostragem..."
@@ -170,7 +170,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={2}
         value={data.sampleSecurity}
-        onChange={(e) => onChange('section1.sampleSecurity', e.target.value)}
+        onChange={(value) => onChange('section1.sampleSecurity', value)}
         error={errors['section1.sampleSecurity']}
         required
         placeholder="Medidas tomadas para garantir a segurança e integridade das amostras..."
@@ -183,7 +183,7 @@ export const Section1Sampling: React.FC<Section1SamplingProps> = ({
         type="textarea"
         rows={2}
         value={data.auditsOrReviews}
-        onChange={(e) => onChange('section1.auditsOrReviews', e.target.value)}
+        onChange={(value) => onChange('section1.auditsOrReviews', value)}
         error={errors['section1.auditsOrReviews']}
         placeholder="Resultados de quaisquer auditorias ou revisões dos procedimentos de amostragem e ensaio..."
         tooltip="The results of any audits or reviews of sampling techniques and data"

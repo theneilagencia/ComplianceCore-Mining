@@ -140,11 +140,9 @@ function Router() {
           <PrivateRoute><RadarNotificationsPage /></PrivateRoute>
         </Route>
         <Route path="/reports/:reportId/review">
-          {(params) => (
-            <PrivateRoute>
-              <ReviewReport {...params} />
-            </PrivateRoute>
-          )}
+          <PrivateRoute>
+            <ReviewReport />
+          </PrivateRoute>
         </Route>
         {/* Explainability View removed - not in briefing */}
       </Suspense>

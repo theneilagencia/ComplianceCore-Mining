@@ -20,11 +20,11 @@ export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
   const [currentAuditId, setCurrentAuditId] = useState<string>("");
 
   // Get all audits for the report
-  const { data: trends } = trpc.audit.getTrends.useQuery({
+  const { data: trends } = trpc.technicalReports.audit.getTrends.useQuery({
     reportId,
   });
 
-  const { data: comparison, isLoading } = trpc.audit.compareAudits.useQuery(
+  const { data: comparison, isLoading } = trpc.technicalReports.audit.compareAudits.useQuery(
     {
       reportId,
       previousAuditId,
@@ -90,7 +90,7 @@ export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-qivo-primary focus:border-transparent"
             >
               <option value="">Selecione uma auditoria</option>
-              {audits.map((audit, idx) => (
+              {audits.map((audit: { period: string; score: number }, idx: number) => (
                 <option key={idx} value={audit.period}>
                   {audit.period} - Score: {audit.score.toFixed(1)}%
                 </option>
@@ -108,7 +108,7 @@ export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
               className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-qivo-primary focus:border-transparent"
             >
               <option value="">Selecione uma auditoria</option>
-              {audits.map((audit, idx) => (
+              {audits.map((audit: { period: string; score: number }, idx: number) => (
                 <option key={idx} value={audit.period}>
                   {audit.period} - Score: {audit.score.toFixed(1)}%
                 </option>
@@ -186,7 +186,7 @@ export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
               Insights
             </h3>
             <div className="space-y-2">
-              {comparison.insights.map((insight, idx) => (
+              {comparison.insights.map((insight: string, idx: number) => (
                 <div
                   key={idx}
                   className="bg-blue-50 border border-blue-200 rounded-lg p-3 text-blue-900"
@@ -205,7 +205,7 @@ export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
                 Issues Resolvidas ({comparison.comparison.resolvedIssues.length})
               </h3>
               <div className="space-y-2">
-                {comparison.comparison.resolvedIssues.map((issue, idx) => (
+                {comparison.comparison.resolvedIssues.map((issue: { code: string; message: string; severity: string }, idx: number) => (
                   <div
                     key={idx}
                     className="bg-green-50 border border-green-200 rounded-lg p-3"
@@ -241,7 +241,7 @@ export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
                 Novas Issues ({comparison.comparison.newIssues.length})
               </h3>
               <div className="space-y-2">
-                {comparison.comparison.newIssues.map((issue, idx) => (
+                {comparison.comparison.newIssues.map((issue: { code: string; message: string; severity: string }, idx: number) => (
                   <div
                     key={idx}
                     className="bg-red-50 border border-red-200 rounded-lg p-3"
@@ -277,7 +277,7 @@ export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
                 Issues Persistentes ({comparison.comparison.persistentIssues.length})
               </h3>
               <div className="space-y-2">
-                {comparison.comparison.persistentIssues.map((issue, idx) => (
+                {comparison.comparison.persistentIssues.map((issue: { code: string; message: string; severity: string }, idx: number) => (
                   <div
                     key={idx}
                     className="bg-yellow-50 border border-yellow-200 rounded-lg p-3"
@@ -312,7 +312,7 @@ export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
               Histórico de Auditorias
             </h3>
             <div className="space-y-2">
-              {comparison.audits.map((audit, idx) => (
+              {comparison.audits.map((audit: { auditId: string; date: Date; totalIssues: number; score: number }, idx: number) => (
                 <div
                   key={idx}
                   className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
