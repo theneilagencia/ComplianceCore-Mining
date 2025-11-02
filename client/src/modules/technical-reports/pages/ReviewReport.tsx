@@ -6,10 +6,11 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
-import { CheckCircle, AlertTriangle, ArrowRight, Save } from "lucide-react";
+import { CheckCircle, AlertTriangle, ArrowRight, Save, Eye } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation, useParams } from "wouter";
+import LazyPDFViewer from "@/components/PDFViewer.lazy";
 
 export default function ReviewReport() {
  const params = useParams<{ reportId: string }>();
@@ -18,6 +19,7 @@ export default function ReviewReport() {
 
  const [editedValues, setEditedValues] = useState<Record<string, any>>({});
  const [savedFields, setSavedFields] = useState<Set<string>>(new Set());
+ const [showPDFViewer, setShowPDFViewer] = useState(false);
 
  const utils = trpc.useUtils();
 
@@ -276,4 +278,5 @@ export default function ReviewReport() {
  </DashboardLayout>
  );
 }
+
 

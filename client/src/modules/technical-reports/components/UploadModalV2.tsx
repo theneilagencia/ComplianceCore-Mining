@@ -8,9 +8,10 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { Upload, FileText, X, CheckCircle, AlertCircle } from "lucide-react";
+import { Upload, FileText, X, CheckCircle, AlertCircle, Eye } from "lucide-react";
 import { useState, useCallback } from "react";
 import { toast } from "sonner";
+import LazyPDFViewer from "@/components/PDFViewer.lazy";
 
 interface UploadModalV2Props {
   open: boolean;
@@ -21,6 +22,8 @@ export default function UploadModalV2({ open, onClose }: UploadModalV2Props) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [reportId, setReportId] = useState<string | null>(null);
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
   const utils = trpc.useUtils();
   const uploadAndProcess = trpc.technicalReports.uploadsV2.uploadAndProcessReport.useMutation();
@@ -37,6 +40,12 @@ export default function UploadModalV2({ open, onClose }: UploadModalV2Props) {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
       setFile(selectedFile);
+      
+      // Create preview URL if it's a PDF
+      if (selectedFile.type === 'application/pdf') {
+        const url = URL.createObjectURL(selectedFile);
+        setPreviewUrl(url);
+      }
     }
   };
 
@@ -101,13 +110,21 @@ export default function UploadModalV2({ open, onClose }: UploadModalV2Props) {
     if (!uploading) {
       setFile(null);
       setReportId(null);
+      setShowPreview(false);
+      
+      // Clean up preview URL
+      if (previewUrl) {
+        URL.revokeObjectURL(previewUrl);
+        setPreviewUrl(null);
+      }
+      
       onClose();
     }
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className={showPreview ? "max-w-6xl" : "max-w-2xl"}>
         <DialogHeader>
           <DialogTitle>Upload de Relatório Externo (V2)</DialogTitle>
           <DialogDescription>
@@ -115,7 +132,9 @@ export default function UploadModalV2({ open, onClose }: UploadModalV2Props) {
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className={showPreview ? "grid grid-cols-2 gap-6" : "space-y-4"}>
+          {/* Left column / Main content */}
+          <div className="space-y-4">
           {!file ? (
             <div
               onDrop={handleDrop}
@@ -211,21 +230,58 @@ export default function UploadModalV2({ open, onClose }: UploadModalV2Props) {
             </div>
           </div>
 
-          <div className="flex justify-end gap-2">
-            <Button
-              variant="outline"
-              onClick={handleClose}
-              disabled={uploading}
-            >
-              Cancelar
-            </Button>
-            <Button
-              onClick={handleUpload}
-              disabled={!file || uploading}
-            >
-              {uploading ? "Processando..." : "Iniciar Upload"}
-            </Button>
+          <div className="flex justify-between gap-2">
+            <div>
+              {file && file.type === 'application/pdf' && previewUrl && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPreview(!showPreview)}
+                  disabled={uploading}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  {showPreview ? "Ocultar Preview" : "Ver Preview"}
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={handleClose}
+                disabled={uploading}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={handleUpload}
+                disabled={!file || uploading}
+              >
+                {uploading ? "Processando..." : "Iniciar Upload"}
+              </Button>
+            </div>
           </div>
+          </div>
+
+          {/* Right column - PDF Preview */}
+          {showPreview && previewUrl && file?.type === 'application/pdf' && (
+            <div className="border-l pl-6">
+              <h3 className="text-lg font-semibold mb-4">Preview do Documento</h3>
+              <LazyPDFViewer
+                url={previewUrl}
+                title={file.name}
+                maxHeight="600px"
+                enableDownload={false}
+                enableFullscreen={true}
+                onLoadSuccess={(pages) => {
+                  console.log(`Preview loaded: ${pages} pages`);
+                }}
+                onLoadError={(error) => {
+                  toast.error("Erro ao carregar preview", {
+                    description: error.message,
+                  });
+                }}
+              />
+            </div>
+          )}
         </div>
       </DialogContent>
     </Dialog>
