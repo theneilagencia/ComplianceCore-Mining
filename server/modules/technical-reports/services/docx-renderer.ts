@@ -3,6 +3,9 @@
  * 
  * Gera documentos Word (.docx) a partir de relatórios normalizados.
  * Usa a biblioteca 'docx' para criar documentos formatados profissionalmente.
+ * 
+ * @module DOCXRenderer
+ * @sprint SPRINT5-FIX - Added i18n support
  */
 
 import { 
@@ -19,6 +22,7 @@ import {
   Packer,
   PageBreak,
 } from 'docx';
+import { getTranslations, detectLanguageFromMetadata, formatDate, type SupportedLanguage } from './i18n';
 
 export type Standard = 'JORC_2012' | 'NI_43_101' | 'PERC' | 'SAMREC' | 'CBRR';
 
@@ -28,6 +32,8 @@ interface ReportPayload {
   location?: string;
   standard: Standard;
   date?: string;
+  language?: SupportedLanguage;
+  metadata?: any;
   competentPerson?: {
     name: string;
     credentials: string;
@@ -81,6 +87,10 @@ interface ReportPayload {
  * Renderiza um relatório em formato DOCX
  */
 export async function renderDOCX(payload: ReportPayload, standard: Standard): Promise<Buffer> {
+  // Detectar idioma do relatório
+  const language = payload.language || detectLanguageFromMetadata(payload.metadata);
+  const t = getTranslations(language);
+  
   const sections: any[] = [];
 
   // ========================================
@@ -88,7 +98,7 @@ export async function renderDOCX(payload: ReportPayload, standard: Standard): Pr
   // ========================================
   sections.push(
     new Paragraph({
-      text: payload.title || 'Relatório Técnico',
+      text: payload.title || t.technicalReport,
       heading: HeadingLevel.TITLE,
       alignment: AlignmentType.CENTER,
       spacing: {
@@ -97,7 +107,7 @@ export async function renderDOCX(payload: ReportPayload, standard: Standard): Pr
       },
     }),
     new Paragraph({
-      text: `Standard: ${getStandardFullName(standard)}`,
+      text: `${t.standard}: ${getStandardFullName(standard)}`,
       alignment: AlignmentType.CENTER,
       spacing: { after: 200 },
     }),

@@ -39,6 +39,7 @@ export const technicalReportsRouter = router({
           title: z.string().min(5, "Título deve ter no mínimo 5 caracteres"),
           projectName: z.string().optional(),
           location: z.string().optional(),
+          language: z.enum(["pt-BR", "en-US", "es-ES", "fr-FR"]).default("pt-BR"),
           metadata: z.record(z.string(), z.any()).optional(),
         })
       )
@@ -54,6 +55,14 @@ export const technicalReportsRouter = router({
         const { reports } = await import("../../../drizzle/schema");
         const reportId = `rpt_${randomUUID()}`;
 
+        // Preparar parsing summary com idioma e metadata
+        const parsingSummary = {
+          language: input.language,
+          projectName: input.projectName,
+          location: input.location,
+          metadata: input.metadata || {},
+        };
+
         await db.insert(reports).values({
           id: reportId,
           tenantId: ctx.user.tenantId,
@@ -62,12 +71,14 @@ export const technicalReportsRouter = router({
           title: input.title,
           status: "draft",
           sourceType: "internal",
+          parsingSummary: parsingSummary as any,
         });
 
         return {
           reportId,
           standard: input.standard,
           title: input.title,
+          language: input.language,
           status: "draft",
           message: "Relatório criado com sucesso",
         };

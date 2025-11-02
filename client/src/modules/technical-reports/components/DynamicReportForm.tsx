@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/select';
 import { getSchemaByStandard, getAllStandards, type FieldDefinition } from '../schemas/standardSchemasExpanded';
 import ReportPreview from './ReportPreview';
-import { HelpCircle } from 'lucide-react';
+import { HelpCircle, Globe } from 'lucide-react';
 import {
   Tooltip,
   TooltipContent,
@@ -28,6 +28,7 @@ interface DynamicReportFormProps {
 
 export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReportFormProps) {
   const [standard, setStandard] = useState<string>('NI_43_101');
+  const [language, setLanguage] = useState<string>('pt-BR');
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [showPreview, setShowPreview] = useState<boolean>(false);
 
@@ -62,6 +63,7 @@ export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReport
 
     onSubmit({
       standard,
+      language,
       ...formData,
     });
     setShowPreview(false);
@@ -156,22 +158,45 @@ export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReport
       {/* Standard Selector */}
       <Card className="p-6">
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="standard" className="text-lg font-semibold">
-              Padrão Internacional
-            </Label>
-            <Select value={standard} onValueChange={setStandard}>
-              <SelectTrigger className="mt-2">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {standards.map((std) => (
-                  <SelectItem key={std.code} value={std.code}>
-                    {std.name} ({std.description})
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <Label htmlFor="standard" className="text-lg font-semibold">
+                Padrão Internacional
+              </Label>
+              <Select value={standard} onValueChange={setStandard}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {standards.map((std) => (
+                    <SelectItem key={std.code} value={std.code}>
+                      {std.name} ({std.description})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div>
+              <Label htmlFor="language" className="text-lg font-semibold flex items-center gap-2">
+                <Globe className="h-4 w-4" />
+                Idioma do Relatório
+              </Label>
+              <Select value={language} onValueChange={setLanguage}>
+                <SelectTrigger className="mt-2">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pt-BR">🇧🇷 Português (Brasil)</SelectItem>
+                  <SelectItem value="en-US">🇺🇸 English (US)</SelectItem>
+                  <SelectItem value="es-ES">🇪🇸 Español</SelectItem>
+                  <SelectItem value="fr-FR">🇫🇷 Français</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-sm text-muted-foreground mt-1">
+                Define o idioma usado na geração do relatório e exportações
+              </p>
+            </div>
           </div>
 
           {/* Standard Description */}
