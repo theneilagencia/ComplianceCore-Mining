@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { createServer } from "http";
 import net from "net";
+import rateLimit from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import paymentRouter from "../modules/payment/router";
@@ -101,6 +102,36 @@ async function startServer() {
   // Cookie parser for reading cookies
   app.use(cookieParser());
   
+  // Rate limiting - General API protection
+  const generalLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 100, // Máximo 100 requisições por IP por janela
+    message: 'Muitas requisições deste IP, tente novamente em 15 minutos',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  
+  // Rate limiting - Strict para uploads
+  const uploadLimiter = rateLimit({
+    windowMs: 60 * 60 * 1000, // 1 hora
+    max: 20, // Máximo 20 uploads por IP por hora
+    message: 'Limite de uploads excedido, tente novamente em 1 hora',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  
+  // Rate limiting - Muito strict para autenticação
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutos
+    max: 5, // Máximo 5 tentativas de login por IP
+    message: 'Muitas tentativas de login, tente novamente em 15 minutos',
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+  
+  // Aplicar rate limiting geral a todas as rotas /api
+  app.use('/api/', generalLimiter);
+  
   // Health check endpoint
   app.get('/api/health', async (req, res) => {
     try {
@@ -130,9 +161,9 @@ async function startServer() {
   // OAuth callback under /api/oauth/callback
   registerOAuthRoutes(app);
   
-  // Authentication routes
-  app.use("/api/auth", authRouter);
-  app.use("/api/auth", googleHealthRouter);
+  // Authentication routes (com rate limiting strict)
+  app.use("/api/auth", authLimiter, authRouter);
+  app.use("/api/auth", authLimiter, googleHealthRouter);
   
   // Development routes (only in dev mode)
   app.use("/api/dev", devRouter);
@@ -200,7 +231,9 @@ async function startServer() {
   
   // Fix s3Url migration route
   app.use("/api", fixS3UrlRouter);
-  // tRPC API
+  
+  // tRPC API (com rate limiting para uploads)
+  // Note: uploadLimiter será aplicado especificamente no endpoint de upload via tRPC middleware
   app.use(
     "/api/trpc",
     createExpressMiddleware({

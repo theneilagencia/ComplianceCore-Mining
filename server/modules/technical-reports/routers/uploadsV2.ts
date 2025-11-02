@@ -37,6 +37,29 @@ export const uploadsV2Router = router({
         throw new Error(`Invalid user context`);
       }
 
+      // Validação de MIME type permitidos
+      const allowedMimeTypes = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document', // .docx
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
+        'application/msword', // .doc
+        'application/vnd.ms-excel', // .xls
+        'application/zip',
+        'application/x-zip-compressed',
+        'text/plain',
+        'text/csv',
+      ];
+
+      if (!allowedMimeTypes.includes(input.fileType)) {
+        throw new Error(`Tipo de arquivo não permitido: ${input.fileType}. Tipos aceitos: PDF, DOCX, XLSX, DOC, XLS, ZIP, TXT, CSV`);
+      }
+
+      // Validação de tamanho máximo (50MB já configurado no Express, mas validamos aqui também)
+      const maxSizeBytes = 50 * 1024 * 1024; // 50 MB
+      if (input.fileSize > maxSizeBytes) {
+        throw new Error(`Arquivo muito grande: ${(input.fileSize / 1024 / 1024).toFixed(2)}MB. Tamanho máximo: 50MB`);
+      }
+
       const uploadId = `upl_${randomUUID()}`;
       const reportId = `rpt_${randomUUID()}`;
       const s3Key = `tenants/${ctx.user.tenantId}/uploads/${uploadId}/${input.fileName}`;

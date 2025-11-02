@@ -413,7 +413,8 @@ async function generateXLSX(template: any, type: string): Promise<Buffer> {
     worksheet.views = [{ state: 'frozen', ySplit: 1 }];
   }
   
-  return await workbook.xlsx.writeBuffer() as Buffer;
+  const buffer = await workbook.xlsx.writeBuffer();
+  return Buffer.from(buffer);
 }
 
 // ============================================================================
@@ -464,13 +465,26 @@ router.get('/:kind', async (req, res) => {
       });
     }
 
+    // Type guard to check if template has sections
+    const hasMultipleSections = 'sections' in template && Array.isArray(template.sections);
+    const hasSimpleStructure = 'headers' in template && 'data' in template;
+
     // Generate file
     if (format === 'csv') {
-      const csvContent = template.sections 
-        ? generateMultiSectionCSV(template.sections)
-        : generateCSV(template.headers, template.data);
+      let csvContent: string;
       
-      const filename = template.filename_csv || `template_${kind}_${type}.csv`;
+      if (hasMultipleSections) {
+        csvContent = generateMultiSectionCSV(template.sections as any[]);
+      } else if (hasSimpleStructure) {
+        csvContent = generateCSV(template.headers as string[], template.data as string[][]);
+      } else {
+        return res.status(500).json({
+          error: 'Invalid template structure',
+          message: 'Template must have either sections or headers/data'
+        });
+      }
+      
+      const filename = ('filename_csv' in template ? template.filename_csv : `template_${kind}_${type}.csv`) as string;
       
       res.setHeader('Content-Type', 'text/csv; charset=utf-8');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
@@ -478,7 +492,7 @@ router.get('/:kind', async (req, res) => {
       res.send('\ufeff' + csvContent); // UTF-8 BOM
     } else {
       const xlsxBuffer = await generateXLSX(template, kind);
-      const filename = template.filename_xlsx || `template_${kind}_${type}.xlsx`;
+      const filename = ('filename_xlsx' in template ? template.filename_xlsx : `template_${kind}_${type}.xlsx`) as string;
       
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
       res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
