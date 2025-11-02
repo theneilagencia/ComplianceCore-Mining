@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -51,23 +52,30 @@ export default function AuditKRCI() {
   );
 
   // Query para gerar plano de correção
-  const { data: planData } = trpc.technicalReports.audit.correctionPlan.useQuery(
+  const { data: planData, error: planError } = trpc.technicalReports.audit.correctionPlan.useQuery(
     { auditId: auditResult?.auditId || '' },
     {
       enabled: shouldGeneratePlan && !!auditResult?.auditId,
-      onSuccess: (data) => {
-        setCorrectionPlan(data);
-        setShouldGeneratePlan(false);
-        toast.success('Plano de correção gerado!');
-      },
-      onError: (error) => {
-        setShouldGeneratePlan(false);
-        toast.error('Erro ao gerar plano', {
-          description: error.message,
-        });
-      },
     }
   );
+
+  // Handle plan data success/error
+  useEffect(() => {
+    if (planData && shouldGeneratePlan) {
+      setCorrectionPlan(planData);
+      setShouldGeneratePlan(false);
+      toast.success('Plano de correção gerado!');
+    }
+  }, [planData, shouldGeneratePlan]);
+
+  useEffect(() => {
+    if (planError && shouldGeneratePlan) {
+      setShouldGeneratePlan(false);
+      toast.error('Erro ao gerar plano', {
+        description: planError.message,
+      });
+    }
+  }, [planError, shouldGeneratePlan]);
 
   // Mutation para executar auditoria
   const runAudit = trpc.technicalReports.audit.run.useMutation({

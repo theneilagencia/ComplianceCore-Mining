@@ -384,11 +384,11 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: audit.krcisJsonJson as any[],
+        krcis: audit.krcisJson as any[],
         categoryScores: {},
         recommendations: audit.recommendationsJson as string[],
         executionTime: 0,
-      };
+      } as any;
 
       const plan = generateCorrectionPlan(audit.reportId, scanResult);
 
@@ -440,11 +440,11 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: audit.krcisJsonJson as any[],
+        krcis: audit.krcisJson as any[],
         categoryScores: {},
         recommendations: audit.recommendationsJson as string[],
         executionTime: 0,
-      };
+      } as any;
 
       const plan = generateCorrectionPlan(audit.reportId, scanResult);
       const exported = exportCorrectionPlan(plan, input.format);
@@ -560,7 +560,7 @@ export const auditRouter = router({
       }
 
       // Parse KRCI results (use krcisJson from schema)
-      const krcis = (audit.krcisJsonJson as any) || [];
+      const krcis = (audit.krcisJson as any) || [];
       
       // Get parsed report summary
       const { getParsingSummary } = await import("../types/parsing");
@@ -642,15 +642,15 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: (audit.krcisJsonJson as any) || [],
-        createdAt: audit.createdAt,
+        krcis: (audit.krcisJson as any) || [],
+        createdAt: audit.createdAt as Date,
         reportData: {
           title: report.title,
           standard: report.standard,
           location: parsingSummary?.location,
           commodity: parsingSummary?.commodity,
         },
-      };
+      } as any;
 
       // Export with advanced options
       const result = await exportAuditResults(auditData, {
@@ -791,11 +791,11 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: audit.krcisJson || [],
-        createdAt: audit.createdAt,
+        krcis: (audit.krcisJson as any[]) || [],
+        createdAt: audit.createdAt as Date,
       }));
 
-      const trends = await calculateAuditTrends(input.reportId, historyItems);
+      const trends = await calculateAuditTrends(input.reportId, historyItems as any);
       return trends;
     }),
 
@@ -875,8 +875,8 @@ export const auditRouter = router({
         totalRules: previousAudit.totalRules,
         passedRules: previousAudit.passedRules,
         failedRules: previousAudit.failedRules,
-        krcis: previousAudit.krcis || [],
-        createdAt: previousAudit.createdAt,
+        krcis: (previousAudit.krcisJson as any[]) || [],
+        createdAt: previousAudit.createdAt as Date,
       };
 
       const current = {
@@ -886,15 +886,15 @@ export const auditRouter = router({
         totalRules: currentAudit.totalRules,
         passedRules: currentAudit.passedRules,
         failedRules: currentAudit.failedRules,
-        krcis: currentAudit.krcis || [],
-        createdAt: currentAudit.createdAt,
+        krcis: (currentAudit.krcisJson as any[]) || [],
+        createdAt: currentAudit.createdAt as Date,
       };
 
       const comparison = compareAudits(
         input.reportId,
-        previous,
-        current,
-        historyItems
+        previous as any,
+        current as any,
+        historyItems as any
       );
 
       return comparison;
@@ -952,11 +952,11 @@ export const auditRouter = router({
         totalRules: audit.totalRules,
         passedRules: audit.passedRules,
         failedRules: audit.failedRules,
-        krcis: audit.krcisJson || [],
-        createdAt: audit.createdAt,
+        krcis: (audit.krcisJson as any[]) || [],
+        createdAt: audit.createdAt as Date,
       }));
 
-      const statistics = getAuditStatistics(historyItems);
+      const statistics = getAuditStatistics(historyItems as any);
       return statistics;
     }),
 });

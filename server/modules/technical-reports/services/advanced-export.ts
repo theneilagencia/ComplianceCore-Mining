@@ -54,13 +54,13 @@ function generateEnhancedCSV(data: AuditData): string {
   csv += 'Summary by Severity\n';
   csv += 'Severity,Count,Percentage\n';
   
-  const bySeverity = data.krcis.reduce((acc, krci) => {
+  const bySeverity = data.krcis.reduce((acc: any, krci: any) => {
     acc[krci.severity] = (acc[krci.severity] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   Object.entries(bySeverity).forEach(([severity, count]) => {
-    const percentage = ((count / data.krcis.length) * 100).toFixed(1);
+    const percentage = ((Number(count) / data.krcis.length) * 100).toFixed(1);
     csv += `${severity},${count},${percentage}%\n`;
   });
   csv += '\n';
@@ -69,13 +69,13 @@ function generateEnhancedCSV(data: AuditData): string {
   csv += 'Summary by Category\n';
   csv += 'Category,Count,Percentage\n';
   
-  const byCategory = data.krcis.reduce((acc, krci) => {
+  const byCategory = data.krcis.reduce((acc: any, krci: any) => {
     acc[krci.category] = (acc[krci.category] || 0) + 1;
     return acc;
   }, {} as Record<string, number>);
 
   Object.entries(byCategory).forEach(([category, count]) => {
-    const percentage = ((count / data.krcis.length) * 100).toFixed(1);
+    const percentage = ((Number(count) / data.krcis.length) * 100).toFixed(1);
     csv += `${category},${count},${percentage}%\n`;
   });
   csv += '\n';
@@ -206,7 +206,7 @@ export function exportToMarkdown(data: AuditData, options: ExportOptions): strin
 
     md += `### ${getSeverityEmoji(severity)} ${severity.toUpperCase()} (${issues.length})\n\n`;
     
-    issues.forEach((krci, i) => {
+    issues.forEach((krci: any, i: number) => {
       md += `#### ${i + 1}. ${krci.code} - ${krci.message}\n\n`;
       md += `- **Category**: ${krci.category}\n`;
       md += `- **Section**: ${krci.section || 'N/A'}\n`;

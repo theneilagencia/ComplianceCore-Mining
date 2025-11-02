@@ -88,7 +88,7 @@ export async function generateExecutiveSummary(
 
 **Issues by Category**:
 ${Object.entries(krcisByCategory)
-  .map(([category, issues]) => `- ${category}: ${issues.length} issues`)
+  .map(([category, issues]) => `- ${category}: ${(issues as any).length} issues`)
   .join('\n')}
 
 **Sample Issues**:
@@ -257,9 +257,9 @@ function generateFallbackSummary(
   const patterns = Object.entries(krcisByCategory)
     .map(([category, issues]) => ({
       pattern: `Múltiplas issues na categoria ${category}`,
-      occurrences: issues.length,
+      occurrences: (issues as any).length,
       significance:
-        issues.length > 5
+        (issues as any).length > 5
           ? 'Alta - indica problema sistêmico nesta área'
           : 'Média - requer atenção',
     }))
@@ -301,7 +301,7 @@ function generateFallbackSummary(
     patterns,
     insights: [
       `Score KRCI de ${auditScore}% indica ${getOverallStatus(auditScore) === 'excellent' ? 'excelente' : getOverallStatus(auditScore) === 'good' ? 'boa' : 'conformidade moderada'}`,
-      `Categoria com mais issues: ${Object.entries(krcisByCategory).sort((a, b) => b[1].length - a[1].length)[0]?.[0] || 'N/A'}`,
+      `Categoria com mais issues: ${Object.entries(krcisByCategory).sort((a: any, b: any) => (b[1] as any).length - (a[1] as any).length)[0]?.[0] || 'N/A'}`,
     ],
     nextSteps: [
       'Revisar e corrigir todas as não-conformidades identificadas',

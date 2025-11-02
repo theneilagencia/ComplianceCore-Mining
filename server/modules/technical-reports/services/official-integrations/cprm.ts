@@ -6,10 +6,9 @@
  * Rate Limit: 60 requests/minute
  */
 
-import { db } from '../../../../db';
-import { technicalReports, reportFields } from '../../../../db/schema';
+import { getDb } from '../../../../db';
+import { reports } from '../../../../../drizzle/schema';
 import { eq } from 'drizzle-orm';
-import { metrics } from '../../../../monitoring/metrics';
 
 export interface CPRMGeologyResponse {
   latitude: number;
