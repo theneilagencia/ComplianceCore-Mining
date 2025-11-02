@@ -70,38 +70,38 @@ export const uploadsRouter = router({
       
       console.log('[Upload] Inserting upload record:', JSON.stringify(uploadData, null, 2));
       
+      // Usar transação atômica para garantir consistência
       try {
-        await db.insert(uploads).values(uploadData);
-        console.log('[Upload] Upload record inserted successfully');
+        await db.transaction(async (tx) => {
+          // Inserir upload
+          await tx.insert(uploads).values(uploadData);
+          console.log('[Upload] Upload record inserted successfully');
+          
+          // Inserir report
+          const reportData = {
+            id: reportId,
+            tenantId: ctx.user.tenantId,
+            userId: ctx.user.id,
+            sourceType: "external" as const,
+            standard: "JORC_2012" as const,
+            title: input.fileName,
+            status: "parsing" as const,
+          };
+          
+          console.log('[Upload] Inserting report record:', JSON.stringify(reportData, null, 2));
+          await tx.insert(reports).values(reportData);
+          console.log('[Upload] Report record inserted successfully');
+        });
+        
+        console.log('[Upload] Transaction committed successfully');
       } catch (error: any) {
-        console.error('[Upload] Database insert failed:', error);
+        console.error('[Upload] Transaction failed:', error);
         console.error('[Upload] Error details:', {
           message: error.message,
           code: error.code,
           stack: error.stack,
         });
-        throw new Error(`Failed to create upload record: ${error.message}`);
-      }
-
-      // Criar relatório com status parsing
-      const reportData = {
-        id: reportId,
-        tenantId: ctx.user.tenantId,
-        userId: ctx.user.id,
-        sourceType: "external" as const,
-        standard: "JORC_2012" as const, // Será detectado no parsing
-        title: input.fileName,
-        status: "parsing" as const,
-      };
-      
-      console.log('[Upload] Inserting report record:', JSON.stringify(reportData, null, 2));
-      
-      try {
-        await db.insert(reports).values(reportData);
-        console.log('[Upload] Report record inserted successfully');
-      } catch (error: any) {
-        console.error('[Upload] Report insert failed:', error);
-        throw new Error(`Failed to create report record: ${error.message}`);
+        throw new Error(`Failed to create records: ${error.message}`);
       }
 
       return {
