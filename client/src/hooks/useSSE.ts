@@ -49,6 +49,14 @@ export enum SSEEventType {
   CACHE_INVALIDATED = 'cache:invalidated',
   SYSTEM_STATUS = 'system:status',
   
+  // Metrics Events
+  METRICS_UPDATED = 'metrics:updated',
+  
+  // Alert Events
+  ALERT_FIRED = 'alert:fired',
+  ALERT_RESOLVED = 'alert:resolved',
+  ALERT_ACKNOWLEDGED = 'alert:acknowledged',
+  
   // Connection Events
   HEARTBEAT = 'heartbeat',
   CONNECTED = 'connected',
