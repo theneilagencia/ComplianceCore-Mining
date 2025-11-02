@@ -123,6 +123,14 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
 
       console.log('[Upload] File uploaded:', uploadResult);
       
+      // Validar resposta do upload
+      if (!uploadResult || !uploadResult.s3Url || !uploadResult.s3Key) {
+        throw new Error(
+          `Upload incompleto: ${JSON.stringify(uploadResult)}. ` +
+          'Verifique se o storage está configurado (RENDER_DISK_PATH, CLOUDINARY ou FORGE).'
+        );
+      }
+      
       const s3Url = uploadResult.s3Url;
       const s3Key = uploadResult.s3Key;
 
