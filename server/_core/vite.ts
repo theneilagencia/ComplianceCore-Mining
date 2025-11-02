@@ -64,7 +64,18 @@ export function serveStatic(app: Express) {
     );
   }
 
-  app.use(express.static(distPath));
+  // Serve static files with proper cache headers
+  app.use(express.static(distPath, {
+    maxAge: '1h', // Cache assets for 1 hour
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+      // Bust cache for HTML files to ensure new deploys are picked up
+      if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      }
+    }
+  }));
 
   // fall through to index.html if the file doesn't exist (but not for API routes)
   // IMPORTANT: Use middleware without path (not "*") to only catch unhandled routes
