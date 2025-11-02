@@ -123,7 +123,7 @@ async function startServer() {
   // Rate limiting - Muito strict para autenticação
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 5, // Máximo 5 tentativas de login por IP
+    max: 100, // Máximo 100 tentativas de login por IP (aumentado temporariamente)
     message: 'Muitas tentativas de login, tente novamente em 15 minutos',
     standardHeaders: true,
     legacyHeaders: false,
