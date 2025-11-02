@@ -70,55 +70,65 @@ export const uploadsRouter = router({
       
       console.log('[Upload] Inserting upload record:', JSON.stringify(uploadData, null, 2));
       
-      // Usar transação atômica para garantir consistência
+      // Inserir registros sequencialmente (mais robusto que transação)
       try {
-        await db.transaction(async (tx) => {
-          // Inserir upload
-          await tx.insert(uploads).values(uploadData);
-          console.log('[Upload] Upload record inserted successfully');
-          
-          // Inserir report
-          const reportData = {
-            id: reportId,
-            tenantId: ctx.user.tenantId,
-            userId: ctx.user.id,
-            sourceType: "external" as const,
-            standard: "JORC_2012" as const,
-            title: input.fileName,
-            status: "parsing" as const,
-          };
-          
-          console.log('[Upload] Inserting report record:', JSON.stringify(reportData, null, 2));
-          await tx.insert(reports).values(reportData);
-          console.log('[Upload] Report record inserted successfully');
-        });
+        // 1. Inserir report primeiro
+        const reportData = {
+          id: reportId,
+          tenantId: ctx.user.tenantId,
+          userId: ctx.user.id,
+          sourceType: "external" as const,
+          standard: "JORC_2012" as const,
+          title: input.fileName,
+          status: "draft" as const, // Começa como draft, não parsing
+        };
         
-        console.log('[Upload] Transaction committed successfully');
+        console.log('[Upload] Inserting report record:', JSON.stringify(reportData, null, 2));
+        await db.insert(reports).values(reportData);
+        console.log('[Upload] Report record inserted successfully');
+        
+        // 2. Inserir upload depois (referencia o report)
+        console.log('[Upload] Inserting upload record:', JSON.stringify(uploadData, null, 2));
+        await db.insert(uploads).values(uploadData);
+        console.log('[Upload] Upload record inserted successfully');
+        
       } catch (error: any) {
-        console.error('[Upload] Transaction failed:', error);
+        console.error('[Upload] Insert failed:', error);
         console.error('[Upload] Error details:', {
           message: error.message,
           code: error.code,
+          detail: error.detail,
           stack: error.stack,
         });
+        
+        // Tentar limpar registros parciais
+        try {
+          await db.delete(reports).where(eq(reports.id, reportId));
+          await db.delete(uploads).where(eq(uploads.id, uploadId));
+        } catch (cleanupError) {
+          console.error('[Upload] Cleanup failed:', cleanupError);
+        }
+        
         throw new Error(`Failed to create records: ${error.message}`);
       }
 
-      // VERIFICAÇÃO ADICIONAL: Confirmar que o registro foi criado
+      // VERIFICAÇÃO: Confirmar que os registros existem
       try {
         const [uploadCheck] = await db.select().from(uploads).where(eq(uploads.id, uploadId)).limit(1);
         const [reportCheck] = await db.select().from(reports).where(eq(reports.id, reportId)).limit(1);
         
         if (!uploadCheck) {
-          console.error('[Upload] CRITICAL: Upload record not found after transaction!');
+          console.error('[Upload] CRITICAL: Upload record not found!');
           throw new Error('Upload record was not created in database');
         }
         if (!reportCheck) {
-          console.error('[Upload] CRITICAL: Report record not found after transaction!');
+          console.error('[Upload] CRITICAL: Report record not found!');
           throw new Error('Report record was not created in database');
         }
         
-        console.log('[Upload] Verification passed: Both records exist in database');
+        console.log('[Upload] Verification passed: Both records exist');
+        console.log('[Upload] Upload:', JSON.stringify(uploadCheck, null, 2));
+        console.log('[Upload] Report:', JSON.stringify(reportCheck, null, 2));
       } catch (verifyError: any) {
         console.error('[Upload] Verification failed:', verifyError);
         throw new Error(`Database verification failed: ${verifyError.message}`);
