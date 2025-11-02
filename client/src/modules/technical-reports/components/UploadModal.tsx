@@ -134,11 +134,20 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
       const s3Url = uploadResult.s3Url;
       const s3Key = uploadResult.s3Key;
       
+      // FIX CRÍTICO: Se s3Url vier como path ao invés de URL, construir URL correta
+      let finalS3Url = s3Url;
+      if (s3Key && (!s3Url || (!s3Url.startsWith('/') && !s3Url.startsWith('http')))) {
+        // s3Url está vindo como path (ex: tenants/xxx/file.pdf)
+        // Construir URL correta: /api/storage/download/{s3Key_encoded}
+        finalS3Url = `/api/storage/download/${encodeURIComponent(s3Key)}`;
+        console.warn('[Upload] s3Url corrigida de', s3Url, 'para', finalS3Url);
+      }
+      
       console.log('[Upload] Preparing completeUpload with:', {
         uploadId: initResult.uploadId,
-        s3Url,
+        s3Url: finalS3Url,
         s3Key,
-        s3UrlType: typeof s3Url,
+        s3UrlType: typeof finalS3Url,
         s3KeyType: typeof s3Key,
       });
 
@@ -150,7 +159,7 @@ export default function UploadModal({ open, onClose }: UploadModalProps) {
 
       const completeResult = await completeUpload.mutateAsync({
         uploadId: initResult.uploadId,
-        s3Url: s3Url,
+        s3Url: finalS3Url,  // USA A URL CORRIGIDA
         s3Key: s3Key,
         fileContent: undefined,
       });

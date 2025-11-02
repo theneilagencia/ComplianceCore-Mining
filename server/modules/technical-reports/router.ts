@@ -380,3 +380,6 @@ export const technicalReportsRouter = router({
   precertification: precertificationRouter,
 });
 
+// Module load detection
+console.log('MODULE LOAD: server/modules/technical-reports/router.ts loaded -', new Date().toISOString());
+

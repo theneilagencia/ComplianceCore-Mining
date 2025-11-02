@@ -29,6 +29,7 @@ import contactRouter from "../modules/contact/router";
 import storageDownloadRouter from "../routes/storage-download";
 import fixS3UrlRouter from "../routes/fix-s3url";
 import { initStorage } from "../storage-hybrid";
+import { installS3UrlTrigger } from "../install-s3url-trigger";
 import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
 import initDbRouter from "../modules/dev/init-db-router";
@@ -205,6 +206,9 @@ async function startServer() {
     
     // Initialize storage
     await initStorage();
+    
+    // Install database trigger to auto-fix s3Url
+    await installS3UrlTrigger();
     
     // Auto-seed disabled - use POST /api/dev/init to create test users
     if (process.env.NODE_ENV !== 'production') {
