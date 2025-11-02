@@ -4,7 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import { createServer } from "http";
 import net from "net";
-import rateLimit from "express-rate-limit";
+import { rateLimit } from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import paymentRouter from "../modules/payment/router";
