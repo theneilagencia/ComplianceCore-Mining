@@ -1,0 +1,9 @@
+# .renderignore
+# Impede que Render detecte automaticamente Python build
+# Este projeto é Node.js/TypeScript em produção
+requirements.txt
+requirements-ai.txt
+wsgi.py
+pytest.ini
+app/__pycache__
+*.pyc
