@@ -124,45 +124,46 @@ async function renderDOCX(payload: any, toStandard: Standard): Promise<Buffer> {
 }
 
 async function renderXLSX(payload: any, toStandard: Standard): Promise<Buffer> {
-  const wb = XLSX.utils.book_new();
+  // Import our professional XLSX renderer
+  const { renderXLSX: professionalRender } = await import('./xlsx-renderer');
   
-  // Sheet 1: Metadata
-  const metadataData = [
-    ['Padrão', payload.standard],
-    ['Projeto', payload.project_name],
-    ['Empresa', payload.company],
-    ['Data Efetiva', payload.effective_date],
-  ];
-  const ws1 = XLSX.utils.aoa_to_sheet(metadataData);
-  XLSX.utils.book_append_sheet(wb, ws1, 'Metadata');
+  // Transform payload to match expected interface
+  const reportPayload = {
+    title: payload.project_name || 'Relatório Técnico',
+    projectName: payload.project_name,
+    location: payload.location,
+    standard: toStandard,
+    date: payload.effective_date || new Date().toLocaleDateString('pt-BR'),
+    competentPerson: payload.competent_persons?.[0] ? {
+      name: payload.competent_persons[0].name,
+      credentials: payload.competent_persons[0].qualification,
+      organization: payload.competent_persons[0].organization,
+    } : undefined,
+    executiveSummary: payload.executive_summary ? {
+      overview: payload.executive_summary.overview || '',
+      keyFindings: payload.executive_summary.key_findings || [],
+    } : undefined,
+    introduction: payload.introduction,
+    locationAccess: payload.location_access,
+    geology: payload.geology_data,
+    resources: payload.resources_table?.map((r: any) => ({
+      category: r.category,
+      tonnage: r.tonnage,
+      grade: r.grades?.Au || r.grades?.main || 0,
+      contained: r.contained || 0,
+    })),
+    reserves: payload.reserves_table?.map((r: any) => ({
+      category: r.category,
+      tonnage: r.tonnage,
+      grade: r.grades?.Au || r.grades?.main || 0,
+      recoverable: r.recoverable || 0,
+    })),
+    methodology: payload.methodology,
+    economics: payload.economic_assumptions,
+    conclusions: payload.conclusions,
+  };
 
-  // Sheet 2: Resources
-  const resourcesData = [
-    ['Categoria', 'Tonnage', 'Grades', 'Cutoff'],
-    ...payload.resources_table.map((r: any) => [
-      r.category,
-      r.tonnage,
-      JSON.stringify(r.grades),
-      JSON.stringify(r.cutoff),
-    ]),
-  ];
-  const ws2 = XLSX.utils.aoa_to_sheet(resourcesData);
-  XLSX.utils.book_append_sheet(wb, ws2, 'Resources');
-
-  // Sheet 3: Competent Persons
-  const cpData = [
-    ['Nome', 'Qualificação', 'Organização'],
-    ...payload.competent_persons.map((cp: any) => [
-      cp.name,
-      cp.qualification,
-      cp.organization,
-    ]),
-  ];
-  const ws3 = XLSX.utils.aoa_to_sheet(cpData);
-  XLSX.utils.book_append_sheet(wb, ws3, 'Competent Persons');
-
-  const buffer = XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
-  return buffer;
+  return await professionalRender(reportPayload, toStandard);
 }
 
 export async function exportReport(
