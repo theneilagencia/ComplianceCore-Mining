@@ -164,8 +164,8 @@ export const uploadsRouter = router({
     .input(
       z.object({
         uploadId: z.string(),
-        s3Url: z.string().optional(), // URL ou path relativo
-        s3Key: z.string(), // Storage key usado para download
+        s3Key: z.string(), // Storage key - URL será construída a partir dele
+        s3Url: z.string().optional(), // Mantido para compatibilidade, mas será ignorado
         fileContent: z.string().optional(), // Para demonstração, em produção viria do S3
       })
     )
@@ -189,24 +189,16 @@ export const uploadsRouter = router({
         }, null, 2));
         
         // Validar que temos os dados necessários
-        if (!input.s3Url && !input.s3Key) {
-          throw new Error('Neither s3Url nor s3Key provided');
+        if (!input.s3Key) {
+          throw new Error('s3Key is required');
         }
         
-        // Garantir que s3Url seja uma URL válida, não um path
-        let s3UrlToSave: string;
-        if (input.s3Url && input.s3Url.startsWith('/')) {
-          // Já é uma URL relativa válida
-          s3UrlToSave = input.s3Url;
-        } else if (input.s3Url && (input.s3Url.startsWith('http://') || input.s3Url.startsWith('https://'))) {
-          // URL absoluta (Cloudinary, S3, etc)
-          s3UrlToSave = input.s3Url;
-        } else {
-          // Construir URL a partir do s3Key
-          s3UrlToSave = `/api/storage/download/${encodeURIComponent(input.s3Key)}`;
-        }
+        // SOLUÇÃO DEFINITIVA: Sempre construir a URL a partir do s3Key
+        // Isso garante que sempre salvamos uma URL válida, não um path
+        const s3UrlToSave = `/api/storage/download/${encodeURIComponent(input.s3Key)}`;
         
-        console.log('[Complete] s3Url to save:', s3UrlToSave);
+        console.log('[Complete] s3Key received:', input.s3Key);
+        console.log('[Complete] s3Url constructed:', s3UrlToSave);
         console.log('[Complete] Executing update query...');
         
         await db
