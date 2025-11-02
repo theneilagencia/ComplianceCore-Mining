@@ -111,8 +111,19 @@ export const uploadsV2Router = router({
           console.log('[Upload V2] Parsing completed successfully');
         } catch (error) {
           console.error(`[Upload V2] Parsing failed for report ${reportId}:`, error);
-          // Atualizar status do report para 'failed'
-          await db.update(reports).set({ status: "failed" }).where(eq(reports.id, reportId));
+          // Update status to needs_review and store error in parsingSummary
+          await db.update(reports).set({ 
+            status: "needs_review" as any,
+            parsingSummary: { 
+              error: String(error), 
+              failedAt: new Date().toISOString(),
+              detectedStandard: "JORC_2012", // Placeholder
+              confidence: 0,
+              warnings: ["Parsing failed"],
+              totalFields: 0,
+              uncertainFields: 0
+            } as any
+          }).where(eq(reports.id, reportId));
         }
       })();
 
