@@ -18,10 +18,10 @@ RUN pnpm install --frozen-lockfile
 COPY . .
 
 # Build application
-RUN pnpm run build
+RUN bash build.sh
 
-# Expose port
-EXPOSE 3000
+# Expose port (Render uses PORT env var, default to 10000)
+EXPOSE 10000
 
 # Start application
 CMD ["pnpm", "run", "start"]

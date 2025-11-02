@@ -1,33 +1,56 @@
 # ===============================
-# 🚀 QIVO Backend - Render Deploy
+# 🚀 ComplianceCore Mining™ - Render Deploy
 # ===============================
-# Este arquivo instrui o Render sobre como construir e rodar o backend Flask.
-# Ele ignora o frontend React/Vite e usa apenas a raiz onde está o wsgi.py.
+# Node.js/Express + React/Vite Full Stack Application
 
 services:
   - type: web
-    name: qivo-backend
-    env: python
-    plan: free                         # ou "starter" se quiser mais performance
-    region: oregon                     # pode ajustar se quiser outra região
+    name: compliancecore-mining
+    runtime: node
+    env: node
+    plan: free
+    region: oregon
     branch: main
-    rootDir: .                         # raiz do projeto (onde está wsgi.py)
+    rootDir: .
 
     buildCommand: |
-      pip install --upgrade pip
-      pip install -r requirements.txt
-      flask db upgrade || true
+      echo "Installing pnpm..."
+      npm install -g pnpm@10.4.1
+      echo "Installing dependencies..."
+      pnpm install --frozen-lockfile
+      echo "Running build script..."
+      bash build.sh
 
-    startCommand: gunicorn wsgi:app -b 0.0.0.0:10000
+    startCommand: pnpm run start
 
     envVars:
-      - key: FLASK_APP
-        value: wsgi:app
-      - key: FLASK_ENV
+      - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
       - key: DATABASE_URL
-        value: sqlite:///compliance.db
+        sync: false
+      - key: SESSION_SECRET
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_REDIRECT_URI
+        sync: false
       - key: OPENAI_API_KEY
-        sync: false   # define manualmente no painel Render (por segurança)
+        sync: false
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: REDIS_URL
+        sync: false
