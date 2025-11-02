@@ -3,6 +3,8 @@
  * Comprehensive field definitions for each reporting standard
  */
 
+import { SEC_SK_1300_SCHEMA } from './sec-sk-1300-schema';
+
 export interface FieldDefinition {
   name: string;
   label: string;
@@ -1228,6 +1230,8 @@ export function getSchemaByStandard(standardCode: string): StandardSchema {
       return JORC_SCHEMA_EXPANDED;
     case 'NI_43_101':
       return NI_43_101_SCHEMA_EXPANDED;
+    case 'SEC_SK_1300':
+      return SEC_SK_1300_SCHEMA;
     // PERC and SAMREC can use the original schemas for now
     default:
       return JORC_SCHEMA_EXPANDED;
@@ -1240,6 +1244,7 @@ export function getAllStandards() {
     { code: 'NI_43_101', name: 'NI 43-101', description: 'Canadá' },
     { code: 'PERC', name: 'PERC', description: 'Europa' },
     { code: 'SAMREC', name: 'SAMREC', description: 'África do Sul' },
+    { code: 'SEC_SK_1300', name: 'SEC S-K 1300', description: 'Estados Unidos (SEC)' },
   ];
 }
 

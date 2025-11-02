@@ -24,7 +24,7 @@ import {
 } from 'docx';
 import { getTranslations, detectLanguageFromMetadata, formatDate, type SupportedLanguage } from './i18n';
 
-export type Standard = 'JORC_2012' | 'NI_43_101' | 'PERC' | 'SAMREC' | 'CBRR';
+export type Standard = 'JORC_2012' | 'NI_43_101' | 'PERC' | 'SAMREC' | 'CBRR' | 'SEC_SK_1300';
 
 interface ReportPayload {
   title: string;
@@ -671,6 +671,7 @@ function getStandardFullName(standard: Standard): string {
     PERC: 'Pan-European Reserves and Resources Reporting Committee',
     SAMREC: 'South African Mineral Resource Committee',
     CBRR: 'Código Brasileiro de Recursos e Reservas Minerais',
+    SEC_SK_1300: 'SEC Regulation S-K Item 1300 - Mining Property Disclosure',
   };
 
   return names[standard] || standard;
