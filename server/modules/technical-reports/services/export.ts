@@ -81,84 +81,46 @@ async function renderPDF(payload: any, toStandard: Standard): Promise<Buffer> {
 }
 
 async function renderDOCX(payload: any, toStandard: Standard): Promise<Buffer> {
-  const doc = new Document({
-    sections: [{
-      properties: {},
-      children: [
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: `Relatório Técnico — ${payload.standard}`,
-              bold: true,
-              size: 32,
-            }),
-          ],
-        }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: `${payload.project_name} · ${payload._brand.company_display}`,
-              size: 20,
-            }),
-          ],
-        }),
-        new Paragraph({ text: '' }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: 'Pessoas Competentes',
-              bold: true,
-              size: 24,
-            }),
-          ],
-        }),
-        ...payload.competent_persons.map((cp: any) => 
-          new Paragraph({
-            children: [
-              new TextRun({
-                text: `• ${cp.name} — ${cp.qualification} (${cp.organization})`,
-              }),
-            ],
-          })
-        ),
-        new Paragraph({ text: '' }),
-        new Paragraph({
-          children: [
-            new TextRun({
-              text: 'Estimativa de Recursos Minerais',
-              bold: true,
-              size: 24,
-            }),
-          ],
-        }),
-        new Table({
-          rows: [
-            new TableRow({
-              children: [
-                new TableCell({ children: [new Paragraph('Categoria')] }),
-                new TableCell({ children: [new Paragraph('Tonnage')] }),
-                new TableCell({ children: [new Paragraph('Grades')] }),
-                new TableCell({ children: [new Paragraph('Cutoff')] }),
-              ],
-            }),
-            ...payload.resources_table.map((r: any) =>
-              new TableRow({
-                children: [
-                  new TableCell({ children: [new Paragraph(r.category)] }),
-                  new TableCell({ children: [new Paragraph(String(r.tonnage))] }),
-                  new TableCell({ children: [new Paragraph(JSON.stringify(r.grades))] }),
-                  new TableCell({ children: [new Paragraph(JSON.stringify(r.cutoff))] }),
-                ],
-              })
-            ),
-          ],
-        }),
-      ],
-    }],
-  });
+  // Import our professional DOCX renderer
+  const { renderDOCX: professionalRender } = await import('./docx-renderer');
+  
+  // Transform payload to match expected interface
+  const reportPayload = {
+    title: payload.project_name || 'Relatório Técnico',
+    projectName: payload.project_name,
+    location: payload.location,
+    standard: toStandard,
+    date: payload.effective_date || new Date().toLocaleDateString('pt-BR'),
+    competentPerson: payload.competent_persons?.[0] ? {
+      name: payload.competent_persons[0].name,
+      credentials: payload.competent_persons[0].qualification,
+      organization: payload.competent_persons[0].organization,
+    } : undefined,
+    executiveSummary: payload.executive_summary ? {
+      overview: payload.executive_summary.overview || '',
+      keyFindings: payload.executive_summary.key_findings || [],
+    } : undefined,
+    introduction: payload.introduction,
+    locationAccess: payload.location_access,
+    geology: payload.geology_data,
+    resources: payload.resources_table?.map((r: any) => ({
+      category: r.category,
+      tonnage: r.tonnage,
+      grade: r.grades?.Au || r.grades?.main || 0,
+      contained: r.contained || 0,
+    })),
+    reserves: payload.reserves_table?.map((r: any) => ({
+      category: r.category,
+      tonnage: r.tonnage,
+      grade: r.grades?.Au || r.grades?.main || 0,
+      recoverable: r.recoverable || 0,
+    })),
+    methodology: payload.methodology,
+    economics: payload.economic_assumptions,
+    conclusions: payload.conclusions,
+  };
 
-  const buffer = await Packer.toBuffer(doc);
-  return buffer;
+  return await professionalRender(reportPayload, toStandard);
 }
 
 async function renderXLSX(payload: any, toStandard: Standard): Promise<Buffer> {
