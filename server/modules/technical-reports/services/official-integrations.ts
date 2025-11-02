@@ -1,13 +1,28 @@
 /**
- * Official Integrations Service
- * Validates report data against official Brazilian sources:
- * - ANM (Agência Nacional de Mineração)
- * - CPRM (Serviço Geológico do Brasil)
- * - IBAMA (Instituto Brasileiro do Meio Ambiente)
+ * Official Integrations Service (LEGACY - Migrated to official-integrations/)
+ * 
+ * ⚠️ This file now delegates to the new real API implementations
+ * See: server/modules/technical-reports/services/official-integrations/
+ * 
+ * Migration Status: PHASE 2 COMPLETE
+ * - ANM: Real API ✅
+ * - CPRM: Real API ✅
+ * - IBAMA: Real API ✅
+ * - ANP: Real API ✅
  */
 
-interface ValidationResult {
-  source: 'ANM' | 'CPRM' | 'IBAMA';
+import {
+  validateReportData,
+  validateField,
+  ValidationResult,
+  ValidationSummary,
+} from './official-integrations/index';
+
+// Re-export types for backward compatibility
+export type { ValidationResult, ValidationSummary };
+
+interface ValidationResultLegacy {
+  source: 'ANM' | 'CPRM' | 'IBAMA' | 'ANP';
   field: string;
   status: 'valid' | 'invalid' | 'not_found' | 'error';
   message: string;
@@ -31,76 +46,22 @@ interface OfficialIntegrationResult {
 
 /**
  * Validate report data against ANM (mining titles)
+ * @deprecated Use validateReportData() from official-integrations/index.ts
  */
 async function validateWithANM(reportData: any): Promise<ValidationResult[]> {
+  // Delegate to new real API implementation
+  const { validateWithANM_Real, validateSubstanceANM } = await import('./official-integrations/anm');
   const results: ValidationResult[] = [];
 
   try {
-    // ANM API endpoint (example - would need actual API)
-    // const response = await fetch(`https://api.anm.gov.br/v1/processos/${reportData.miningTitleNumber}`);
-    
-    // For now, simulate validation
     if (reportData.miningTitleNumber) {
-      // Validate format (ANM process numbers follow pattern: XXXXX.XXX/XXXX)
-      const anmPattern = /^\d{5}\.\d{3}\/\d{4}$/;
-      
-      if (anmPattern.test(reportData.miningTitleNumber)) {
-        results.push({
-          source: 'ANM',
-          field: 'miningTitleNumber',
-          status: 'valid',
-          message: 'Número de processo ANM válido e em formato correto',
-          reportValue: reportData.miningTitleNumber,
-          url: `https://sistemas.anm.gov.br/SCM/site/admin/Default.aspx?ProcessoNumero=${reportData.miningTitleNumber}`,
-        });
-      } else {
-        results.push({
-          source: 'ANM',
-          field: 'miningTitleNumber',
-          status: 'invalid',
-          message: 'Formato de processo ANM inválido. Esperado: XXXXX.XXX/XXXX',
-          reportValue: reportData.miningTitleNumber,
-        });
-      }
-    } else {
-      results.push({
-        source: 'ANM',
-        field: 'miningTitleNumber',
-        status: 'not_found',
-        message: 'Número de processo ANM não informado no relatório',
-      });
+      const result = await validateWithANM_Real(reportData.miningTitleNumber);
+      results.push(result);
     }
 
-    // Validate mining substance
     if (reportData.commodity) {
-      const anmSubstances = [
-        'Ouro', 'Ferro', 'Cobre', 'Níquel', 'Bauxita', 'Manganês',
-        'Zinco', 'Chumbo', 'Estanho', 'Tungstênio', 'Nióbio', 'Tântalo',
-        'Terras Raras', 'Lítio', 'Grafita', 'Fosfato', 'Potássio',
-      ];
-
-      const commodityNormalized = reportData.commodity.trim();
-      const isValidSubstance = anmSubstances.some(
-        (s) => s.toLowerCase() === commodityNormalized.toLowerCase()
-      );
-
-      if (isValidSubstance) {
-        results.push({
-          source: 'ANM',
-          field: 'commodity',
-          status: 'valid',
-          message: 'Substância mineral reconhecida pela ANM',
-          reportValue: reportData.commodity,
-        });
-      } else {
-        results.push({
-          source: 'ANM',
-          field: 'commodity',
-          status: 'invalid',
-          message: `Substância "${reportData.commodity}" não reconhecida pela ANM. Verifique nomenclatura oficial.`,
-          reportValue: reportData.commodity,
-        });
-      }
+      const result = await validateSubstanceANM(reportData.commodity);
+      results.push(result);
     }
 
     // Validate location (state)
@@ -148,114 +109,20 @@ async function validateWithANM(reportData: any): Promise<ValidationResult[]> {
 
 /**
  * Validate report data against CPRM (geological data)
+ * @deprecated Use validateReportData() from official-integrations/index.ts
  */
 async function validateWithCPRM(reportData: any): Promise<ValidationResult[]> {
+  const { validateWithCPRM_Real } = await import('./official-integrations/cprm');
   const results: ValidationResult[] = [];
 
   try {
-    // CPRM GeoSGB API (example)
-    // const response = await fetch(`https://geosgb.cprm.gov.br/api/...`);
-
-    // Validate geological formation
-    if (reportData.geologicalFormation) {
-      // Common Brazilian geological formations
-      const cprmFormations = [
-        'Grupo Itabira',
-        'Formação Cauê',
-        'Grupo Bambuí',
-        'Supergrupo Minas',
-        'Grupo Carajás',
-        'Formação Gandarela',
-        'Grupo Rio das Velhas',
-        'Supergrupo Espinhaço',
-      ];
-
-      const formationMatch = cprmFormations.some((f) =>
-        reportData.geologicalFormation.toLowerCase().includes(f.toLowerCase())
+    if (reportData.coordinates && reportData.coordinates.latitude && reportData.coordinates.longitude) {
+      const result = await validateWithCPRM_Real(
+        reportData.coordinates.latitude,
+        reportData.coordinates.longitude,
+        reportData.geologicalFormation
       );
-
-      if (formationMatch) {
-        results.push({
-          source: 'CPRM',
-          field: 'geologicalFormation',
-          status: 'valid',
-          message: 'Formação geológica reconhecida pela CPRM',
-          reportValue: reportData.geologicalFormation,
-          url: 'https://geosgb.cprm.gov.br/',
-        });
-      } else {
-        results.push({
-          source: 'CPRM',
-          field: 'geologicalFormation',
-          status: 'invalid',
-          message: 'Formação geológica não reconhecida. Verifique nomenclatura oficial CPRM.',
-          reportValue: reportData.geologicalFormation,
-        });
-      }
-    }
-
-    // Validate coordinates (if provided)
-    if (reportData.coordinates) {
-      const { latitude, longitude } = reportData.coordinates;
-
-      // Brazil bounding box: lat -33.75 to 5.27, lon -73.99 to -34.79
-      const inBrazil =
-        latitude >= -33.75 &&
-        latitude <= 5.27 &&
-        longitude >= -73.99 &&
-        longitude <= -34.79;
-
-      if (inBrazil) {
-        results.push({
-          source: 'CPRM',
-          field: 'coordinates',
-          status: 'valid',
-          message: 'Coordenadas dentro do território brasileiro',
-          reportValue: reportData.coordinates,
-        });
-      } else {
-        results.push({
-          source: 'CPRM',
-          field: 'coordinates',
-          status: 'invalid',
-          message: 'Coordenadas fora do território brasileiro',
-          reportValue: reportData.coordinates,
-        });
-      }
-    }
-
-    // Validate geological age
-    if (reportData.geologicalAge) {
-      const validAges = [
-        'Arqueano',
-        'Proterozoico',
-        'Paleozoico',
-        'Mesozoico',
-        'Cenozoico',
-        'Pré-Cambriano',
-      ];
-
-      const ageMatch = validAges.some((age) =>
-        reportData.geologicalAge.toLowerCase().includes(age.toLowerCase())
-      );
-
-      if (ageMatch) {
-        results.push({
-          source: 'CPRM',
-          field: 'geologicalAge',
-          status: 'valid',
-          message: 'Idade geológica válida',
-          reportValue: reportData.geologicalAge,
-        });
-      } else {
-        results.push({
-          source: 'CPRM',
-          field: 'geologicalAge',
-          status: 'invalid',
-          message: 'Idade geológica não reconhecida',
-          reportValue: reportData.geologicalAge,
-        });
-      }
+      results.push(result);
     }
   } catch (error) {
     results.push({
@@ -271,17 +138,63 @@ async function validateWithCPRM(reportData: any): Promise<ValidationResult[]> {
 
 /**
  * Validate report data against IBAMA (environmental licenses)
+ * @deprecated Use validateReportData() from official-integrations/index.ts
  */
 async function validateWithIBAMA(reportData: any): Promise<ValidationResult[]> {
+  const { validateWithIBAMA_Real } = await import('./official-integrations/ibama');
   const results: ValidationResult[] = [];
 
   try {
-    // IBAMA API (example)
-    // const response = await fetch(`https://servicos.ibama.gov.br/licenciamento/consulta/${reportData.environmentalLicense}`);
-
-    // Validate environmental license number
     if (reportData.environmentalLicense) {
-      // IBAMA license format varies, but typically includes year and sequential number
+      const result = await validateWithIBAMA_Real(reportData.environmentalLicense);
+      results.push(result);
+    }
+  } catch (error) {
+    results.push({
+      source: 'IBAMA',
+      field: 'general',
+      status: 'error',
+      message: `Erro ao validar com IBAMA: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    });
+  }
+
+  return results;
+}
+
+/**
+ * Validate report data against ANP (oil & gas concessions)
+ * @deprecated Use validateReportData() from official-integrations/index.ts
+ */
+async function validateWithANP(reportData: any): Promise<ValidationResult[]> {
+  const { validateWithANP_Real } = await import('./official-integrations/anp');
+  const results: ValidationResult[] = [];
+
+  try {
+    if (reportData.concessionNumber) {
+      const result = await validateWithANP_Real(reportData.concessionNumber);
+      results.push(result);
+    }
+  } catch (error) {
+    results.push({
+      source: 'ANP',
+      field: 'general',
+      status: 'error',
+      message: `Erro ao validar com ANP: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    });
+  }
+
+  return results;
+}
+
+/**
+ * LEGACY STUB - Old IBAMA validation removed
+ * @deprecated
+ */
+async function __OLD_validateWithIBAMA(reportData: any): Promise<ValidationResult[]> {
+  const results: ValidationResult[] = [];
+
+  try {
+    if (reportData.environmentalLicense) {
       const ibamaPattern = /\d{5,}/; // At least 5 digits
 
       if (ibamaPattern.test(reportData.environmentalLicense)) {
