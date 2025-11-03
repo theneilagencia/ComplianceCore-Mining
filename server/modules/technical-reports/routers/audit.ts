@@ -11,7 +11,7 @@ import { exportAuditResults } from "../services/advanced-export";
 import { validateWithOfficialSources } from "../services/official-integrations";
 import { calculateAuditTrends, compareAudits, getAuditStatistics } from "../services/audit-trends";
 import { generateAuditPDF } from "../services/pdf-generator";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 
 export const auditRouter = router({
   // Executar auditoria KRCI em um relatório
@@ -100,25 +100,31 @@ export const auditRouter = router({
       // Executar auditoria
       const auditResult = runAudit(normalizedReport, input.auditType);
 
-      // Gerar PDF
-      const pdfUrl = await generateAuditPDF(
-        {
-          reportId: report.id,
-          reportTitle: report.title,
-          projectName: undefined,
-          effectiveDate: report.createdAt?.toISOString(),
-          standard: report.standard,
-          score: auditResult.score,
-          totalRules: auditResult.totalRules,
-          passedRules: auditResult.passedRules,
-          failedRules: auditResult.failedRules,
-          krcis: auditResult.krcis,
-          recommendations: auditResult.recommendations,
-          auditDate: new Date().toISOString(),
-          auditorName: ctx.user.name || undefined,
-        },
-        report.tenantId
-      );
+      // Gerar PDF (com error handling)
+      let pdfUrl: string | null = null;
+      try {
+        pdfUrl = await generateAuditPDF(
+          {
+            reportId: report.id,
+            reportTitle: report.title,
+            projectName: undefined,
+            effectiveDate: report.createdAt?.toISOString(),
+            standard: report.standard,
+            score: auditResult.score,
+            totalRules: auditResult.totalRules,
+            passedRules: auditResult.passedRules,
+            failedRules: auditResult.failedRules,
+            krcis: auditResult.krcis,
+            recommendations: auditResult.recommendations,
+            auditDate: new Date().toISOString(),
+            auditorName: ctx.user.name || undefined,
+          },
+          report.tenantId
+        );
+      } catch (error) {
+        console.error("[Audit] Failed to generate PDF:", error);
+        // Continua sem PDF, apenas warning
+      }
 
       // Salvar auditoria no banco
       const auditId = `aud_${randomUUID()}`;
@@ -184,7 +190,7 @@ export const auditRouter = router({
         conditions.push(eq(audits.reportId, input.reportId));
       }
 
-      const auditsList = await db.select().from(audits).where(conditions.length > 1 ? conditions[0] : conditions[0]).limit(input.limit);
+      const auditsList = await db.select().from(audits).where(conditions.length > 1 ? and(...conditions) : conditions[0]).limit(input.limit);
 
       /* const auditsList = await db.query.audits.findMany({
         where: conditions.length > 1 ? conditions : conditions[0],
