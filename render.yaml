@@ -28,8 +28,12 @@ services:
         value: production
       - key: PORT
         value: 10000
+      
+      # Database
       - key: DATABASE_URL
         sync: false
+      
+      # Authentication
       - key: SESSION_SECRET
         sync: false
       - key: GOOGLE_CLIENT_ID
@@ -38,6 +42,22 @@ services:
         sync: false
       - key: GOOGLE_REDIRECT_URI
         sync: false
+      
+      # External APIs (opcional - fallback seguro se ausentes)
+      - key: SIGMINE_API_KEY
+        sync: false
+      - key: MAPBIOMAS_API_KEY
+        sync: false
+      - key: GFW_API_KEY
+        sync: false
+      - key: ENABLE_SIGMINE
+        value: false
+      - key: ENABLE_MAPBIOMAS
+        value: false
+      - key: ENABLE_GFW
+        value: false
+      
+      # AI & Other
       - key: OPENAI_API_KEY
         sync: false
       - key: CLOUDINARY_CLOUD_NAME
