@@ -128,17 +128,25 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
             });
           }
           
-          // Chamar onSuccess callback se fornecido
+          // Fechar modal e chamar callback
+          toast.dismiss('processing-toast');
+          
+          // Fechar modal primeiro
+          onClose();
+          
+          // Depois executar ação apropriada
           if (onSuccess && uploadId) {
-            console.log('[UploadModalAtomic] Chamando onSuccess callback');
-            onSuccess({ uploadId, reportId });
+            console.log('[UploadModalAtomic] Chamando onSuccess callback com reportId:', reportId);
+            // Pequeno delay para garantir que modal fechou antes de navegar
+            setTimeout(() => {
+              onSuccess({ uploadId, reportId });
+            }, 100);
           } else {
             // Se não há callback, redirecionar para a lista
             console.log('[UploadModalAtomic] Sem callback, redirecionando para lista');
             setTimeout(() => {
-              onClose();
               setLocation(`/reports/generate`);
-            }, 1500);
+            }, 100);
           }
         }
       } catch (error: any) {
@@ -362,9 +370,14 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
 
   const handleClose = () => {
     if (!uploading && !processing) {
+      console.log('[UploadModalAtomic] Fechando modal e limpando estados');
       setFile(null);
       setReportId(null);
       setUploadId(null);
+      setProcessing(false);
+      setUploading(false);
+      toast.dismiss('processing-toast');
+      toast.dismiss('upload-process');
       onClose();
     }
   };

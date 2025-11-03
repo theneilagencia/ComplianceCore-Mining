@@ -446,14 +446,23 @@ export default function GenerateReport() {
 	{showUploadModal && (
 		<UploadModalAtomic 
 			open={showUploadModal} 
-			onClose={() => setShowUploadModal(false)}
+			onClose={() => {
+				console.log('[GenerateReport] Modal fechado');
+				setShowUploadModal(false);
+			}}
 			onSuccess={(result) => {
-				console.log('[GenerateReport] Upload concluído:', result);
+				console.log('[GenerateReport] ✅ Upload concluído com sucesso!');
+				console.log('[GenerateReport] Report ID:', result.reportId);
+				console.log('[GenerateReport] Upload ID:', result.uploadId);
+				
 				// Fechar modal
 				setShowUploadModal(false);
+				
 				// Invalidar lista para atualizar
 				utils.technicalReports.generate.list.invalidate();
+				
 				// Redirecionar para a página de revisão do relatório
+				console.log('[GenerateReport] Navegando para:', `/reports/${result.reportId}/review`);
 				navigate(`/reports/${result.reportId}/review`);
 			}}
 		/>
