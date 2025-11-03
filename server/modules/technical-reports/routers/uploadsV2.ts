@@ -30,12 +30,6 @@ export const uploadsV2Router = router({
         const db = await import("../../../db").then((m) => m.getDb());
         if (!db) throw new Error("Database not available");
 
-        console.log('[Upload V2] ========== INÍCIO DO UPLOAD V2 ==========');
-        console.log('[Upload V2] User:', ctx.user?.email);
-        console.log('[Upload V2] File:', input.fileName, `(${input.fileSize} bytes)`);
-        console.log('[Upload V2] FileType:', input.fileType);
-        console.log('[Upload V2] FileData length:', input.fileData?.length || 0);
-
       if (!ctx.user || !ctx.user.id || !ctx.user.tenantId) {
         throw new Error(`Invalid user context`);
       }
@@ -67,13 +61,7 @@ export const uploadsV2Router = router({
       const reportId = `rpt_${randomUUID()}`;
       const s3Key = `tenants/${ctx.user.tenantId}/uploads/${uploadId}/${input.fileName}`;
 
-      console.log('[Upload V2] Generated IDs:', { uploadId, reportId });
-
       // 1. Fazer upload do arquivo para o storage
-      console.log('[Upload V2] Uploading to storage...');
-      console.log('[Upload V2] fileData length:', input.fileData?.length || 0);
-      console.log('[Upload V2] fileData preview:', input.fileData?.substring(0, 50) || 'EMPTY');
-      
       if (!input.fileData || input.fileData.length === 0) {
         throw new Error('Dados do arquivo estão vazios. O arquivo pode não ter sido lido corretamente.');
       }
@@ -81,17 +69,14 @@ export const uploadsV2Router = router({
       let buffer: Buffer;
       try {
         buffer = Buffer.from(input.fileData, "base64");
-        console.log('[Upload V2] Buffer created, size:', buffer.length, 'bytes');
       } catch (error: any) {
         console.error('[Upload V2] Erro ao criar buffer:', error);
         throw new Error(`Erro ao processar dados do arquivo: ${error.message}`);
       }
       
       const storageResult = await storagePut(s3Key, buffer, input.fileType);
-      console.log('[Upload V2] Storage URL:', storageResult.url);
 
       // 2. Executar inserções no banco de dados dentro de uma transação
-      console.log('[Upload V2] Creating database records...');
       await db.transaction(async (tx) => {
         // 2a. Criar registro na tabela 'uploads'
         await tx.insert(uploads).values({
@@ -121,12 +106,9 @@ export const uploadsV2Router = router({
         });
       });
 
-      console.log('[Upload V2] Database records created successfully');
-
       // 3. Iniciar o parsing de forma assíncrona (não bloquear a resposta)
       (async () => {
         try {
-          console.log('[Upload V2] Starting async parsing...');
           const parsingResult = await parseAndNormalize(
             buffer.toString(),
             input.fileType,
@@ -148,8 +130,6 @@ export const uploadsV2Router = router({
               s3NormalizedUrl: normalizedUrl,
               parsingSummary: parsingResult.summary,
             }).where(eq(reports.id, reportId));
-
-          console.log('[Upload V2] Parsing completed successfully');
         } catch (error) {
           console.error(`[Upload V2] Parsing failed for report ${reportId}:`, error);
           // Update status to needs_review and store error in parsingSummary
@@ -169,27 +149,13 @@ export const uploadsV2Router = router({
       })();
 
       // 4. Retornar sucesso imediato para o frontend
-      console.log('[Upload V2] ✅ Upload V2 concluído com sucesso!');
-      console.log('[Upload V2] uploadId:', uploadId);
-      console.log('[Upload V2] reportId:', reportId);
-      console.log('[Upload V2] s3Url:', storageResult.url);
-      
       return {
         uploadId,
         reportId,
         s3Url: storageResult.url,
       };
     } catch (error: any) {
-      console.error('[Upload V2] ❌ ERRO NO UPLOAD V2!');
-      console.error('[Upload V2] Error.name:', error.name);
-      console.error('[Upload V2] Error.message:', error.message);
-      console.error('[Upload V2] Error.stack:', error.stack);
-      console.error('[Upload V2] Input:', {
-        fileName: input.fileName,
-        fileSize: input.fileSize,
-        fileType: input.fileType,
-        fileDataLength: input.fileData?.length || 0,
-      });
+      console.error('[Upload V2] Upload failed:', error.message);
       throw error;
     }
     }),
