@@ -25,6 +25,7 @@ import supportRouter from "../modules/support/router";
 import radarRouter from "../modules/radar/router";
 import diagnosticRouter from "../modules/radar/diagnosticRouter";
 import { startDiagnosticCron } from "../modules/radar/services/diagnosticCron";
+import { startScheduler } from "../modules/radar/services/scheduler";
 import templatesRouter from "../modules/templates/router";
 import validateRouter from "../modules/validate/router";
 import contactRouter from "../modules/contact/router";
@@ -328,6 +329,17 @@ async function startServer() {
     
     // Install database trigger to auto-fix s3Url
     await installS3UrlTrigger();
+    
+    // Initialize Radar Scheduler (cron jobs for data aggregation and notifications)
+    if (process.env.NODE_ENV !== 'test') {
+      try {
+        await startScheduler();
+        console.log('✅ [Radar Scheduler] Initialized successfully - Jobs scheduled for data aggregation and DOU scraping');
+      } catch (error) {
+        console.error('❌ [Radar Scheduler] Failed to initialize:', error);
+        // Non-blocking - continue server startup even if scheduler fails
+      }
+    }
     
     // Auto-seed disabled - use POST /api/dev/init to create test users
     if (process.env.NODE_ENV !== 'production') {
