@@ -22,43 +22,100 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import UploadModalAtomic from '../components/UploadModalAtomic';
+import { exportCorrectionPlan } from '@/services/export-correction-plan';
+
+// Tipos para estados (BUG-005 fix)
+interface KRCI {
+  code: string;
+  section: string;
+  message: string;
+  severity: "critical" | "high" | "medium" | "low";
+  weight: number;
+}
+
+interface AuditResult {
+  auditId: string;
+  reportId: string;
+  score: number;
+  totalRules: number;
+  passedRules: number;
+  failedRules: number;
+  krcis: KRCI[];
+  recommendations: string[];
+  pdfUrl: string | null;
+  timestamp: string;
+}
+
+interface CorrectionItem {
+  ruleCode: string;
+  category: string;
+  section: string;
+  issue: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  weight: number;
+  priority: number;
+  estimatedTime: number;
+  suggestedFix: string;
+  autoFixAvailable: boolean;
+  steps: string[];
+}
+
+interface CorrectionPlanData {
+  reportId: string;
+  auditScore: number;
+  totalIssues: number;
+  criticalIssues: number;
+  highIssues: number;
+  mediumIssues: number;
+  lowIssues: number;
+  estimatedTotalTime: number;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  corrections: CorrectionItem[];
+  quickWins: CorrectionItem[];
+  mustFix: CorrectionItem[];
+  canDefer: CorrectionItem[];
+  summary: string;
+  createdAt: Date;
+}
 
 export default function AuditKRCI() {
   const [, navigate] = useLocation();
   const [selectedReport, setSelectedReport] = useState<string>("");
   const [showGuardRail, setShowGuardRail] = useState<boolean>(false);
-  const [auditResult, setAuditResult] = useState<any>(null);
-  const [correctionPlan, setCorrectionPlan] = useState<any>(null);
+  const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
+  const [correctionPlan, setCorrectionPlan] = useState<CorrectionPlanData | null>(null);
   const [shouldGeneratePlan, setShouldGeneratePlan] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'select' | 'upload'>('select');
   const [advancedTab, setAdvancedTab] = useState<'trends' | 'comparison' | 'official'>('trends');
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
 
-  // Query para listar relatórios (sem polling)
+  // Query para listar relatórios (polling ativo após audit - BUG-007 fix)
   const { data: reports } = trpc.technicalReports.generate.list.useQuery(
     { limit: 20 },
     {
-      refetchInterval: false,
-      refetchOnWindowFocus: false,
+      refetchInterval: auditResult ? 30000 : false, // Poll a cada 30s se há resultado
+      refetchOnWindowFocus: true, // Atualiza ao voltar para tab
       staleTime: 5 * 60 * 1000,
     }
   );
 
-  // Query para listar auditorias (sem polling)
+  // Query para listar auditorias (polling ativo após audit - BUG-007 fix)
   const { data: audits } = trpc.technicalReports.audit.list.useQuery(
     { limit: 10 },
     {
-      refetchInterval: false,
-      refetchOnWindowFocus: false,
+      refetchInterval: auditResult ? 30000 : false, // Poll a cada 30s se há resultado
+      refetchOnWindowFocus: true, // Atualiza ao voltar para tab
       staleTime: 5 * 60 * 1000,
     }
   );
 
-  // Query para gerar plano de correção
+  // Query para gerar plano de correção (BUG-004 fix: retry logic)
   const { data: planData, error: planError } = trpc.technicalReports.audit.correctionPlan.useQuery(
     { auditId: auditResult?.auditId || '' },
     {
       enabled: shouldGeneratePlan && !!auditResult?.auditId,
+      retry: 3, // Tenta 3 vezes
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 5000), // 1s, 2s, 4s
     }
   );
 
@@ -386,20 +443,27 @@ export default function AuditKRCI() {
             )}
 
             {/* Download PDF */}
-            <div className="flex gap-3">
-              <Button asChild className="flex-1">
-                <a href={auditResult.pdfUrl} target="_blank" rel="noopener noreferrer">
-                  <Download className="h-4 w-4 mr-2" />
-                  Baixar Relatório PDF
-                </a>
-              </Button>
-              <Button variant="outline" asChild>
-                <a href={auditResult.pdfUrl} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="h-4 w-4 mr-2" />
-                  Visualizar
-                </a>
-              </Button>
-            </div>
+            {auditResult.pdfUrl && (
+              <div className="flex gap-3">
+                <Button asChild className="flex-1">
+                  <a href={auditResult.pdfUrl} target="_blank" rel="noopener noreferrer">
+                    <Download className="h-4 w-4 mr-2" />
+                    Baixar Relatório PDF
+                  </a>
+                </Button>
+                <Button variant="outline" asChild>
+                  <a href={auditResult.pdfUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    Visualizar
+                  </a>
+                </Button>
+              </div>
+            )}
+            {!auditResult.pdfUrl && (
+              <div className="text-center py-4 text-sm text-yellow-600">
+                ⚠️ PDF não disponível. A auditoria foi salva mas o relatório não pôde ser gerado.
+              </div>
+            )}
           </Card>
         )}
 
@@ -409,44 +473,8 @@ export default function AuditKRCI() {
             <CorrectionPlan
               plan={correctionPlan}
               onExport={(format) => {
-                // Exportar plano de correção usando o próprio objeto
-                let content = '';
-                let mimeType = 'text/plain';
-                
-                if (format === 'json') {
-                  content = JSON.stringify(correctionPlan, null, 2);
-                  mimeType = 'application/json';
-                } else if (format === 'markdown') {
-                  content = `# Plano de Correção - KRCI\n\n${correctionPlan.summary}\n\n`;
-                  content += `## Resumo\n\n`;
-                  content += `- **Score KRCI**: ${correctionPlan.auditScore}%\n`;
-                  content += `- **Total de Issues**: ${correctionPlan.totalIssues}\n`;
-                  content += `- **Tempo Estimado**: ${Math.floor(correctionPlan.estimatedTotalTime / 60)}h ${correctionPlan.estimatedTotalTime % 60}m\n\n`;
-                  content += `## Correções\n\n`;
-                  correctionPlan.corrections.forEach((item: any, i: number) => {
-                    content += `### ${i + 1}. ${item.ruleCode} - ${item.issue}\n`;
-                    content += `- **Categoria**: ${item.category}\n`;
-                    content += `- **Severidade**: ${item.severity}\n`;
-                    content += `- **Tempo**: ${item.estimatedTime} min\n`;
-                    content += `- **Sugestão**: ${item.suggestedFix}\n\n`;
-                  });
-                } else if (format === 'csv') {
-                  content = 'Code,Category,Severity,Priority,Time,Issue,Suggestion\n';
-                  correctionPlan.corrections.forEach((item: any) => {
-                    content += `"${item.ruleCode}","${item.category}","${item.severity}",${item.priority},${item.estimatedTime},"${item.issue}","${item.suggestedFix}"\n`;
-                  });
-                  mimeType = 'text/csv';
-                }
-                
-                const blob = new Blob([content], { type: mimeType });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `correction-plan-${correctionPlan.reportId}.${format}`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                // BUG-006 fix: Usa service de export
+                exportCorrectionPlan(correctionPlan, format);
                 toast.success(`Plano exportado em ${format.toUpperCase()}`);
               }}
             />
