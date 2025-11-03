@@ -71,6 +71,7 @@ async function startServer() {
   // Configure CORS with credentials - Centralized on Render only
   const allowedOrigins = [
     'https://qivo-mining.onrender.com',
+    'https://compliancecore-mining-1.onrender.com',
     'http://localhost:5173',
     'http://localhost:3000',
     'http://localhost:4173'
