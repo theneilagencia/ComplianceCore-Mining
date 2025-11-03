@@ -18,8 +18,9 @@ import UploadModalAtomic from "../components/UploadModalAtomic";
 import { Badge } from "@/components/ui/badge";
 import { ReportListSkeleton } from "@/components/ui/skeleton";
 import { useLocation } from "wouter";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import type { Report, ReportStandard, STATUS_COLORS, STATUS_LABELS } from "../types";
 import DynamicReportForm from "../components/DynamicReportForm";
 
 export default function GenerateReport() {
@@ -60,15 +61,31 @@ export default function GenerateReport() {
  },
  });
 
- // Query para listar relatórios (sem polling para evitar re-renders)
- const { data: reports, isLoading } = trpc.technicalReports.generate.list.useQuery(
+ // Query para listar relatórios com retry logic
+ const { data: reports, isLoading, error, refetch } = trpc.technicalReports.generate.list.useQuery(
  { limit: 10 },
  {
+ retry: 3, // Retry até 3 vezes em caso de falha
+ retryDelay: (attemptIndex) => Math.min(1000 * 2 ** attemptIndex, 30000), // Exponential backoff
  refetchInterval: false, // Desabilitar polling automático
  refetchOnWindowFocus: false, // Não refetch ao focar janela
  staleTime: 5 * 60 * 1000, // Considerar dados frescos por 5 minutos
  }
  );
+
+ // Handle query errors with toast notification
+ useEffect(() => {
+ if (error) {
+ console.error("[GenerateReport] Error loading reports:", error);
+ toast.error("Erro ao carregar relatórios", {
+ description: error.message || "Tente novamente mais tarde",
+ action: {
+ label: "Tentar Novamente",
+ onClick: () => refetch(),
+ },
+ });
+ }
+ }, [error, refetch]);
 
  const handleSubmit = (e: React.FormEvent) => {
  e.preventDefault();
@@ -411,7 +428,7 @@ export default function GenerateReport() {
  <ReportListSkeleton count={5} />
  ) : reports && reports.items && reports.items.length > 0 ? (
  <div className="space-y-3">
- {reports.items.map((report: any) => (
+ {reports.items.map((report) => (
  <div
  key={report.id}
  className="flex items-center justify-between p-4 border rounded-lg hover:bg-[#000020] cursor-pointer"
@@ -422,12 +439,12 @@ export default function GenerateReport() {
  <div>
  <h3 className="font-medium">{report.title}</h3>
  <p className="text-sm text-gray-400">
- {report.standard} • {new Date(report.createdAt).toLocaleDateString('pt-BR')}
+ {report.standard} • {report.createdAt ? new Date(report.createdAt).toLocaleDateString('pt-BR') : 'Data não disponível'}
  </p>
  </div>
  </div>
- <Badge variant={report.status === 'completed' ? 'default' : 'secondary'}>
- {report.status === 'completed' ? <CheckCircle className="h-3 w-3 mr-1" /> : null}
+ <Badge variant={report.status === 'audited' || report.status === 'certified' ? 'default' : 'secondary'}>
+ {(report.status === 'audited' || report.status === 'certified') ? <CheckCircle className="h-3 w-3 mr-1" /> : null}
  {report.status}
  </Badge>
  </div>
