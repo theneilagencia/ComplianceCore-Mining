@@ -443,17 +443,15 @@ export default function GenerateReport() {
  </Card>
  </div>
 
-	{showUploadModal && (
-		<UploadModalAtomic 
-			isOpen={showUploadModal} 
-			onClose={() => setShowUploadModal(false)}
-			onSuccess={(result) => {
-				console.log('[GenerateReport] Upload success! Navigating to review...');
-				console.log('[GenerateReport] Report ID:', result.reportId);
-				navigate(`/reports/${result.reportId}/review`);
-			}}
-		/>
-	)}
+	<UploadModalAtomic 
+		isOpen={showUploadModal} 
+		onClose={() => setShowUploadModal(false)}
+		onSuccess={(result) => {
+			console.log('[GenerateReport] Upload success! Navigating to review...');
+			console.log('[GenerateReport] Report ID:', result.reportId);
+			navigate(`/reports/${result.reportId}/review`);
+		}}
+	/>
  </DashboardLayout>
  );
 }
