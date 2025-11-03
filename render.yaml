@@ -2,6 +2,8 @@
 # 🚀 ComplianceCore Mining™ - Render Deploy
 # ===============================
 # Node.js/Express + React/Vite Full Stack Application
+# IMPORTANT: This is a Node.js application, not Python!
+# Python files exist only for AI modules called via child_process
 
 services:
   - type: web
@@ -12,18 +14,26 @@ services:
     region: oregon
     branch: main
     rootDir: .
+    
+    # Force Node.js runtime (ignore Python files)
+    buildFilter:
+      paths:
+        - "**/*.ts"
+        - "**/*.tsx"
+        - "**/*.js"
+        - "**/*.jsx"
+        - "package.json"
+        - "pnpm-lock.yaml"
+        - "vite.config.ts"
+        - "tsconfig.json"
+        - "build.sh"
 
-    buildCommand: |
-      echo "Installing pnpm..."
-      npm install -g pnpm@10.4.1
-      echo "Installing dependencies..."
-      pnpm install --frozen-lockfile
-      echo "Running build script..."
-      bash build.sh
-      echo "Running database migrations..."
-      pnpm drizzle-kit push || echo "⚠️  Migrations failed or DATABASE_URL not set"
+    # CRITICAL: This overrides any dashboard settings
+    buildCommand: npm install -g pnpm@10.4.1 && pnpm install --frozen-lockfile && bash build.sh && (pnpm drizzle-kit push || echo "⚠️ Migrations skipped")
 
     startCommand: pnpm run start
+    
+    healthCheckPath: /api/health
 
     envVars:
       - key: NODE_ENV
