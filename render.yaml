@@ -28,45 +28,17 @@ services:
         - "tsconfig.json"
         - "build.sh"
 
-    # FORCE Node.js runtime - optimized build with caching
-    buildCommand: |
-      echo "🚀 QIVO Mining - Node.js Build v2.0"
-      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-      node --version
-      npm --version
-      
-      # Install pnpm globally (cached)
-      if ! command -v pnpm &> /dev/null; then
-        npm install -g pnpm@10.4.1
-      fi
-      pnpm --version
-      
-      # Install dependencies (with cache)
-      pnpm install --frozen-lockfile --prefer-offline
-      
-      # Run optimized build script
-      bash build.sh
-      
-      # Migrations (production only, non-blocking)
-      if [ "$NODE_ENV" = "production" ]; then
-        pnpm drizzle-kit push || echo "⚠️ Migrations skipped (non-blocking)"
-      fi
-      
-      echo "✅ Build completed successfully"
+    # Build command (uses pre-build.sh to install pnpm first)
+    buildCommand: bash pre-build.sh
 
-    startCommand: |
-      echo "🚀 Starting QIVO Mining Server"
-      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-      echo "Environment: $NODE_ENV"
-      echo "Node version: $(node --version)"
-      echo "Port: $PORT"
-      echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-      node dist/index.js
+    # Start command
+    startCommand: node dist/index.js
     
-    healthCheckPath: /api/health
+    # Health check disabled temporarily (causing loops)
+    # healthCheckPath: /api/health
     
-    # Auto-deploy on push to main
-    autoDeploy: true
+    # DISABLED: Auto-deploy causing loops
+    autoDeploy: false
 
     envVars:
       - key: NODE_ENV
