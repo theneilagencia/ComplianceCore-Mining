@@ -84,33 +84,81 @@ export const technicalReportsRouter = router({
         };
       }),
 
-    // Listar relatórios do tenant
+    // Listar relatórios do tenant com cursor-based pagination
     list: protectedProcedure
       .input(
         z.object({
-          status: z.enum(["draft", "parsing", "needs_review", "ready_for_audit", "audited", "certified", "exported"]).optional(),
+          status: z.enum(["draft", "parsing", "parsing_failed", "needs_review", "ready_for_audit", "audited", "certified", "exported"]).optional(),
           limit: z.number().min(1).max(100).default(20),
+          cursor: z.string().optional(), // ISO date string for cursor
+          orderBy: z.enum(["createdAt", "title", "status"]).default("createdAt"),
+          orderDirection: z.enum(["asc", "desc"]).default("desc"),
+          search: z.string().optional(), // Search by title
         }).optional()
       )
       .query(async ({ ctx, input }) => {
         const db = await import("../../db").then(m => m.getDb());
-        if (!db) return [];
+        if (!db) return { items: [], nextCursor: null, hasMore: false };
 
         const { reports } = await import("../../../drizzle/schema");
-        const { eq, and } = await import("drizzle-orm");
+        const { eq, and, or, ilike, gt, lt, desc, asc } = await import("drizzle-orm");
 
+        const limit = input?.limit || 20;
+        const orderBy = input?.orderBy || "createdAt";
+        const orderDirection = input?.orderDirection || "desc";
+
+        // Build where conditions
         let whereConditions = [eq(reports.tenantId, ctx.user.tenantId)];
         
+        // Filter by status
         if (input?.status) {
           whereConditions.push(eq(reports.status, input.status));
         }
 
+        // Search by title
+        if (input?.search && input.search.trim().length > 0) {
+          whereConditions.push(ilike(reports.title, `%${input.search.trim()}%`));
+        }
+
+        // Cursor-based pagination
+        if (input?.cursor) {
+          const cursorDate = new Date(input.cursor);
+          if (!isNaN(cursorDate.getTime())) {
+            if (orderDirection === "desc") {
+              whereConditions.push(lt(reports.createdAt, cursorDate));
+            } else {
+              whereConditions.push(gt(reports.createdAt, cursorDate));
+            }
+          }
+        }
+
+        // Build order by clause
+        const orderByClause = orderDirection === "desc" 
+          ? desc(reports[orderBy]) 
+          : asc(reports[orderBy]);
+
+        // Fetch limit + 1 to check if there are more results
         const results = await db
           .select()
           .from(reports)
           .where(and(...whereConditions))
-          .limit(input?.limit || 20);
-        return results;
+          .orderBy(orderByClause)
+          .limit(limit + 1);
+
+        // Check if there are more results
+        const hasMore = results.length > limit;
+        const items = hasMore ? results.slice(0, limit) : results;
+
+        // Generate next cursor from last item's createdAt
+        const nextCursor = hasMore && items.length > 0
+          ? items[items.length - 1].createdAt?.toISOString() || null
+          : null;
+
+        return {
+          items,
+          nextCursor,
+          hasMore,
+        };
       }),
 
     // Obter detalhes de um relatório

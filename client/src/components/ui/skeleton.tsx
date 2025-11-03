@@ -71,4 +71,49 @@ function FormSkeleton() {
   );
 }
 
-export { Skeleton, CardSkeleton, AuditListSkeleton, FormSkeleton };
+/**
+ * Skeleton para lista de relatórios
+ * Matches the structure of report items in GenerateReport.tsx
+ */
+interface ReportListSkeletonProps {
+  count?: number;
+}
+
+function ReportListSkeleton({ count = 3 }: ReportListSkeletonProps) {
+  return (
+    <div className="space-y-3" aria-busy="true" aria-label="Carregando relatórios">
+      {Array.from({ length: count }).map((_, i) => (
+        <div
+          key={i}
+          className="group relative flex items-center justify-between p-4 rounded-lg border border-border bg-card hover:border-primary/50 transition-colors"
+        >
+          {/* Left side: Title, Standard, Date */}
+          <div className="flex-1 min-w-0 space-y-2">
+            {/* Title */}
+            <Skeleton className="h-5 w-3/4 max-w-md" />
+            
+            {/* Standard badge + Date */}
+            <div className="flex items-center gap-2 flex-wrap">
+              <Skeleton className="h-5 w-20 rounded-full" />
+              <Skeleton className="h-4 w-32" />
+            </div>
+          </div>
+
+          {/* Right side: Status badge + Actions */}
+          <div className="flex items-center gap-3 ml-4">
+            {/* Status badge */}
+            <Skeleton className="h-6 w-24 rounded-full" />
+            
+            {/* Action buttons */}
+            <div className="flex items-center gap-1">
+              <Skeleton className="h-8 w-8 rounded" />
+              <Skeleton className="h-8 w-8 rounded" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+export { Skeleton, CardSkeleton, AuditListSkeleton, FormSkeleton, ReportListSkeleton };
