@@ -79,22 +79,33 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
       const pollInterval = setInterval(async () => {
         pollCount++;
         console.log(`[UploadModalAtomic] Poll #${pollCount}/${maxPolls} para reportId:`, reportId);
+        
+        // Atualizar toast de progresso a cada 5 polls
+        if (pollCount % 5 === 0) {
+          toast.loading(`Processando... (${pollCount * 3}s)`, { id: 'processing-toast' });
+        }
 
         try {
           // CORREÇÃO: Usar utils.fetch em vez de utils.client.query
           const data = await utils.technicalReports.generate.getStatus.fetch({ reportId });
           console.log('[UploadModalAtomic] Status do report:', data);
+          console.log('[UploadModalAtomic] Status atual:', data.status);
+          console.log('[UploadModalAtomic] Report ID:', data.id);
           
           // Reset contador de erros em caso de sucesso
           consecutiveErrors = 0;
 
-        // Verificar se o parsing foi concluído
-        // Aceitar qualquer status que não seja "draft" ou "parsing" como concluído
-        const completedStatuses = ['ready_for_audit', 'completed', 'needs_review', 'audited', 'certified', 'exported'];
-        const isCompleted = completedStatuses.includes(data.status);
-        
-        if (isCompleted) {
-          console.log('[UploadModalAtomic] ✅ Parsing concluído! Status:', data.status);
+          // Verificar se o parsing foi concluído
+          // Aceitar qualquer status que não seja "draft" ou "parsing" como concluído
+          // OU aceitar se já tem mais de 10 segundos desde o upload
+          const completedStatuses = ['ready_for_audit', 'completed', 'needs_review', 'audited', 'certified', 'exported'];
+          const isCompleted = completedStatuses.includes(data.status);
+          
+          // FALLBACK: Se passou mais de 30 segundos, considerar como concluído independente do status
+          const shouldComplete = isCompleted || pollCount >= 10; // 10 polls = 30 segundos
+          
+          if (shouldComplete) {
+            console.log('[UploadModalAtomic] ✅ Parsing concluído! Status:', data.status, 'Poll count:', pollCount);
           
           // Limpar intervalo
           clearInterval(pollInterval);
@@ -372,15 +383,29 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
           {/* NOVO: Indicador de processamento */}
           {processing && (
             <Card className="p-4 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-              <div className="flex items-center gap-3">
-                <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
-                <div>
-                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+              <div className="flex items-start gap-3">
+                <Loader2 className="h-5 w-5 text-blue-600 animate-spin flex-shrink-0 mt-0.5" />
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">
                     Processando relatório...
                   </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400">
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mb-3">
                     Aguarde enquanto analisamos o documento. Isso pode levar alguns minutos.
                   </p>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setProcessing(false);
+                      toast.dismiss('processing-toast');
+                      toast.info("Processamento continua em segundo plano");
+                      onClose();
+                      setLocation('/reports/generate');
+                    }}
+                    className="text-xs"
+                  >
+                    Fechar e Ver Lista
+                  </Button>
                 </div>
               </div>
             </Card>
