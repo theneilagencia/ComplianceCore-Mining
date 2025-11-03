@@ -17,6 +17,7 @@ import { FileText, Upload as UploadIcon, Download, AlertCircle, CheckCircle } fr
 import UploadModalAtomic from "../components/UploadModalAtomic";
 import { Badge } from "@/components/ui/badge";
 import { ReportListSkeleton } from "@/components/ui/skeleton";
+import { EmptyState } from "@/components/EmptyState";
 import { useLocation } from "wouter";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -106,6 +107,8 @@ export default function GenerateReport() {
  };
 
 	const handleDownloadTemplate = async (format: string) => {
+		const toastId = toast.loading(`Preparando template ${format}...`);
+		
 		try {
 			// Mapear formato para kind da API
 			const kindMap: Record<string, string> = {
@@ -126,23 +129,70 @@ export default function GenerateReport() {
 			
 			const templateType = standardMap[standard] || "jorc";
 			
-			// Fazer download via API
+			// Fazer download via API com timeout de 30 segundos
 			const url = `/api/templates/${templateType}?format=${kind}&type=report`;
-			const response = await fetch(url);
 			
+			const controller = new AbortController();
+			const timeoutId = setTimeout(() => controller.abort(), 30000);
+			
+			let response: Response;
+			try {
+				response = await fetch(url, { signal: controller.signal });
+			} catch (fetchError) {
+				clearTimeout(timeoutId);
+				if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+					throw new Error("Tempo limite excedido. O servidor está demorando muito para responder. Tente novamente.");
+				}
+				throw new Error("Erro de conexão. Verifique sua internet e tente novamente.");
+			}
+			
+			clearTimeout(timeoutId);
+			
+			// Validar resposta
 			if (!response.ok) {
-				throw new Error("Erro ao baixar template");
+				if (response.status === 404) {
+					throw new Error(`Template ${format} não encontrado para o padrão ${standard}.`);
+				} else if (response.status === 403) {
+					throw new Error("Você não tem permissão para baixar este template.");
+				} else if (response.status >= 500) {
+					throw new Error("Erro no servidor. Tente novamente em alguns instantes.");
+				}
+				throw new Error(`Erro ao baixar template (${response.status})`);
+			}
+			
+			// Validar Content-Type
+			const contentType = response.headers.get("Content-Type");
+			const expectedTypes: Record<string, string[]> = {
+				xlsx: ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/octet-stream"],
+				csv: ["text/csv", "text/plain", "application/csv"],
+				pdf: ["application/pdf"],
+			};
+			
+			const validTypes = expectedTypes[kind] || [];
+			if (contentType && !validTypes.some(type => contentType.includes(type))) {
+				console.warn(`Content-Type inesperado: ${contentType} para formato ${kind}`);
 			}
 			
 			// Extrair nome do arquivo do header Content-Disposition
 			const contentDisposition = response.headers.get("Content-Disposition");
-			let filename = `template_${templateType}.${kind}`;
+			let filename = `template_${templateType}_${standard}.${kind}`;
 			
 			if (contentDisposition) {
-				const matches = /filename="?([^"]+)"?/.exec(contentDisposition);
+				const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(contentDisposition);
 				if (matches && matches[1]) {
-					filename = matches[1];
+					filename = matches[1].replace(/['"]/g, '');
 				}
+			}
+			
+			// Verificar tamanho do arquivo para progress em arquivos grandes
+			const contentLength = response.headers.get("Content-Length");
+			const totalSize = contentLength ? parseInt(contentLength, 10) : 0;
+			
+			// Para arquivos > 5MB, mostrar progresso
+			if (totalSize > 5 * 1024 * 1024) {
+				toast.loading(`Baixando... 0%`, { id: toastId });
+				// Nota: Progress tracking real requer ReadableStream
+				// Implementação simplificada aqui
 			}
 			
 			// Criar blob e fazer download
@@ -156,13 +206,20 @@ export default function GenerateReport() {
 			document.body.removeChild(a);
 			window.URL.revokeObjectURL(downloadUrl);
 			
-			toast.success(`Template ${format} baixado com sucesso!`, {
-				description: `Arquivo: ${filename}`
+			toast.success(`Template ${format} baixado!`, {
+				id: toastId,
+				description: `Arquivo: ${filename} (${(blob.size / 1024).toFixed(1)} KB)`
 			});
 		} catch (error) {
-			console.error("Erro ao baixar template:", error);
-			toast.error("Erro ao baixar template", {
-				description: "Tente novamente ou entre em contato com o suporte"
+			console.error("[TemplateDownload] Error:", error);
+			const errorMessage = error instanceof Error ? error.message : "Erro desconhecido ao baixar template";
+			toast.error("Erro no download", {
+				id: toastId,
+				description: errorMessage,
+				action: {
+					label: "Tentar Novamente",
+					onClick: () => handleDownloadTemplate(format),
+				},
 			});
 		}
 	};
@@ -421,12 +478,17 @@ export default function GenerateReport() {
  </Card>
 
  {/* Relatórios Recentes */}
- <Card className="p-6">
+ <div>
  <h2 className="text-xl font-semibold mb-4">Relatórios Recentes</h2>
  
  {isLoading ? (
  <ReportListSkeleton count={5} />
+ ) : error ? (
+ <EmptyState
+ variant="error"
+ />
  ) : reports && reports.items && reports.items.length > 0 ? (
+ <Card className="p-6">
  <div className="space-y-3">
  {reports.items.map((report) => (
  <div
@@ -450,13 +512,17 @@ export default function GenerateReport() {
  </div>
  ))}
  </div>
- ) : (
- <div className="text-center py-8 text-gray-500">
- <FileText className="h-12 w-12 mx-auto mb-3 text-gray-300" />
- <p>Nenhum relatório encontrado</p>
- </div>
- )}
  </Card>
+ ) : (
+ <EmptyState
+ variant="no-reports"
+ onCreateReport={() => {
+ // Scroll to top to show form
+ window.scrollTo({ top: 0, behavior: 'smooth' });
+ }}
+ onUploadReport={() => setShowUploadModal(true)}
+ />
+ )}
  </div>
 
 	<UploadModalAtomic 
@@ -470,6 +536,7 @@ export default function GenerateReport() {
 			navigate(`/reports/${result.reportId}/review`);
 		}}
 	/>
+ </div>
  </DashboardLayout>
  );
 }
