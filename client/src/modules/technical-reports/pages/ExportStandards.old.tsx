@@ -123,7 +123,7 @@ export default function ExportStandards() {
                 className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               >
                 <option value="">Selecione um relatório...</option>
-                {reportsQuery.data?.map((report: any) => (
+                {reportsQuery.data?.items?.map((report: any) => (
                   <option key={report.id} value={report.id}>
                     {report.title} ({report.standard}) - {report.status}
                   </option>

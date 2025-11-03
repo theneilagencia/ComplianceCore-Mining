@@ -104,7 +104,7 @@ export default function ExportStandards() {
         return await utils.client.technicalReports.generate.list.query();
       });
       
-      setReports(data || []);
+      setReports(data?.items || []);
     } catch (err: any) {
       console.error('Erro ao carregar relatórios:', err);
       setError('Não foi possível carregar a lista de relatórios. Tente novamente.');

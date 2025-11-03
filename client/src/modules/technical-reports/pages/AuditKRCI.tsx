@@ -163,7 +163,7 @@ export default function AuditKRCI() {
     }
 
     // GUARD-RAIL: Verificar se o relatório precisa de revisão
-    const report = reports?.find((r) => r.id === selectedReport);
+    const report = reports?.items?.find((r) => r.id === selectedReport);
     if (report?.status === "needs_review") {
       setShowGuardRail(true);
       return;
@@ -255,7 +255,7 @@ export default function AuditKRCI() {
               <div>
                 <p className="text-sm text-gray-400">Relatórios Prontos</p>
                 <p className="text-2xl font-bold">
-                  {reports?.filter((r) => r.status === "ready_for_audit").length || 0}
+                  {reports?.items?.filter((r) => r.status === "ready_for_audit").length || 0}
                 </p>
               </div>
             </div>
@@ -314,7 +314,7 @@ export default function AuditKRCI() {
                       <SelectValue placeholder="Selecione um relatório..." />
                     </SelectTrigger>
                     <SelectContent>
-                      {reports?.map((report) => (
+                      {reports?.items?.map((report) => (
                         <SelectItem key={report.id} value={report.id}>
                           {report.title} ({report.standard}) - {report.status}
                         </SelectItem>
