@@ -40,11 +40,6 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
   const [, setLocation] = useLocation();
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
-  
-  // NOVO: Estado para controlar o processamento após upload
-  const [processing, setProcessing] = useState(false);
-  const [reportId, setReportId] = useState<string | null>(null);
-  const [uploadId, setUploadId] = useState<string | null>(null);
 
   const utils = trpc.useUtils();
 
@@ -54,138 +49,13 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
       console.log('[UploadModalAtomic] Modal aberto - resetando estados');
       setFile(null);
       setUploading(false);
-      setProcessing(false);
-      setReportId(null);
-      setUploadId(null);
     }
   }, [open]);
 
   // Usar o endpoint atômico V2
   const uploadAndProcess = trpc.technicalReports.uploadsV2.uploadAndProcessReport.useMutation();
 
-  // NOVO: Polling para verificar status do parsing
-  useEffect(() => {
-    if (!processing || !reportId) return;
-
-    console.log('[UploadModalAtomic] Iniciando polling para reportId:', reportId);
-
-    let pollCount = 0;
-    const maxPolls = 60; // 3 minutos (60 * 3s)
-    let consecutiveErrors = 0;
-    const maxConsecutiveErrors = 5;
-    
-    // Aguardar 2 segundos antes de iniciar polling (dar tempo pro backend processar)
-    const initialDelay = setTimeout(() => {
-      const pollInterval = setInterval(async () => {
-        pollCount++;
-        console.log(`[UploadModalAtomic] Poll #${pollCount}/${maxPolls} para reportId:`, reportId);
-        
-        // Atualizar toast de progresso a cada 5 polls
-        if (pollCount % 5 === 0) {
-          toast.loading(`Processando... (${pollCount * 3}s)`, { id: 'processing-toast' });
-        }
-
-        try {
-          // CORREÇÃO: Usar utils.fetch em vez de utils.client.query
-          const data = await utils.technicalReports.generate.getStatus.fetch({ reportId });
-          console.log('[UploadModalAtomic] Status do report:', data);
-          console.log('[UploadModalAtomic] Status atual:', data.status);
-          console.log('[UploadModalAtomic] Report ID:', data.id);
-          
-          // Reset contador de erros em caso de sucesso
-          consecutiveErrors = 0;
-
-          // Verificar se o parsing foi concluído
-          // Aceitar qualquer status que não seja "draft" ou "parsing" como concluído
-          // OU aceitar se já tem mais de 10 segundos desde o upload
-          const completedStatuses = ['ready_for_audit', 'completed', 'needs_review', 'audited', 'certified', 'exported'];
-          const isCompleted = completedStatuses.includes(data.status);
-          
-          // FALLBACK: Se passou mais de 30 segundos, considerar como concluído independente do status
-          const shouldComplete = isCompleted || pollCount >= 10; // 10 polls = 30 segundos
-          
-          if (shouldComplete) {
-            console.log('[UploadModalAtomic] ✅ Parsing concluído! Status:', data.status, 'Poll count:', pollCount);
-          
-          // Limpar intervalo
-          clearInterval(pollInterval);
-          
-          // Atualizar estado para "done"
-          setProcessing(false);
-          
-          // Invalidar queries para atualizar listas
-          utils.technicalReports.generate.list.invalidate();
-          utils.technicalReports.uploads.list.invalidate();
-          
-          // Mostrar toast apropriado
-          if (data.status === 'needs_review') {
-            toast.warning("Relatório processado com avisos", {
-              description: "Alguns campos precisam de revisão manual.",
-            });
-          } else {
-            toast.success("Relatório processado com sucesso!", {
-              description: "Seu relatório está pronto para auditoria.",
-            });
-          }
-          
-          // Fechar modal e chamar callback
-          toast.dismiss('processing-toast');
-          
-          // Fechar modal primeiro
-          onClose();
-          
-          // Depois executar ação apropriada
-          if (onSuccess && uploadId) {
-            console.log('[UploadModalAtomic] Chamando onSuccess callback com reportId:', reportId);
-            // Pequeno delay para garantir que modal fechou antes de navegar
-            setTimeout(() => {
-              onSuccess({ uploadId, reportId });
-            }, 100);
-          } else {
-            // Se não há callback, redirecionar para a lista
-            console.log('[UploadModalAtomic] Sem callback, redirecionando para lista');
-            setTimeout(() => {
-              setLocation(`/reports/generate`);
-            }, 100);
-          }
-        }
-      } catch (error: any) {
-        console.error('[UploadModalAtomic] Erro no polling:', error);
-        consecutiveErrors++;
-        
-        // Se houver muitos erros consecutivos, parar o polling
-        if (consecutiveErrors >= maxConsecutiveErrors) {
-          console.error('[UploadModalAtomic] Muitos erros consecutivos, parando polling');
-          clearInterval(pollInterval);
-          setProcessing(false);
-          
-          toast.error("Erro ao verificar status do relatório", {
-            description: "Tente recarregar a página ou entre em contato com o suporte.",
-            duration: 7000,
-          });
-          return;
-        }
-      }
-
-      // Timeout após maxPolls tentativas
-      if (pollCount >= maxPolls) {
-        console.warn('[UploadModalAtomic] Timeout do polling após', maxPolls, 'tentativas');
-        clearInterval(pollInterval);
-        setProcessing(false);
-        
-        toast.warning("Processamento está demorando", {
-          description: "O relatório está sendo processado. Você pode fechar esta janela.",
-        });
-      }
-      }, 3000); // Poll a cada 3 segundos
-    }, 2000); // Aguardar 2 segundos antes de iniciar polling
-
-    // Cleanup ao desmontar
-    return () => {
-      console.log('[UploadModalAtomic] Limpando timeouts e intervalos');
-      clearTimeout(initialDelay);
-    };
-  }, [processing, reportId, uploadId, onSuccess, onClose, setLocation, utils]);
+  // REMOVIDO: Polling complexo - Agora redirecionamento é imediato após upload
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -320,20 +190,32 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
       console.log('[UploadModalAtomic] ✅ Upload concluído!');
       console.log('[UploadModalAtomic] Result:', { uploadId: result.uploadId, reportId: result.reportId });
       
-      // Atualizar estados
-      setReportId(result.reportId);
-      setUploadId(result.uploadId);
+      toast.dismiss('upload-process');
+      toast.success("Upload concluído!", {
+        description: "Redirecionando para visualização...",
+        duration: 2000,
+      });
+
+      // SIMPLIFICADO: Fechar modal imediatamente e chamar onSuccess
       setUploading(false);
       
-      // NOVO: Ativar estado de processamento
-      setProcessing(true);
-
-      toast.dismiss('upload-process');
-      toast.info("Processando relatório...", {
-        description: "Aguarde enquanto analisamos o documento.",
-        duration: Infinity, // Não fecha automaticamente
-        id: 'processing-toast',
-      });
+      // Fechar modal
+      console.log('[UploadModalAtomic] Fechando modal após upload');
+      onClose();
+      
+      // Chamar onSuccess se disponível
+      if (onSuccess) {
+        console.log('[UploadModalAtomic] Chamando onSuccess com reportId:', result.reportId);
+        setTimeout(() => {
+          onSuccess({ uploadId: result.uploadId, reportId: result.reportId });
+        }, 100);
+      } else {
+        // Fallback: redirecionar para lista
+        console.log('[UploadModalAtomic] Sem callback, redirecionando para lista');
+        setTimeout(() => {
+          setLocation(`/reports/generate`);
+        }, 100);
+      }
 
     } catch (error: any) {
       console.error('[UploadModalAtomic] ❌ Erro:', error);
@@ -364,17 +246,13 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
       });
       
       setUploading(false);
-      setProcessing(false);
     }
   };
 
   const handleClose = () => {
-    if (!uploading && !processing) {
+    if (!uploading) {
       console.log('[UploadModalAtomic] Fechando modal e limpando estados');
       setFile(null);
-      setReportId(null);
-      setUploadId(null);
-      setProcessing(false);
       setUploading(false);
       toast.dismiss('processing-toast');
       toast.dismiss('upload-process');
@@ -393,36 +271,6 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
         </DialogHeader>
 
         <div className="space-y-4">
-          {/* NOVO: Indicador de processamento */}
-          {processing && (
-            <Card className="p-4 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
-              <div className="flex items-start gap-3">
-                <Loader2 className="h-5 w-5 text-blue-600 animate-spin flex-shrink-0 mt-0.5" />
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300 mb-1">
-                    Processando relatório...
-                  </p>
-                  <p className="text-xs text-blue-600 dark:text-blue-400 mb-3">
-                    Aguarde enquanto analisamos o documento. Isso pode levar alguns minutos.
-                  </p>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setProcessing(false);
-                      toast.dismiss('processing-toast');
-                      toast.info("Processamento continua em segundo plano");
-                      onClose();
-                      setLocation('/reports/generate');
-                    }}
-                    className="text-xs"
-                  >
-                    Fechar e Ver Lista
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          )}
 
           {/* Área de drop */}
           <div
@@ -432,7 +280,7 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
               border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
               transition-colors duration-200
               ${file ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50'}
-              ${uploading || processing ? 'opacity-50 cursor-not-allowed' : ''}
+              ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
             `}
           >
             {!file ? (
@@ -451,7 +299,7 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
                       className="hidden"
                       accept=".pdf,.docx,.xlsx,.csv,.zip"
                       onChange={handleFileSelect}
-                      disabled={uploading || processing}
+                      disabled={uploading}
                     />
                   </label>
                 </div>
@@ -469,7 +317,7 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
-                  {!uploading && !processing && (
+                  {!uploading && (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -485,25 +333,23 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
           </div>
 
           {/* Informações sobre o processo */}
-          {!processing && (
-            <Card className="p-4 bg-muted/50">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
-                <div className="space-y-2 text-sm">
-                  <p className="font-medium">Upload V2 - Melhorias:</p>
-                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                    <li>Upload atômico em uma única requisição</li>
-                    <li>Processamento assíncrono mais rápido</li>
-                    <li>Menos pontos de falha</li>
-                    <li>Melhor tratamento de erros</li>
-                  </ul>
-                </div>
+          <Card className="p-4 bg-muted/50">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
+              <div className="space-y-2 text-sm">
+                <p className="font-medium">Upload V2 - Melhorias:</p>
+                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                  <li>Upload atômico em uma única requisição</li>
+                  <li>Processamento assíncrono mais rápido</li>
+                  <li>Menos pontos de falha</li>
+                  <li>Melhor tratamento de erros</li>
+                </ul>
               </div>
-            </Card>
-          )}
+            </div>
+          </Card>
 
           {/* Estimativa de tempo */}
-          {file && !processing && (
+          {file && (
             <Card className="p-3 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
                 <CheckCircle className="h-4 w-4" />
@@ -517,23 +363,18 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
             <Button
               variant="outline"
               onClick={handleClose}
-              disabled={uploading || processing}
+              disabled={uploading}
             >
-              {processing ? "Processando..." : "Cancelar"}
+              Cancelar
             </Button>
             <Button
               onClick={handleUpload}
-              disabled={!file || uploading || processing}
+              disabled={!file || uploading}
             >
               {uploading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
                   Enviando...
-                </>
-              ) : processing ? (
-                <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Processando...
                 </>
               ) : (
                 "Iniciar Upload"
