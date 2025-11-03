@@ -11,6 +11,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { AuditListSkeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
 import { Shield, CheckCircle, AlertTriangle, FileSearch, Download, ExternalLink } from "lucide-react";
 import GuardRailModal from "../components/GuardRailModal";
@@ -100,7 +101,7 @@ export default function AuditKRCI() {
   );
 
   // Query para listar auditorias (polling ativo após audit - BUG-007 fix)
-  const { data: audits } = trpc.technicalReports.audit.list.useQuery(
+  const { data: audits, isLoading: auditsLoading } = trpc.technicalReports.audit.list.useQuery(
     { limit: 10 },
     {
       refetchInterval: auditResult ? 30000 : false, // Poll a cada 30s se há resultado
@@ -323,7 +324,13 @@ export default function AuditKRCI() {
                 </div>
 
                 <div className="pt-4">
-                  <Button type="submit" className="w-full" disabled={runAudit.isPending}>
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={runAudit.isPending}
+                    aria-label="Executar auditoria KRCI no relatório selecionado"
+                    aria-busy={runAudit.isPending}
+                  >
                     {runAudit.isPending ? "Executando auditoria..." : "Executar Auditoria"}
                   </Button>
                 </div>
@@ -378,8 +385,9 @@ export default function AuditKRCI() {
                   onClick={() => setShouldGeneratePlan(true)}
                   className="w-full"
                   variant="default"
+                  aria-label={`Gerar plano de correção para ${auditResult.failedRules} regras falhadas`}
                 >
-                  <FileSearch className="h-4 w-4 mr-2" />
+                  <FileSearch className="h-4 w-4 mr-2" aria-hidden="true" />
                   Gerar Plano de Correção Automático
                 </Button>
               </div>
@@ -445,15 +453,15 @@ export default function AuditKRCI() {
             {/* Download PDF */}
             {auditResult.pdfUrl && (
               <div className="flex gap-3">
-                <Button asChild className="flex-1">
+                <Button asChild className="flex-1" aria-label="Baixar relatório de auditoria em PDF">
                   <a href={auditResult.pdfUrl} target="_blank" rel="noopener noreferrer">
-                    <Download className="h-4 w-4 mr-2" />
+                    <Download className="h-4 w-4 mr-2" aria-hidden="true" />
                     Baixar Relatório PDF
                   </a>
                 </Button>
-                <Button variant="outline" asChild>
+                <Button variant="outline" asChild aria-label="Visualizar relatório de auditoria em nova aba">
                   <a href={auditResult.pdfUrl} target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" />
+                    <ExternalLink className="h-4 w-4 mr-2" aria-hidden="true" />
                     Visualizar
                   </a>
                 </Button>
@@ -538,7 +546,9 @@ export default function AuditKRCI() {
         {/* Auditorias Recentes */}
         <Card className="p-6">
           <h3 className="text-lg font-semibold mb-4">Auditorias Recentes</h3>
-          {audits && audits.length > 0 ? (
+          {auditsLoading ? (
+            <AuditListSkeleton />
+          ) : audits && audits.length > 0 ? (
             <div className="space-y-3">
               {audits.map((audit) => (
                 <div
@@ -561,7 +571,12 @@ export default function AuditKRCI() {
                       </p>
                     </div>
                     {audit.pdfUrl && (
-                      <Button size="sm" variant="outline" asChild>
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        asChild
+                        aria-label={`Baixar relatório de auditoria ${audit.id}`}
+                      >
                         <a href={audit.pdfUrl} target="_blank" rel="noopener noreferrer">
                           <Download className="h-4 w-4" />
                         </a>
