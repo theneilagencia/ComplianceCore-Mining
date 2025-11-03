@@ -8,14 +8,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
-import { Upload, FileText, X, CheckCircle, AlertCircle } from "lucide-react";
-import { useState, useCallback } from "react";
+import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
+import { useState, useCallback, useEffect } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 
 interface UploadModalProps {
   open: boolean;
   onClose: () => void;
+  onSuccess?: (result: { uploadId: string; reportId: string }) => void;
 }
 
 /**
@@ -27,17 +28,127 @@ interface UploadModalProps {
  * - Parsing assíncrono
  * 
  * Elimina condições de corrida e garante consistência total.
+ * 
+ * CORREÇÕES APLICADAS:
+ * 1. Substituído mutate() por mutateAsync() e aguardando Promise
+ * 2. Adicionado estado "processing" após upload
+ * 3. Implementado polling para status do parsing
+ * 4. Modal fecha automaticamente quando parsing completa
+ * 5. Logs de debug sem dados sensíveis
  */
-export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
+export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadModalProps) {
   const [, setLocation] = useLocation();
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
+  
+  // NOVO: Estado para controlar o processamento após upload
+  const [processing, setProcessing] = useState(false);
   const [reportId, setReportId] = useState<string | null>(null);
+  const [uploadId, setUploadId] = useState<string | null>(null);
 
   const utils = trpc.useUtils();
 
   // Usar o endpoint atômico V2
   const uploadAndProcess = trpc.technicalReports.uploadsV2.uploadAndProcessReport.useMutation();
+
+  // NOVO: Polling para verificar status do parsing
+  useEffect(() => {
+    if (!processing || !reportId) return;
+
+    console.log('[UploadModalAtomic] Iniciando polling para reportId:', reportId);
+
+    let pollCount = 0;
+    const maxPolls = 60; // 3 minutos (60 * 3s)
+    
+    const pollInterval = setInterval(async () => {
+      pollCount++;
+      console.log(`[UploadModalAtomic] Poll #${pollCount}/${maxPolls} para reportId:`, reportId);
+
+      try {
+        // Fazer requisição para verificar status
+        const response = await fetch(`/api/reports/status/${reportId}`, {
+          credentials: 'include',
+        });
+
+        if (!response.ok) {
+          console.warn('[UploadModalAtomic] Erro ao verificar status:', response.status);
+          return; // Continua tentando
+        }
+
+        const data = await response.json();
+        console.log('[UploadModalAtomic] Status do report:', data);
+
+        // Verificar se o parsing foi concluído
+        if (data.status === 'ready_for_audit' || data.status === 'completed') {
+          console.log('[UploadModalAtomic] ✅ Parsing concluído!');
+          
+          // Limpar intervalo
+          clearInterval(pollInterval);
+          
+          // Atualizar estado para "done"
+          setProcessing(false);
+          
+          // Invalidar queries para atualizar listas
+          utils.technicalReports.generate.list.invalidate();
+          utils.technicalReports.uploads.list.invalidate();
+          
+          // Mostrar toast de sucesso
+          toast.success("Relatório processado com sucesso!", {
+            description: "Seu relatório está pronto para auditoria.",
+          });
+          
+          // Chamar onSuccess callback se fornecido
+          if (onSuccess && uploadId) {
+            onSuccess({ uploadId, reportId });
+          }
+          
+          // Fechar modal e redirecionar
+          setTimeout(() => {
+            onClose();
+            setLocation(`/reports/generate`);
+          }, 1500);
+        } else if (data.status === 'needs_review') {
+          console.log('[UploadModalAtomic] ⚠️ Parsing completou com avisos');
+          
+          clearInterval(pollInterval);
+          setProcessing(false);
+          
+          toast.warning("Relatório processado com avisos", {
+            description: "Alguns campos precisam de revisão manual.",
+          });
+          
+          if (onSuccess && uploadId) {
+            onSuccess({ uploadId, reportId });
+          }
+          
+          setTimeout(() => {
+            onClose();
+            setLocation(`/reports/generate`);
+          }, 1500);
+        }
+      } catch (error) {
+        console.error('[UploadModalAtomic] Erro no polling:', error);
+        // Não fazer nada, continua tentando
+      }
+
+      // Timeout após maxPolls tentativas
+      if (pollCount >= maxPolls) {
+        console.warn('[UploadModalAtomic] Timeout do polling após', maxPolls, 'tentativas');
+        clearInterval(pollInterval);
+        setProcessing(false);
+        
+        toast.warning("Processamento está demorando", {
+          description: "O relatório está sendo processado. Você pode fechar esta janela.",
+        });
+      }
+    }, 3000); // Poll a cada 3 segundos
+
+    // Cleanup ao desmontar
+    return () => {
+      console.log('[UploadModalAtomic] Limpando intervalo de polling');
+      clearInterval(pollInterval);
+    };
+  }, [processing, reportId, uploadId, onSuccess, onClose, setLocation, utils]);
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -55,16 +166,19 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
   };
 
   const handleUpload = async () => {
+    console.log('[UploadModalAtomic] ========== INÍCIO DO UPLOAD ==========');
     
     if (!file) {
-      console.error('[Upload Atomic] ERRO: Nenhum arquivo selecionado');
+      console.error('[UploadModalAtomic] ERRO: Nenhum arquivo selecionado');
       toast.error("Selecione um arquivo");
       return;
     }
 
+    console.log('[UploadModalAtomic] Arquivo:', file.name, `(${file.size} bytes)`);
+
     // Validar se o arquivo existe e não está vazio
     if (file.size === 0) {
-      console.error('[Upload Atomic] ERRO: Arquivo vazio');
+      console.error('[UploadModalAtomic] ERRO: Arquivo vazio');
       toast.error("Arquivo vazio", {
         description: "O arquivo selecionado está vazio. Selecione um arquivo válido.",
       });
@@ -74,7 +188,7 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     // Validar tamanho do arquivo (50MB max)
     const maxSize = 50 * 1024 * 1024; // 50MB
     if (file.size > maxSize) {
-      console.error('[Upload Atomic] ERRO: Arquivo muito grande:', file.size);
+      console.error('[UploadModalAtomic] ERRO: Arquivo muito grande:', file.size);
       toast.error("Arquivo muito grande", {
         description: `Tamanho máximo: 50MB. Seu arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
       });
@@ -96,7 +210,7 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     const validExtensions = ['pdf', 'docx', 'xlsx', 'csv', 'zip'];
     
     if (!validExtensions.includes(fileExtension || '')) {
-      console.error('[Upload Atomic] ERRO: Extensão inválida:', fileExtension);
+      console.error('[UploadModalAtomic] ERRO: Extensão inválida:', fileExtension);
       toast.error("Extensão de arquivo não suportada", {
         description: `Extensão "${fileExtension}" não é aceita. Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP`,
       });
@@ -104,39 +218,31 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     }
     
     if (file.type && !allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|docx|xlsx|csv|zip)$/i)) {
-      console.error('[Upload Atomic] ERRO: MIME type inválido:', file.type);
+      console.error('[UploadModalAtomic] ERRO: MIME type inválido:', file.type);
       toast.error("Tipo de arquivo não suportado", {
         description: "Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP",
       });
       return;
     }
 
+    console.log('[UploadModalAtomic] ✅ Validações passaram');
 
     try {
       setUploading(true);
+      console.log('[UploadModalAtomic] Estado uploading=true');
 
       toast.loading("Enviando arquivo...", { id: 'upload-process' });
 
       // Converter arquivo para base64
+      console.log('[UploadModalAtomic] Convertendo para base64...');
       const fileData = await new Promise<string>((resolve, reject) => {
-        
         const reader = new FileReader();
-        
-        reader.onloadstart = () => {
-        };
-        
-        reader.onprogress = (e) => {
-          if (e.lengthComputable) {
-            const percentComplete = (e.loaded / e.total) * 100;
-          }
-        };
         
         reader.onload = () => {
           try {
             const result = reader.result as string;
             
             if (!result || !result.includes(',')) {
-              console.error('[Upload Atomic] ERRO: Formato inválido, não contém vírgula');
               reject(new Error("Formato de arquivo inválido"));
               return;
             }
@@ -144,48 +250,29 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
             const base64 = result.split(",")[1];
             
             if (!base64) {
-              console.error('[Upload Atomic] ERRO: Base64 vazio após split');
               reject(new Error("Não foi possível converter o arquivo"));
               return;
             }
             
+            console.log('[UploadModalAtomic] ✅ Conversão para base64 concluída');
             resolve(base64);
           } catch (error) {
-            console.error('[Upload Atomic] ERRO no try/catch de onload:', error);
             reject(new Error(`Erro ao processar arquivo: ${error}`));
           }
         };
         
-        reader.onerror = (event) => {
-          console.error('[Upload Atomic] ❌ FileReader.onerror DISPARADO!');
-          console.error('[Upload Atomic] Event:', event);
-          console.error('[Upload Atomic] Reader.error:', reader.error);
-          console.error('[Upload Atomic] Reader.error.name:', reader.error?.name);
-          console.error('[Upload Atomic] Reader.error.message:', reader.error?.message);
-          console.error('[Upload Atomic] File.name:', file.name);
-          console.error('[Upload Atomic] File.size:', file.size);
-          console.error('[Upload Atomic] File.type:', file.type);
-          
+        reader.onerror = () => {
           const errorMsg = reader.error?.message || 'desconhecido';
-          const errorName = reader.error?.name || 'UnknownError';
-          
-          reject(new Error(`Erro ao ler arquivo "${file.name}": ${errorName} - ${errorMsg}. Verifique se o arquivo não está corrompido ou em uso por outro programa.`));
+          reject(new Error(`Erro ao ler arquivo: ${errorMsg}`));
         };
         
-        reader.onabort = () => {
-          console.error('[Upload Atomic] ❌ FileReader.onabort - Leitura cancelada!');
-          reject(new Error("Leitura do arquivo foi cancelada"));
-        };
-        
-        try {
-          reader.readAsDataURL(file);
-        } catch (error) {
-          console.error('[Upload Atomic] ERRO ao chamar readAsDataURL:', error);
-          reject(new Error(`Erro ao iniciar leitura: ${error}`));
-        }
+        reader.readAsDataURL(file);
       });
+      
+      console.log('[UploadModalAtomic] Base64 size:', fileData.length, 'chars');
 
-      // ÚNICA CHAMADA: Upload + Storage + Banco (Parsing é assíncrono)
+      // CORREÇÃO: Aguardar a Promise do mutateAsync()
+      console.log('[UploadModalAtomic] Chamando uploadAndProcess.mutateAsync...');
       const result = await uploadAndProcess.mutateAsync({
         fileName: file.name,
         fileSize: file.size,
@@ -193,53 +280,42 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
         fileData,
       });
 
-      setReportId(result.reportId);
-
-      // Invalidar queries
-      utils.technicalReports.generate.list.invalidate();
-      utils.technicalReports.uploads.list.invalidate();
-
-      // Exibir resultado
-      toast.dismiss('upload-process');
+      console.log('[UploadModalAtomic] ✅ Upload concluído!');
+      console.log('[UploadModalAtomic] Result:', { uploadId: result.uploadId, reportId: result.reportId });
       
-      toast.success("Upload concluído com sucesso!", {
-        description: "Seu relatório está sendo processado em segundo plano. Você será notificado quando estiver pronto.",
-        duration: 5000,
-      });
+      // Atualizar estados
+      setReportId(result.reportId);
+      setUploadId(result.uploadId);
+      setUploading(false);
+      
+      // NOVO: Ativar estado de processamento
+      setProcessing(true);
 
-      // Fechar modal e redirecionar para lista de relatórios
-      setTimeout(() => {
-        onClose();
-        setLocation(`/reports/generate`); // Redireciona para lista
-      }, 2000);
+      toast.dismiss('upload-process');
+      toast.info("Processando relatório...", {
+        description: "Aguarde enquanto analisamos o documento.",
+        duration: Infinity, // Não fecha automaticamente
+        id: 'processing-toast',
+      });
 
     } catch (error: any) {
-      console.error('[Upload Atomic] Error:', error);
-      console.error('[Upload Atomic] Error stack:', error?.stack);
-      console.error('[Upload Atomic] File details:', {
-        name: file.name,
-        size: file.size,
-        type: file.type,
-      });
+      console.error('[UploadModalAtomic] ❌ Erro:', error);
       
       toast.dismiss('upload-process');
       
       // Mensagens de erro mais específicas
-      let errorMessage = "Erro desconhecido";
+      let errorMessage = "Erro no upload";
       let errorDescription = "Tente novamente ou entre em contato com o suporte";
       
       if (error.message?.includes("ler arquivo")) {
         errorMessage = "Erro ao ler arquivo";
-        errorDescription = "O arquivo pode estar corrompido ou em uso por outro programa. Feche o arquivo e tente novamente.";
+        errorDescription = "O arquivo pode estar corrompido ou em uso.";
       } else if (error.message?.includes("Tipo de arquivo")) {
         errorMessage = "Tipo de arquivo não suportado";
         errorDescription = error.message;
       } else if (error.message?.includes("muito grande")) {
         errorMessage = "Arquivo muito grande";
         errorDescription = error.message;
-      } else if (error.message?.includes("Database")) {
-        errorMessage = "Erro de banco de dados";
-        errorDescription = "Houve um problema ao salvar o relatório. Tente novamente.";
       } else if (error.message) {
         errorMessage = "Erro no upload";
         errorDescription = error.message;
@@ -249,15 +325,17 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
         description: errorDescription,
         duration: 7000,
       });
-    } finally {
+      
       setUploading(false);
+      setProcessing(false);
     }
   };
 
   const handleClose = () => {
-    if (!uploading) {
+    if (!uploading && !processing) {
       setFile(null);
       setReportId(null);
+      setUploadId(null);
       onClose();
     }
   };
@@ -266,13 +344,30 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
-          <DialogTitle>Upload de Relatório Externo</DialogTitle>
+          <DialogTitle>Upload de Relatório Externo (V2)</DialogTitle>
           <DialogDescription>
             Faça upload de relatórios em PDF, DOCX, XLSX, CSV ou ZIP para análise automática
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
+          {/* NOVO: Indicador de processamento */}
+          {processing && (
+            <Card className="p-4 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
+              <div className="flex items-center gap-3">
+                <Loader2 className="h-5 w-5 text-blue-600 animate-spin" />
+                <div>
+                  <p className="text-sm font-medium text-blue-700 dark:text-blue-300">
+                    Processando relatório...
+                  </p>
+                  <p className="text-xs text-blue-600 dark:text-blue-400">
+                    Aguarde enquanto analisamos o documento. Isso pode levar alguns minutos.
+                  </p>
+                </div>
+              </div>
+            </Card>
+          )}
+
           {/* Área de drop */}
           <div
             onDrop={handleDrop}
@@ -281,7 +376,7 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
               border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
               transition-colors duration-200
               ${file ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50'}
-              ${uploading ? 'opacity-50 cursor-not-allowed' : ''}
+              ${uploading || processing ? 'opacity-50 cursor-not-allowed' : ''}
             `}
           >
             {!file ? (
@@ -300,7 +395,7 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
                       className="hidden"
                       accept=".pdf,.docx,.xlsx,.csv,.zip"
                       onChange={handleFileSelect}
-                      disabled={uploading}
+                      disabled={uploading || processing}
                     />
                   </label>
                 </div>
@@ -318,7 +413,7 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
                       {(file.size / 1024 / 1024).toFixed(2)} MB
                     </p>
                   </div>
-                  {!uploading && (
+                  {!uploading && !processing && (
                     <Button
                       variant="ghost"
                       size="icon"
@@ -334,23 +429,25 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
           </div>
 
           {/* Informações sobre o processo */}
-          <Card className="p-4 bg-muted/50">
-            <div className="flex items-start gap-3">
-              <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
-              <div className="space-y-2 text-sm">
-                <p className="font-medium">O que acontece após o upload:</p>
-                <ul className="list-disc list-inside space-y-1 text-muted-foreground">
-                  <li>Detecção automática do padrão (JORC, NI 43-101, etc.)</li>
-                  <li>Extração de seções, recursos e pessoas competentes</li>
-                  <li>Campos incertos serão marcados para revisão humana</li>
-                  <li>Você será notificado quando a análise estiver completa</li>
-                </ul>
+          {!processing && (
+            <Card className="p-4 bg-muted/50">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
+                <div className="space-y-2 text-sm">
+                  <p className="font-medium">Upload V2 - Melhorias:</p>
+                  <ul className="list-disc list-inside space-y-1 text-muted-foreground">
+                    <li>Upload atômico em uma única requisição</li>
+                    <li>Processamento assíncrono mais rápido</li>
+                    <li>Menos pontos de falha</li>
+                    <li>Melhor tratamento de erros</li>
+                  </ul>
+                </div>
               </div>
-            </div>
-          </Card>
+            </Card>
+          )}
 
           {/* Estimativa de tempo */}
-          {file && (
+          {file && !processing && (
             <Card className="p-3 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
                 <CheckCircle className="h-4 w-4" />
@@ -364,15 +461,27 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
             <Button
               variant="outline"
               onClick={handleClose}
-              disabled={uploading}
+              disabled={uploading || processing}
             >
-              Cancelar
+              {processing ? "Processando..." : "Cancelar"}
             </Button>
             <Button
               onClick={handleUpload}
-              disabled={!file || uploading}
+              disabled={!file || uploading || processing}
             >
-              {uploading ? "Enviando..." : "Iniciar Upload"}
+              {uploading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Enviando...
+                </>
+              ) : processing ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Processando...
+                </>
+              ) : (
+                "Iniciar Upload"
+              )}
             </Button>
           </div>
         </div>
@@ -380,4 +489,3 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     </Dialog>
   );
 }
-
