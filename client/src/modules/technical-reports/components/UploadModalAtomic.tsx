@@ -71,15 +71,22 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
 
     let pollCount = 0;
     const maxPolls = 60; // 3 minutos (60 * 3s)
+    let consecutiveErrors = 0;
+    const maxConsecutiveErrors = 5;
     
-    const pollInterval = setInterval(async () => {
-      pollCount++;
-      console.log(`[UploadModalAtomic] Poll #${pollCount}/${maxPolls} para reportId:`, reportId);
+    // Aguardar 2 segundos antes de iniciar polling (dar tempo pro backend processar)
+    const initialDelay = setTimeout(() => {
+      const pollInterval = setInterval(async () => {
+        pollCount++;
+        console.log(`[UploadModalAtomic] Poll #${pollCount}/${maxPolls} para reportId:`, reportId);
 
-      try {
-        // CORREÇÃO: Usar tRPC em vez de fetch
-        const data = await utils.client.technicalReports.generate.getStatus.query({ reportId });
-        console.log('[UploadModalAtomic] Status do report:', data);
+        try {
+          // CORREÇÃO: Usar utils.fetch em vez de utils.client.query
+          const data = await utils.technicalReports.generate.getStatus.fetch({ reportId });
+          console.log('[UploadModalAtomic] Status do report:', data);
+          
+          // Reset contador de erros em caso de sucesso
+          consecutiveErrors = 0;
 
         // Verificar se o parsing foi concluído
         // Aceitar qualquer status que não seja "draft" ou "parsing" como concluído
@@ -123,9 +130,22 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
             }, 1500);
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('[UploadModalAtomic] Erro no polling:', error);
-        // Não fazer nada, continua tentando
+        consecutiveErrors++;
+        
+        // Se houver muitos erros consecutivos, parar o polling
+        if (consecutiveErrors >= maxConsecutiveErrors) {
+          console.error('[UploadModalAtomic] Muitos erros consecutivos, parando polling');
+          clearInterval(pollInterval);
+          setProcessing(false);
+          
+          toast.error("Erro ao verificar status do relatório", {
+            description: "Tente recarregar a página ou entre em contato com o suporte.",
+            duration: 7000,
+          });
+          return;
+        }
       }
 
       // Timeout após maxPolls tentativas
@@ -138,12 +158,13 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
           description: "O relatório está sendo processado. Você pode fechar esta janela.",
         });
       }
-    }, 3000); // Poll a cada 3 segundos
+      }, 3000); // Poll a cada 3 segundos
+    }, 2000); // Aguardar 2 segundos antes de iniciar polling
 
     // Cleanup ao desmontar
     return () => {
-      console.log('[UploadModalAtomic] Limpando intervalo de polling');
-      clearInterval(pollInterval);
+      console.log('[UploadModalAtomic] Limpando timeouts e intervalos');
+      clearTimeout(initialDelay);
     };
   }, [processing, reportId, uploadId, onSuccess, onClose, setLocation, utils]);
 
