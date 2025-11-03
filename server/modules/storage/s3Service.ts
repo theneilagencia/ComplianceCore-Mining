@@ -13,25 +13,27 @@ const S3_REGION = process.env.S3_REGION || 'us-east-1';
 const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID;
 const AWS_SECRET_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 
+/**
+ * NOTE: This service uses AWS SDK v2 with CommonJS require().
+ * AWS SDK v3 migration is tracked as a separate task due to breaking API changes.
+ * For now, we comment out the require() to avoid ESM conflicts and use mock mode.
+ * 
+ * TODO: Migrate to @aws-sdk/client-s3 (v3) when time permits
+ * - Replace getSignedUrlPromise with getSignedUrl from @aws-sdk/s3-request-presigner
+ * - Replace putObject with PutObjectCommand
+ * - Replace deleteObject with DeleteObjectCommand
+ * - Replace listObjectsV2 with ListObjectsV2Command
+ */
+
 const IS_MOCK = !S3_BUCKET || !AWS_ACCESS_KEY || !AWS_SECRET_KEY;
 
-// Mock S3 if credentials not available
-let s3Client: any;
+// S3 Client - Disabled until AWS SDK v3 migration
+// Using mock mode for now to avoid ESM/CommonJS conflicts
+let s3Client: any = null;
 
-if (!IS_MOCK) {
-  try {
-    const AWS = require('aws-sdk');
-    s3Client = new AWS.S3({
-      region: S3_REGION,
-      accessKeyId: AWS_ACCESS_KEY,
-      secretAccessKey: AWS_SECRET_KEY,
-    });
-    console.log('✅ S3 initialized with real credentials');
-  } catch (error) {
-    console.warn('⚠️ AWS SDK not installed, using mock');
-    s3Client = null;
-  }
-}
+// NOTE: AWS SDK v2 require() commented out for ESM compatibility
+// Migration to v3 required before re-enabling
+console.log('⚠️ S3 Service: Using mock mode (AWS SDK v2 → v3 migration pending)')
 
 /**
  * Generate presigned URL for upload
