@@ -146,6 +146,46 @@ export const technicalReportsRouter = router({
 
         return result[0];
       }),
+
+    // Obter status de um relatório (para polling)
+    getStatus: protectedProcedure
+      .input(z.object({ reportId: z.string() }))
+      .query(async ({ ctx, input }) => {
+        const db = await import("../../db").then(m => m.getDb());
+        if (!db) {
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Database not available",
+          });
+        }
+
+        const { reports } = await import("../../../drizzle/schema");
+        const { eq, and } = await import("drizzle-orm");
+
+        const result = await db
+          .select({
+            id: reports.id,
+            status: reports.status,
+            title: reports.title,
+            standard: reports.standard,
+            updatedAt: reports.updatedAt,
+          })
+          .from(reports)
+          .where(and(
+            eq(reports.id, input.reportId),
+            eq(reports.tenantId, ctx.user.tenantId)
+          ))
+          .limit(1);
+
+        if (result.length === 0) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Relatório não encontrado",
+          });
+        }
+
+        return result[0];
+      }),
   }),
 
   // ==================== AUDIT & KRCI ====================
