@@ -48,6 +48,18 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
 
   const utils = trpc.useUtils();
 
+  // Reset estados quando o modal abre
+  useEffect(() => {
+    if (open) {
+      console.log('[UploadModalAtomic] Modal aberto - resetando estados');
+      setFile(null);
+      setUploading(false);
+      setProcessing(false);
+      setReportId(null);
+      setUploadId(null);
+    }
+  }, [open]);
+
   // Usar o endpoint atômico V2
   const uploadAndProcess = trpc.technicalReports.uploadsV2.uploadAndProcessReport.useMutation();
 
@@ -70,8 +82,12 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
         console.log('[UploadModalAtomic] Status do report:', data);
 
         // Verificar se o parsing foi concluído
-        if (data.status === 'ready_for_audit' || data.status === 'completed') {
-          console.log('[UploadModalAtomic] ✅ Parsing concluído!');
+        // Aceitar qualquer status que não seja "draft" ou "parsing" como concluído
+        const completedStatuses = ['ready_for_audit', 'completed', 'needs_review', 'audited', 'certified', 'exported'];
+        const isCompleted = completedStatuses.includes(data.status);
+        
+        if (isCompleted) {
+          console.log('[UploadModalAtomic] ✅ Parsing concluído! Status:', data.status);
           
           // Limpar intervalo
           clearInterval(pollInterval);
@@ -83,39 +99,29 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
           utils.technicalReports.generate.list.invalidate();
           utils.technicalReports.uploads.list.invalidate();
           
-          // Mostrar toast de sucesso
-          toast.success("Relatório processado com sucesso!", {
-            description: "Seu relatório está pronto para auditoria.",
-          });
+          // Mostrar toast apropriado
+          if (data.status === 'needs_review') {
+            toast.warning("Relatório processado com avisos", {
+              description: "Alguns campos precisam de revisão manual.",
+            });
+          } else {
+            toast.success("Relatório processado com sucesso!", {
+              description: "Seu relatório está pronto para auditoria.",
+            });
+          }
           
           // Chamar onSuccess callback se fornecido
           if (onSuccess && uploadId) {
+            console.log('[UploadModalAtomic] Chamando onSuccess callback');
             onSuccess({ uploadId, reportId });
+          } else {
+            // Se não há callback, redirecionar para a lista
+            console.log('[UploadModalAtomic] Sem callback, redirecionando para lista');
+            setTimeout(() => {
+              onClose();
+              setLocation(`/reports/generate`);
+            }, 1500);
           }
-          
-          // Fechar modal e redirecionar
-          setTimeout(() => {
-            onClose();
-            setLocation(`/reports/generate`);
-          }, 1500);
-        } else if (data.status === 'needs_review') {
-          console.log('[UploadModalAtomic] ⚠️ Parsing completou com avisos');
-          
-          clearInterval(pollInterval);
-          setProcessing(false);
-          
-          toast.warning("Relatório processado com avisos", {
-            description: "Alguns campos precisam de revisão manual.",
-          });
-          
-          if (onSuccess && uploadId) {
-            onSuccess({ uploadId, reportId });
-          }
-          
-          setTimeout(() => {
-            onClose();
-            setLocation(`/reports/generate`);
-          }, 1500);
         }
       } catch (error) {
         console.error('[UploadModalAtomic] Erro no polling:', error);
