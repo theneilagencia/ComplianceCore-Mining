@@ -34,11 +34,12 @@ export default function ReviewReport() {
 
  // Query para buscar campos que precisam de revisão
  // Só busca se o report existe E não está mais em parsing
- const { data: reviewData, isLoading } = trpc.technicalReports.uploads.getReviewFields.useQuery(
+ const { data: reviewData, isLoading, error: reviewError } = trpc.technicalReports.uploads.getReviewFields.useQuery(
  { reportId },
  { 
  enabled: !!reportId && reportStatus?.status !== 'parsing',
- retry: 1, // Reduz tentativas em caso de erro
+ retry: 3, // Aumenta tentativas para 3
+ retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 5000), // 1s, 2s, 4s (max 5s)
  }
  );
 
@@ -132,9 +133,16 @@ export default function ReviewReport() {
  if (!reviewData && reportStatus?.status !== 'parsing' && !isLoading) {
  return (
  <DashboardLayout>
- <div className="text-center py-12">
- <p className="text-red-400">Erro ao carregar dados de revisão</p>
- <p className="text-gray-400 text-sm mt-2">O processamento do relatório pode ter falhado</p>
+ <div className="text-center py-12 space-y-4">
+ <div className="text-red-400 text-lg font-semibold">Erro ao carregar dados de revisão</div>
+ <p className="text-gray-400 text-sm">
+ {reviewError?.message?.includes('Normalized data not found')
+ ? 'O arquivo normalizado ainda está sendo processado. Aguarde alguns segundos e recarregue a página.'
+ : 'O processamento do relatório pode ter falhado. Verifique o status do relatório.'}
+ </p>
+ <Button onClick={() => window.location.reload()} variant="outline">
+ Recarregar Página
+ </Button>
  </div>
  </DashboardLayout>
  );
@@ -166,6 +174,23 @@ export default function ReviewReport() {
  <p className="text-sm text-blue-800">
  O relatório está sendo analisado e os campos estão sendo extraídos.
  Esta página será atualizada automaticamente quando o processamento for concluído.
+ </p>
+ </div>
+ </div>
+ </Card>
+ )}
+
+ {/* Banner quando está carregando campos (retry automático) */}
+ {isLoading && reportStatus?.status !== 'parsing' && (
+ <Card className="p-6 bg-gradient-to-r from-yellow-50 to-amber-50 border-yellow-200">
+ <div className="flex items-start gap-4">
+ <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-yellow-600 flex-shrink-0 mt-1"></div>
+ <div>
+ <h3 className="font-semibold text-yellow-900 mb-2">
+ Carregando campos de revisão...
+ </h3>
+ <p className="text-sm text-yellow-800">
+ Tentando carregar os dados normalizados. Se o upload foi recente, o arquivo pode estar sendo finalizado.
  </p>
  </div>
  </div>
