@@ -1,0 +1,85 @@
+name: 🧭 QIVO Product Core - Roadmap & UX Audit
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC
+    - cron: '0 2 * * *'
+  workflow_dispatch:
+
+jobs:
+  product-core:
+    name: Product Core Analysis
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Analyze Modules
+        run: |
+          chmod +x scripts/product-core/analyzeModules.ts
+          pnpm tsx scripts/product-core/analyzeModules.ts
+      
+      - name: Generate Functional Spec
+        run: |
+          chmod +x scripts/product-core/generateFunctionalSpec.ts
+          pnpm tsx scripts/product-core/generateFunctionalSpec.ts
+      
+      - name: Generate UX Audit
+        run: |
+          chmod +x scripts/product-core/generateUXAudit.ts
+          pnpm tsx scripts/product-core/generateUXAudit.ts
+      
+      - name: Generate Product Roadmap
+        run: |
+          chmod +x scripts/product-core/generateRoadmap.ts
+          pnpm tsx scripts/product-core/generateRoadmap.ts
+      
+      - name: Upload Product Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: qivo-product-reports
+          path: |
+            docs/QIVO_MODULE_ANALYSIS.md
+            docs/QIVO_FUNCTIONAL_SPEC.md
+            docs/QIVO_UX_UI_AUDIT.md
+            docs/QIVO_PRODUCT_ROADMAP.md
+      
+      - name: Commit Product Reports
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "QIVO Product Core"
+          git add docs/QIVO_MODULE_ANALYSIS.md docs/QIVO_FUNCTIONAL_SPEC.md docs/QIVO_UX_UI_AUDIT.md docs/QIVO_PRODUCT_ROADMAP.md || true
+          git diff --staged --quiet || git commit -m "🧭 QIVO Product Core — Documentation Update
+
+          Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          
+          Updated documents:
+          - Module Analysis
+          - Functional Specifications
+          - UX/UI Audit
+          - Product Roadmap
+          
+          All documents reflect current platform state and future planning."
+      
+      - name: Push changes
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
