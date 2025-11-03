@@ -43,6 +43,7 @@ import { runDevSeeds } from "../modules/dev/seed";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { serveStatic, setupVite } from "./vite";
+import { antiRedirectMiddleware } from "./anti-redirect-middleware";
 
 function isPortAvailable(port: number): Promise<boolean> {
   return new Promise(resolve => {
@@ -101,6 +102,9 @@ async function startServer() {
   
   // Cookie parser for reading cookies
   app.use(cookieParser());
+  
+  // Anti-redirect middleware (MUST be early in the chain)
+  app.use(antiRedirectMiddleware);
   
   // Rate limiting - General API protection
   const generalLimiter = rateLimit({
