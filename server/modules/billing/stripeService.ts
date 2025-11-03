@@ -8,23 +8,23 @@
  * - Add-ons
  * - Auto-detect real Stripe keys or use mock
  */
+import Stripe from 'stripe';
 
 const STRIPE_KEY = process.env.STRIPE_KEY;
 const STRIPE_WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET;
 const IS_MOCK = !STRIPE_KEY || !STRIPE_WEBHOOK_SECRET;
 
 // Mock Stripe if keys not available
-let stripe: any;
+let stripe: Stripe | null = null;
 
-if (!IS_MOCK) {
+if (!IS_MOCK && STRIPE_KEY) {
   try {
-    const Stripe = require('stripe');
     stripe = new Stripe(STRIPE_KEY, {
-      apiVersion: '2023-10-16',
+      apiVersion: '2025-10-29.clover',
     });
     console.log('✅ Stripe initialized with real keys');
   } catch (error) {
-    console.warn('⚠️ Stripe package not installed, using mock');
+    console.warn('⚠️ Stripe initialization failed, using mock');
     stripe = null;
   }
 }

@@ -1,4 +1,5 @@
 import { EventEmitter } from 'events';
+import crypto from 'crypto';
 // import { db } from '@/db';
 // import { webhooks, webhookEvents } from '@/db/schema';
 // import { eq, and, desc } from 'drizzle-orm';
@@ -444,7 +445,6 @@ export class WebhookService {
   private generateSignature(payload: WebhookPayload, secret?: string): string {
     if (!secret) return '';
 
-    const crypto = require('crypto');
     const hmac = crypto.createHmac('sha256', secret);
     hmac.update(JSON.stringify(payload));
     return hmac.digest('hex');

@@ -43,10 +43,10 @@ const WEBHOOK_TO_SSE_MAPPING: Record<string, SSEEventType> = {
  * 
  * Listens to webhook events and broadcasts them via SSE
  */
-export function setupWebhookIntegration(): void {
+export async function setupWebhookIntegration(): Promise<void> {
   try {
     // Import webhook service dynamically to avoid circular dependencies
-    const { webhookService } = require('../webhooks/webhook.service');
+    const { webhookService } = await import('../webhooks/webhook.service.js');
 
     console.log('[SSE] Setting up webhook integration...');
 
