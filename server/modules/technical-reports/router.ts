@@ -52,6 +52,10 @@ export const technicalReportsRouter = router({
           });
         }
 
+        // Validate business rules before creating report
+        const { validateBusinessRules, incrementReportUsage } = await import("./services/business-rules");
+        await validateBusinessRules(ctx.user.tenantId, input.title);
+
         const { reports } = await import("../../../drizzle/schema");
         const reportId = `rpt_${randomUUID()}`;
 
@@ -74,6 +78,9 @@ export const technicalReportsRouter = router({
           parsingSummary: parsingSummary as any,
         });
 
+        // Increment usage counter
+        await incrementReportUsage(ctx.user.tenantId);
+
         return {
           reportId,
           standard: input.standard,
@@ -82,6 +89,13 @@ export const technicalReportsRouter = router({
           status: "draft",
           message: "Relatório criado com sucesso",
         };
+      }),
+
+    // Get quota information for tenant
+    getQuota: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getQuotaInfo } = await import("./services/business-rules");
+        return await getQuotaInfo(ctx.user.tenantId);
       }),
 
     // Listar relatórios do tenant com cursor-based pagination
