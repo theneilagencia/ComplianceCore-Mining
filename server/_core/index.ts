@@ -262,8 +262,15 @@ async function startServer() {
     console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
   }
 
+  // Increase timeout for large file uploads (default is 2 minutes)
+  // Base64 encoding increases size by ~33%, so a 50MB file becomes ~66MB
+  server.timeout = 5 * 60 * 1000; // 5 minutes
+  server.keepAliveTimeout = 65 * 1000; // Slightly higher than ALB idle timeout (60s)
+  server.headersTimeout = 66 * 1000; // Slightly higher than keepAliveTimeout
+
   server.listen(port, async () => {
     console.log(`Server running on http://localhost:${port}/`);
+    console.log(`Server timeout: ${server.timeout}ms (${server.timeout / 1000}s)`);
     
     // Initialize storage
     await initStorage();
