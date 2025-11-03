@@ -53,16 +53,15 @@ export async function redirectToCheckout(params: CheckoutParams): Promise<void> 
     if (url) {
       window.location.href = url;
     } else {
-      const stripe = await getStripe();
-      if (!stripe) {
-        throw new Error('Stripe not loaded');
-      }
-      
-      const { error } = await stripe.redirectToCheckout({ sessionId });
-      
-      if (error) {
-        throw error;
-      }
+      // Modern approach: redirect using URL from checkout session
+      const response = await fetch('/api/billing/checkout-session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sessionId }),
+      });
+      const { url } = await response.json();
+      if (!url) throw new Error('No checkout URL returned');
+      window.location.href = url;
     }
   } catch (error: any) {
     console.error('[Stripe] Checkout error:', error);
