@@ -68,21 +68,18 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
-  // Configure CORS with credentials
+  // Configure CORS with credentials - Centralized on Render only
   const allowedOrigins = [
     'https://qivo-mining.onrender.com',
-    'https://qivo-mining.vercel.app',
-    'https://qivo-mining-k7mocnnhh-vinicius-projects-81cedba9.vercel.app',
-    'http://localhost:5173'
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:4173'
   ];
   
   app.use(cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (mobile apps, Postman, etc.)
       if (!origin) return callback(null, true);
-      
-      // Allow any Vercel preview URL
-      if (origin.includes('vercel.app')) return callback(null, true);
       
       // Check if origin is in allowed list
       if (allowedOrigins.includes(origin)) {

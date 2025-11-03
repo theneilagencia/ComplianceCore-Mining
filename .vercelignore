@@ -1,3 +1,7 @@
-# Don't ignore production env file
-!client/.env.production
+# ⚠️ VERCEL DEPLOY DISABLED ⚠️
+# This project is now exclusively hosted on Render
+# Production URL: https://qivo-mining.onrender.com
+#
+# Ignoring everything to prevent accidental Vercel deploys
 
+*
