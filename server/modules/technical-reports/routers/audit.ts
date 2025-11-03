@@ -55,47 +55,27 @@ export const auditRouter = router({
         });
       }
 
-      // Buscar normalized.json do S3 (simulado por enquanto)
-      // Em produção, fazer download real do S3
-      const normalizedReport = {
-        metadata: {
-          title: report.title,
-          projectName: undefined,
-          effectiveDate: report.createdAt?.toISOString(),
-          standard: report.standard,
-        },
-        sections: [
-          { title: "Executive Summary", content: "..." },
-          { title: "Introduction", content: "..." },
-          { title: "Geology", content: "..." },
-          { title: "Sampling and Analysis", content: "..." },
-          { title: "Resource Estimate", content: "..." },
-        ],
-        resourceEstimates: [
-          {
-            category: "Measured",
-            tonnage: 1000000,
-            grade: 2.5,
-            cutoffGrade: 0.5,
-          },
-        ],
-        competentPersons: [
-          {
-            name: "John Doe",
-            qualification: "MAusIMM",
-            organization: "Mining Consultants Inc.",
-          },
-        ],
-        economicAssumptions: {
-          capex: 50000000,
-          opex: 25,
-          recoveryRate: 85,
-        },
-        qaQc: {
-          samplingMethod: "Diamond drilling with HQ core",
-          qualityControl: "Certified reference materials and blanks",
-        },
-      };
+      // Carregar normalized.json do S3 (DADOS REAIS)
+      const { loadNormalizedFromS3 } = await import("../services/parsing");
+      const parsedReport = await loadNormalizedFromS3(
+        report.tenantId,
+        input.reportId
+      );
+
+      if (!parsedReport) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Normalized data not found. Report may not be fully processed. Please ensure the report has been parsed successfully.",
+        });
+      }
+
+      // Mapear formato parsed para formato esperado pelo audit
+      const { adaptParsedReportForAudit } = await import("../services/audit-adapter");
+      const normalizedReport = adaptParsedReportForAudit(
+        parsedReport,
+        report.title,
+        report.createdAt
+      );
 
       // Executar auditoria
       const auditResult = runAudit(normalizedReport, input.auditType);
@@ -271,46 +251,27 @@ export const auditRouter = router({
         });
       }
 
-      // Mock normalized report (em produção, buscar do S3)
-      const normalizedReport = {
-        metadata: {
-          title: report.title,
-          projectName: undefined,
-          effectiveDate: report.createdAt?.toISOString(),
-          standard: report.standard,
-        },
-        sections: [
-          { title: "Executive Summary", content: "..." },
-          { title: "Introduction", content: "..." },
-          { title: "Geology", content: "..." },
-          { title: "Sampling and Analysis", content: "..." },
-          { title: "Resource Estimate", content: "..." },
-        ],
-        resourceEstimates: [
-          {
-            category: "Measured",
-            tonnage: 1000000,
-            grade: 2.5,
-            cutoffGrade: 0.5,
-          },
-        ],
-        competentPersons: [
-          {
-            name: "John Doe",
-            qualification: "MAusIMM",
-            organization: "Mining Consultants Inc.",
-          },
-        ],
-        economicAssumptions: {
-          capex: 50000000,
-          opex: 25,
-          recoveryRate: 85,
-        },
-        qaQc: {
-          samplingMethod: "Diamond drilling with HQ core",
-          qualityControl: "Certified reference materials and blanks",
-        },
-      };
+      // Carregar normalized.json do S3 (DADOS REAIS)
+      const { loadNormalizedFromS3 } = await import("../services/parsing");
+      const parsedReport = await loadNormalizedFromS3(
+        report.tenantId,
+        input.reportId
+      );
+
+      if (!parsedReport) {
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Normalized data not found for extended scan.",
+        });
+      }
+
+      // Mapear formato parsed para formato esperado pelo KRCI scan
+      const { adaptParsedReportForAudit } = await import("../services/audit-adapter");
+      const normalizedReport = adaptParsedReportForAudit(
+        parsedReport,
+        report.title,
+        report.createdAt
+      );
 
       // Run KRCI Extended Scan
       const scanResult = runKRCIScan(normalizedReport, input.mode as ScanMode);

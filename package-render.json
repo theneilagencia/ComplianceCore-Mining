@@ -1,0 +1,17 @@
+{
+  "name": "qivo-mining-render",
+  "engines": {
+    "node": ">=24.0.0",
+    "npm": ">=10.0.0",
+    "pnpm": ">=10.0.0"
+  },
+  "buildpacks": [
+    {
+      "url": "https://github.com/heroku/heroku-buildpack-nodejs"
+    }
+  ],
+  "scripts": {
+    "render-build": "npm install -g pnpm@10.4.1 && pnpm install --frozen-lockfile && bash build.sh && (pnpm drizzle-kit push || echo 'Migrations skipped')",
+    "render-start": "pnpm run start"
+  }
+}
