@@ -62,12 +62,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
       return;
     }
 
-      name: file.name,
-      size: file.size,
-      type: file.type,
-      lastModified: file.lastModified,
-    });
-
     // Validar se o arquivo existe e não está vazio
     if (file.size === 0) {
       console.error('[Upload Atomic] ERRO: Arquivo vazio');
@@ -100,11 +94,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     // Validar por extensão e MIME type
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     const validExtensions = ['pdf', 'docx', 'xlsx', 'csv', 'zip'];
-    
-      extensão: fileExtension,
-      válida: validExtensions.includes(fileExtension || ''),
-      mimeType: file.type,
-    });
     
     if (!validExtensions.includes(fileExtension || '')) {
       console.error('[Upload Atomic] ERRO: Extensão inválida:', fileExtension);
@@ -194,13 +183,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
           console.error('[Upload Atomic] ERRO ao chamar readAsDataURL:', error);
           reject(new Error(`Erro ao iniciar leitura: ${error}`));
         }
-      });
-      
-
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type || "application/pdf",
-        fileDataLength: fileData.length,
       });
 
       // ÚNICA CHAMADA: Upload + Storage + Banco (Parsing é assíncrono)
