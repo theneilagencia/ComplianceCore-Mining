@@ -444,7 +444,19 @@ export default function GenerateReport() {
  </div>
 
 	{showUploadModal && (
-		<UploadModalAtomic open={showUploadModal} onClose={() => setShowUploadModal(false)} />
+		<UploadModalAtomic 
+			open={showUploadModal} 
+			onClose={() => setShowUploadModal(false)}
+			onSuccess={(result) => {
+				console.log('[GenerateReport] Upload concluído:', result);
+				// Fechar modal
+				setShowUploadModal(false);
+				// Invalidar lista para atualizar
+				utils.technicalReports.generate.list.invalidate();
+				// Redirecionar para a página de revisão do relatório
+				navigate(`/reports/${result.reportId}/review`);
+			}}
+		/>
 	)}
  </DashboardLayout>
  );
