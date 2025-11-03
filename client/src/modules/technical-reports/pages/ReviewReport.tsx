@@ -28,20 +28,18 @@ export default function ReviewReport() {
  { reportId },
  {
  enabled: !!reportId,
- refetchInterval: (data) => {
- // Polling a cada 3s apenas se status = 'parsing'
- if (data?.status === 'parsing') {
- return 3000;
- }
- return false; // Desabilita polling para outros status
- },
+ refetchInterval: 3000, // Sempre faz polling a cada 3s enquanto a página está aberta
  }
  );
 
  // Query para buscar campos que precisam de revisão
+ // Só busca se o report existe E não está mais em parsing
  const { data: reviewData, isLoading } = trpc.technicalReports.uploads.getReviewFields.useQuery(
  { reportId },
- { enabled: !!reportId }
+ { 
+ enabled: !!reportId && reportStatus?.status !== 'parsing',
+ retry: 1, // Reduz tentativas em caso de erro
+ }
  );
 
  // Mutation para aplicar revisão
@@ -107,7 +105,8 @@ export default function ReviewReport() {
  }
  };
 
- if (isLoading) {
+ // Mostra loading apenas se estiver carregando o status do report inicial
+ if (isLoading && !reportStatus) {
  return (
  <DashboardLayout>
  <div className="flex items-center justify-center h-64">
@@ -117,7 +116,8 @@ export default function ReviewReport() {
  );
  }
 
- if (!reviewData) {
+ // Se o report não existe
+ if (!reportStatus && !isLoading) {
  return (
  <DashboardLayout>
  <div className="text-center py-12">
@@ -127,7 +127,20 @@ export default function ReviewReport() {
  );
  }
 
- const totalFields = reviewData.totalFields;
+ // Se ainda está em parsing, mostra interface com banner (não bloqueia)
+ // Se não está em parsing mas reviewData não existe, significa erro
+ if (!reviewData && reportStatus?.status !== 'parsing' && !isLoading) {
+ return (
+ <DashboardLayout>
+ <div className="text-center py-12">
+ <p className="text-red-400">Erro ao carregar dados de revisão</p>
+ <p className="text-gray-400 text-sm mt-2">O processamento do relatório pode ter falhado</p>
+ </div>
+ </DashboardLayout>
+ );
+ }
+
+ const totalFields = reviewData?.totalFields || 0;
  const resolvedFields = savedFields.size;
  const progress = totalFields > 0 ? (resolvedFields / totalFields) * 100 : 0;
 
@@ -158,6 +171,21 @@ export default function ReviewReport() {
  </div>
  </Card>
  )}
+
+ {/* Se ainda está em parsing, não mostra campos */}
+ {reportStatus?.status === 'parsing' && (
+ <Card className="p-12">
+ <div className="flex flex-col items-center justify-center gap-4 text-center">
+ <div className="animate-pulse text-6xl">⏳</div>
+ <p className="text-lg text-gray-600">Aguardando conclusão do processamento...</p>
+ <p className="text-sm text-gray-400">Os campos aparecerão aqui automaticamente</p>
+ </div>
+ </Card>
+ )}
+
+ {/* Só mostra o conteúdo se não estiver em parsing */}
+ {reportStatus?.status !== 'parsing' && reviewData && (
+ <>
 
  {/* Banner informativo */}
  <Card className="p-6 bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200">
@@ -306,6 +334,8 @@ export default function ReviewReport() {
  </Button>
  </div>
  </Card>
+ )}
+ </>
  )}
  </div>
  </DashboardLayout>
