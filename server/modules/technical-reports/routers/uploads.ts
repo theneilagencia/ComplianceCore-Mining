@@ -21,9 +21,11 @@ console.log('MODULE LOAD: server/modules/technical-reports/routers/uploads.ts (s
 
 export const uploadsRouter = router({
   /**
+   * @deprecated Use uploadsV2.uploadAndProcessReport instead
    * Iniciar upload de arquivo externo
    */
   initiate: protectedProcedure
+    .meta({ deprecated: true })
     .input(
       z.object({
         fileName: z.string(),
@@ -32,6 +34,7 @@ export const uploadsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      throw new Error('⚠️ Este endpoint está deprecated. Use technicalReports.uploadsV2.uploadAndProcessReport para upload atômico.');
       const db = await import("../../../db").then((m) => m.getDb());
       if (!db) throw new Error("Database not available");
 
@@ -142,9 +145,11 @@ export const uploadsRouter = router({
     }),
 
   /**
+   * @deprecated Use uploadsV2.uploadAndProcessReport instead
    * Upload direto do arquivo (novo endpoint)
    */
   uploadFile: protectedProcedure
+    .meta({ deprecated: true })
     .input(
       z.object({
         uploadId: z.string(),
@@ -154,6 +159,7 @@ export const uploadsRouter = router({
       })
     )
     .mutation(async ({ ctx, input }) => {
+      throw new Error('⚠️ Este endpoint está deprecated. Use technicalReports.uploadsV2.uploadAndProcessReport para upload atômico.');
       console.log('[UploadFile] Starting file upload');
       console.log('[UploadFile] Upload ID:', input.uploadId);
       console.log('[UploadFile] File name:', input.fileName);
@@ -198,9 +204,11 @@ export const uploadsRouter = router({
     }),
 
   /**
+   * @deprecated Use uploadsV2.uploadAndProcessReport instead
    * Finalizar upload e iniciar parsing
    */
   complete: protectedProcedure
+    .meta({ deprecated: true })
     .input(
       z.object({
         uploadId: z.string(),
@@ -208,6 +216,7 @@ export const uploadsRouter = router({
         s3Url: z.string().optional(), // Será ignorado
         fileContent: z.string().optional(),
       }).transform((data) => {
+        throw new Error('⚠️ Este endpoint está deprecated. Use technicalReports.uploadsV2.uploadAndProcessReport para upload atômico.');
         // TRANSFORM FORÇADO: Sempre construir s3Url a partir do s3Key
         // Isso garante que mesmo que s3Url venha errado, será corrigido
         const forcedS3Url = `/api/storage/download/${encodeURIComponent(data.s3Key)}`;
