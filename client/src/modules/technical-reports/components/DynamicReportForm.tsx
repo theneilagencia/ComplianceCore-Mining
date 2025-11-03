@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useCallback, memo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -26,34 +26,42 @@ interface DynamicReportFormProps {
   isLoading?: boolean;
 }
 
-export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReportFormProps) {
+const DynamicReportForm = memo(function DynamicReportForm({ onSubmit, isLoading }: DynamicReportFormProps) {
   const [standard, setStandard] = useState<string>('NI_43_101');
   const [language, setLanguage] = useState<string>('pt-BR');
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [showPreview, setShowPreview] = useState<boolean>(false);
 
-  const schema = getSchemaByStandard(standard);
-  const standards = getAllStandards();
+  // Memoize schema calculation to avoid recalculation on every render
+  const schema = useMemo(() => getSchemaByStandard(standard), [standard]);
+  
+  // Memoize standards list (only needs to be calculated once)
+  const standards = useMemo(() => getAllStandards(), []);
 
-  const handleFieldChange = (fieldName: string, value: any) => {
+  // Memoize required fields calculation
+  const requiredFields = useMemo(() => {
+    return schema.sections.flatMap((section) =>
+      section.fields.filter((field) => field.required).map((field) => field.name)
+    );
+  }, [schema]);
+
+  // Memoize field change handler to prevent recreation on every render
+  const handleFieldChange = useCallback((fieldName: string, value: any) => {
     setFormData((prev) => ({
       ...prev,
       [fieldName]: value,
     }));
-  };
+  }, []);
 
-  const handlePreview = (e: React.FormEvent) => {
+  // Memoize preview handler
+  const handlePreview = useCallback((e: React.FormEvent) => {
     e.preventDefault();
     setShowPreview(true);
-  };
+  }, []);
 
-  const handleConfirmSubmit = () => {
-    
+  // Memoize submit handler
+  const handleConfirmSubmit = useCallback(() => {
     // Validar campos obrigatórios
-    const requiredFields = schema.sections.flatMap((section) =>
-      section.fields.filter((field) => field.required).map((field) => field.name)
-    );
-
     const missingFields = requiredFields.filter((fieldName) => !formData[fieldName]);
 
     if (missingFields.length > 0) {
@@ -67,7 +75,7 @@ export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReport
       ...formData,
     });
     setShowPreview(false);
-  };
+  }, [requiredFields, formData, onSubmit, standard, language]);
 
   const renderField = (field: FieldDefinition) => {
     const value = formData[field.name] || '';
@@ -251,5 +259,7 @@ export default function DynamicReportForm({ onSubmit, isLoading }: DynamicReport
     )}
     </>
   );
-}
+});
+
+export default DynamicReportForm;
 
