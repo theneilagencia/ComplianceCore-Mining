@@ -31,8 +31,22 @@ export const uploadsV2Router = router({
         if (!db) throw new Error("Database not available");
 
       if (!ctx.user || !ctx.user.id || !ctx.user.tenantId) {
-        throw new Error(`Invalid user context`);
+        console.error('❌ Invalid user context:', {
+          hasUser: !!ctx.user,
+          userId: ctx.user?.id,
+          tenantId: ctx.user?.tenantId,
+          userObject: JSON.stringify(ctx.user, null, 2)
+        });
+        throw new Error(`Invalid user context - userId: ${ctx.user?.id}, tenantId: ${ctx.user?.tenantId}`);
       }
+
+      console.log('✅ Upload context validated:', {
+        userId: ctx.user.id,
+        tenantId: ctx.user.tenantId,
+        fileName: input.fileName,
+        fileSize: input.fileSize,
+        mimeType: input.fileType
+      });
 
       // Validação de MIME type permitidos
       const allowedMimeTypes = [
@@ -77,21 +91,28 @@ export const uploadsV2Router = router({
       const storageResult = await storagePut(s3Key, buffer, input.fileType);
 
       // 2. Executar inserções no banco de dados dentro de uma transação
+      const uploadData = {
+        id: uploadId,
+        tenantId: ctx.user.tenantId,
+        userId: ctx.user.id,
+        reportId,
+        fileName: input.fileName,
+        fileSize: input.fileSize,
+        mimeType: input.fileType,
+        s3Url: storageResult.url,
+        status: "completed" as const,
+        createdAt: new Date(),
+        completedAt: new Date(),
+      };
+
+      console.log('📦 Upload data to insert:', {
+        ...uploadData,
+        fileSize: `${input.fileSize} bytes (${(input.fileSize / 1024 / 1024).toFixed(2)} MB)`
+      });
+
       await db.transaction(async (tx) => {
         // 2a. Criar registro na tabela 'uploads'
-        await tx.insert(uploads).values({
-          id: uploadId,
-          tenantId: ctx.user.tenantId,
-          userId: ctx.user.id,
-          reportId,
-          fileName: input.fileName,
-          fileSize: input.fileSize,
-          mimeType: input.fileType,
-          s3Url: storageResult.url, // URL final do arquivo
-          status: "completed", // Já nasce completo
-          createdAt: new Date(),
-          completedAt: new Date(),
-        });
+        await tx.insert(uploads).values(uploadData);
 
         // 2b. Criar registro na tabela 'reports'
         await tx.insert(reports).values({
