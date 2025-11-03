@@ -41,6 +41,9 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
 
   const utils = trpc.useUtils();
 
+  // Debug logging
+  console.log('[UploadModalAtomic] Render - isOpen:', isOpen, 'uploading:', uploading);
+
   const uploadAndProcess = trpc.technicalReports.uploadsV2.uploadAndProcessReport.useMutation();
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -58,8 +61,21 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
     }
   };
 
-  const handleModalClose = () => {
+  // Handle Dialog onOpenChange (from Radix)
+  const handleDialogOpenChange = (open: boolean) => {
+    console.log('[UploadModalAtomic] Dialog onOpenChange:', open);
+    // Only allow closing when not uploading
+    if (!uploading && !open) {
+      console.log('[UploadModalAtomic] Closing modal via onOpenChange');
+      setFile(null);
+      onClose();
+    }
+  };
+
+  // Handle Cancel button click
+  const handleCancelClick = () => {
     if (!uploading) {
+      console.log('[UploadModalAtomic] Cancel button clicked');
       setFile(null);
       onClose();
     }
@@ -132,24 +148,33 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
         fileData,
       });
 
+      // Dismiss loading toast
       toast.dismiss('upload-process');
+      
+      // Show success toast
       toast.success("Upload concluído!", {
         description: "Abrindo relatório...",
         duration: 2000,
       });
 
+      // Reset component state
       setUploading(false);
       setFile(null);
       
+      // Invalidate queries to refresh lists
       utils.technicalReports.generate.list.invalidate();
       utils.technicalReports.uploads.list.invalidate();
       
+      // CRITICAL: Close modal first (this updates parent state)
       onClose();
       
+      // CRITICAL: Wait for Dialog to unmount before navigation
+      // This prevents race conditions with the closing animation
       if (onSuccess) {
         setTimeout(() => {
+          console.log('[UploadModalAtomic] Calling onSuccess with reportId:', result.reportId);
           onSuccess({ uploadId: result.uploadId, reportId: result.reportId });
-        }, 150);
+        }, 400);
       }
 
     } catch (error: any) {
@@ -173,7 +198,7 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleModalClose}>
+    <Dialog open={isOpen} onOpenChange={handleDialogOpenChange}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Upload de Relatório Externo (V2)</DialogTitle>
@@ -269,7 +294,7 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
           <div className="flex justify-end gap-3">
             <Button
               variant="outline"
-              onClick={handleModalClose}
+              onClick={handleCancelClick}
               disabled={uploading}
             >
               Cancelar
