@@ -106,7 +106,11 @@ function Router() {
         
         {/* Technical Reports Routes (protegidas) */}
         <Route path={"/reports/generate"}>
-          <PrivateRoute><GenerateReport /></PrivateRoute>
+          <PrivateRoute>
+            <ErrorBoundary>
+              <GenerateReport />
+            </ErrorBoundary>
+          </PrivateRoute>
         </Route>
         <Route path={"/reports/create"}>
           <PrivateRoute><ReportCreate /></PrivateRoute>
@@ -115,7 +119,11 @@ function Router() {
           <PrivateRoute><JORCReportCreate /></PrivateRoute>
         </Route>
         <Route path={"/reports/audit"}>
-          <PrivateRoute><AuditKRCI /></PrivateRoute>
+          <PrivateRoute>
+            <ErrorBoundary>
+              <AuditKRCI />
+            </ErrorBoundary>
+          </PrivateRoute>
         </Route>
           {/* PreCertification removed - replaced by KRCI */}
         <Route path="/reports/export">
@@ -141,7 +149,9 @@ function Router() {
         </Route>
         <Route path="/reports/:reportId/review">
           <PrivateRoute>
-            <ReviewReport />
+            <ErrorBoundary>
+              <ReviewReport />
+            </ErrorBoundary>
           </PrivateRoute>
         </Route>
         {/* Explainability View removed - not in briefing */}

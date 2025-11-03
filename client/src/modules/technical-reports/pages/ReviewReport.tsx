@@ -23,6 +23,21 @@ export default function ReviewReport() {
 
  const utils = trpc.useUtils();
 
+ // Query para buscar o report e fazer polling se estiver em parsing
+ const { data: reportStatus } = trpc.technicalReports.generate.get.useQuery(
+ { reportId },
+ {
+ enabled: !!reportId,
+ refetchInterval: (data) => {
+ // Polling a cada 3s apenas se status = 'parsing'
+ if (data?.status === 'parsing') {
+ return 3000;
+ }
+ return false; // Desabilita polling para outros status
+ },
+ }
+ );
+
  // Query para buscar campos que precisam de revisão
  const { data: reviewData, isLoading } = trpc.technicalReports.uploads.getReviewFields.useQuery(
  { reportId },
@@ -125,6 +140,24 @@ export default function ReviewReport() {
  Valide os campos extraídos automaticamente para garantir precisão
  </p>
  </div>
+
+ {/* Banner de parsing em progresso */}
+ {reportStatus?.status === 'parsing' && (
+ <Card className="p-6 bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200">
+ <div className="flex items-start gap-4">
+ <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600 flex-shrink-0 mt-1"></div>
+ <div>
+ <h3 className="font-semibold text-blue-900 mb-2">
+ Processamento em andamento...
+ </h3>
+ <p className="text-sm text-blue-800">
+ O relatório está sendo analisado e os campos estão sendo extraídos.
+ Esta página será atualizada automaticamente quando o processamento for concluído.
+ </p>
+ </div>
+ </div>
+ </Card>
+ )}
 
  {/* Banner informativo */}
  <Card className="p-6 bg-gradient-to-r from-orange-50 to-yellow-50 border-orange-200">
