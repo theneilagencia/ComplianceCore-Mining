@@ -84,6 +84,51 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
     }
   };
 
+  // Retry helper with exponential backoff
+  const retryWithBackoff = async <T,>(
+    fn: () => Promise<T>,
+    maxRetries = 3,
+    baseDelay = 1000
+  ): Promise<T> => {
+    let lastError: Error | null = null;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        return await fn();
+      } catch (error: any) {
+        lastError = error;
+        
+        // Don't retry on validation errors (4xx)
+        if (error.message?.includes('Tipo de arquivo') || 
+            error.message?.includes('muito grande') ||
+            error.message?.includes('muito pequeno')) {
+          throw error;
+        }
+        
+        // If last attempt, throw error
+        if (attempt === maxRetries) {
+          throw error;
+        }
+        
+        // Calculate backoff delay: baseDelay * 2^attempt
+        const delay = baseDelay * Math.pow(2, attempt);
+        
+        if (import.meta.env.DEV) {
+          console.log(`[UploadModalAtomic] Retry attempt ${attempt + 1}/${maxRetries} after ${delay}ms`);
+        }
+        
+        toast.loading(`Tentando novamente... (${attempt + 2}/${maxRetries + 1})`, { 
+          id: 'upload-process' 
+        });
+        
+        // Wait before retry
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+    
+    throw lastError || new Error('Upload failed after retries');
+  };
+
   const handleUpload = async () => {
     if (!file) {
       toast.error("Nenhum arquivo selecionado");
@@ -144,12 +189,15 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
         reader.readAsDataURL(file);
       });
 
-      const result = await uploadAndProcess.mutateAsync({
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type || "application/pdf",
-        fileData,
-      });
+      // Upload with retry logic (max 3 attempts with exponential backoff)
+      const result = await retryWithBackoff(() => 
+        uploadAndProcess.mutateAsync({
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type || "application/pdf",
+          fileData,
+        })
+      );
 
       // Dismiss loading toast
       toast.dismiss('upload-process');

@@ -66,13 +66,25 @@ export function serveStatic(app: Express) {
 
   // Serve static files with proper cache headers
   app.use(express.static(distPath, {
-    maxAge: '1h', // Cache assets for 1 hour
+    maxAge: '1y', // Default cache for 1 year (will be overridden below)
     etag: true,
     lastModified: true,
-    setHeaders: (res, path) => {
-      // Bust cache for HTML files to ensure new deploys are picked up
-      if (path.endsWith('.html')) {
+    setHeaders: (res, filePath) => {
+      // No cache for HTML files to ensure new deploys are picked up immediately
+      if (filePath.endsWith('.html')) {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+      }
+      // Long cache for hashed assets (JS, CSS with hash in filename)
+      else if (/\.(js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|ico)$/.test(filePath)) {
+        // Check if file has hash in name (e.g., index.abc123.js)
+        if (/\.[a-f0-9]{8,}\.(js|css)/.test(filePath)) {
+          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+        } else {
+          // Non-hashed assets, shorter cache
+          res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour
+        }
       }
     }
   }));
