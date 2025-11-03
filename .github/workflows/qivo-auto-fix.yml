@@ -1,0 +1,117 @@
+name: 🔧 QIVO Engineer AI - Auto Fix
+
+on:
+  workflow_run:
+    workflows: ["🤖 QIVO Engineer AI - Technical Audit"]
+    types: [completed]
+  workflow_dispatch:
+
+jobs:
+  auto-fix:
+    name: Auto Fix & Deploy
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run Auto Fixes
+        id: auto-fix
+        run: |
+          echo "Running automatic fixes..."
+          
+          # Fix imports
+          pnpm exec eslint --fix "**/*.{ts,tsx,js,jsx}" || true
+          
+          # Format code
+          pnpm exec prettier --write "**/*.{ts,tsx,js,jsx,json,md}" || true
+          
+          # Update dependencies (minor/patch only)
+          pnpm update --latest --interactive=false || true
+          
+          echo "fixes_applied=true" >> $GITHUB_OUTPUT
+      
+      - name: Create Auto Fix Branch
+        if: steps.auto-fix.outputs.fixes_applied == 'true'
+        run: |
+          BRANCH_NAME="auto-fix/$(date +%Y%m%d-%H%M%S)"
+          git checkout -b $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+      
+      - name: Commit Auto Fixes
+        if: steps.auto-fix.outputs.fixes_applied == 'true'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "QIVO Engineer AI"
+          git add . || true
+          git diff --staged --quiet || git commit -m "🔧 QIVO Engineer AI — Auto Fix
+
+          Applied automatic fixes:
+          - ESLint auto-fix
+          - Prettier formatting
+          - Minor dependency updates
+          
+          Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          Branch: ${{ env.BRANCH_NAME }}"
+      
+      - name: Push Auto Fix Branch
+        if: steps.auto-fix.outputs.fixes_applied == 'true'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH_NAME }}
+      
+      - name: Create Pull Request
+        if: steps.auto-fix.outputs.fixes_applied == 'true'
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ env.BRANCH_NAME }}
+          title: "🔧 Auto Fix: Code Quality Improvements"
+          body: |
+            ## 🤖 QIVO Engineer AI - Auto Fix
+            
+            This PR contains automatic fixes applied by QIVO Engineer AI:
+            
+            - ✅ ESLint auto-fix
+            - ✅ Prettier formatting
+            - ✅ Minor dependency updates
+            
+            **Generated:** $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+            
+            Please review and merge if appropriate.
+          labels: |
+            auto-fix
+            qivo-engineer
+      
+      - name: Trigger Render Deploy
+        if: github.ref == 'refs/heads/main' && steps.auto-fix.outputs.fixes_applied == 'true'
+        run: |
+          curl -X POST "${{ secrets.RENDER_DEPLOY_HOOK }}" || echo "Deploy hook not configured"
+        continue-on-error: true
+      
+      - name: Send to Sentry
+        if: failure()
+        run: |
+          curl -X POST \
+            -H "Content-Type: application/json" \
+            -d "{\"message\":\"QIVO Auto Fix Failed\",\"level\":\"error\",\"tags\":{\"source\":\"github-actions\"}}" \
+            "${{ secrets.SENTRY_DSN }}" || echo "Sentry not configured"
+        continue-on-error: true

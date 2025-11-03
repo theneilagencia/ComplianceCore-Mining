@@ -1,0 +1,110 @@
+name: 🤖 QIVO Engineer AI - Technical Audit
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run every 12 hours
+    - cron: '0 */12 * * *'
+  workflow_dispatch:
+
+jobs:
+  technical-audit:
+    name: Technical Core Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: 'pnpm'
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 8
+      
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run Technical Audit
+        run: |
+          chmod +x scripts/technical-core/generateAudit.ts
+          pnpm tsx scripts/technical-core/generateAudit.ts
+        env:
+          API_URL: ${{ secrets.API_URL || 'http://localhost:3000' }}
+      
+      - name: Run Optimization Diff
+        run: |
+          chmod +x scripts/technical-core/generateOptimizationDiff.ts
+          pnpm tsx scripts/technical-core/generateOptimizationDiff.ts HEAD~10 HEAD
+        continue-on-error: true
+      
+      - name: Run Health Check
+        run: |
+          chmod +x scripts/technical-core/healthCheck.ts
+          pnpm tsx scripts/technical-core/healthCheck.ts
+        env:
+          API_URL: ${{ secrets.API_URL || 'http://localhost:3000' }}
+        continue-on-error: true
+      
+      - name: Upload Audit Reports
+        uses: actions/upload-artifact@v3
+        with:
+          name: qivo-audit-reports
+          path: |
+            docs/QIVO_TECHNICAL_AUDIT.md
+            docs/QIVO_OPTIMIZATION_DIFF.md
+            docs/QIVO_HEALTH_CHECK.md
+      
+      - name: Commit Reports
+        if: github.event_name != 'pull_request'
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "QIVO Engineer AI"
+          git add docs/QIVO_*.md || true
+          git diff --staged --quiet || git commit -m "🤖 QIVO Engineer AI — Technical Audit Report
+
+          Generated: $(date -u +"%Y-%m-%d %H:%M:%S UTC")
+          Workflow: Technical Core Audit
+          Trigger: ${{ github.event_name }}
+          
+          Files updated:
+          - docs/QIVO_TECHNICAL_AUDIT.md
+          - docs/QIVO_OPTIMIZATION_DIFF.md
+          - docs/QIVO_HEALTH_CHECK.md"
+      
+      - name: Push changes
+        if: github.event_name != 'pull_request'
+        uses: ad-m/github-push-action@master
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+      
+      - name: Notify Slack (on failure)
+        if: failure() && github.event_name != 'pull_request'
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "🚨 QIVO Engineer AI Technical Audit Failed",
+              "blocks": [
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*QIVO Engineer AI - Technical Audit Failed*\n\nRepository: ${{ github.repository }}\nBranch: ${{ github.ref_name }}\nCommit: ${{ github.sha }}\n\n<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Workflow Run>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
