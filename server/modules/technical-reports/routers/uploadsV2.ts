@@ -2,10 +2,9 @@ import { z } from "zod";
 import { randomUUID } from "crypto";
 import { router, protectedProcedure } from "../../../_core/trpc";
 import { uploads, reports } from "../../../../drizzle/schema";
-import { eq } from "drizzle-orm";
 import { storagePut } from "../../../storage-hybrid";
-import { parseAndNormalize, saveNormalizedToS3 } from "../services/parsing";
-import { retryAsync } from "../../../_core/retry";
+import { parsingQueue } from "../services/parsing-queue";
+import { emitUploadCompleted } from "../services/event-emitter";
 
 /**
  * Upload V2: Sistema de upload atômico e unificado
@@ -107,94 +106,22 @@ export const uploadsV2Router = router({
         });
       });
 
-      // 3. Iniciar o parsing de forma assíncrona com retry logic (não bloquear a resposta)
-      (async () => {
-        let attemptCount = 0;
-        const maxAttempts = 3;
+      // 3. Emit upload completed event
+      emitUploadCompleted(reportId, uploadId, input.fileName);
 
-        try {
-          // Usar retry logic para parsing e normalização
-          const parsingResult = await retryAsync(
-            async () => {
-              attemptCount++;
-              console.log(`[Upload V2] Parsing attempt ${attemptCount}/${maxAttempts} for report ${reportId}`);
-              
-              return await parseAndNormalize(
-                buffer.toString(),
-                input.fileType,
-                reportId,
-                ctx.user.tenantId
-              );
-            },
-            {
-              maxAttempts: 3,
-              initialDelayMs: 2000,
-              maxDelayMs: 8000,
-              backoffMultiplier: 2,
-              onRetry: (error, attempt) => {
-                console.warn(
-                  `[Upload V2] Parsing retry ${attempt}/${maxAttempts} for report ${reportId}: ${error.message}`
-                );
-              },
-            }
-          );
-
-          // Salvar normalizado no S3 também com retry
-          const normalizedUrl = await retryAsync(
-            () => saveNormalizedToS3(
-              parsingResult.normalized,
-              ctx.user.tenantId,
-              reportId
-            ),
-            {
-              maxAttempts: 3,
-              initialDelayMs: 1000,
-              maxDelayMs: 5000,
-            }
-          );
-
-          // Atualizar o report com o resultado do parsing
-          await db.update(reports).set({
-              detectedStandard: parsingResult.summary.detectedStandard as any,
-              standard: parsingResult.summary.detectedStandard as any,
-              status: (parsingResult.status === "needs_review" ? "needs_review" : "ready_for_audit") as any,
-              s3NormalizedUrl: normalizedUrl,
-              parsingSummary: {
-                ...parsingResult.summary,
-                attemptCount,
-                parsedAt: new Date().toISOString(),
-              },
-            }).where(eq(reports.id, reportId));
-
-          console.log(`[Upload V2] Parsing succeeded for report ${reportId} after ${attemptCount} attempt(s)`);
-        } catch (error) {
-          console.error(`[Upload V2] Parsing failed for report ${reportId} after ${maxAttempts} attempts:`, error);
-          
-          // Update status to parsing_failed com informação detalhada
-          await db.update(reports).set({ 
-            status: "parsing_failed" as any,
-            parsingSummary: { 
-              error: error instanceof Error ? error.message : String(error),
-              errorStack: error instanceof Error ? error.stack : undefined,
-              failedAt: new Date().toISOString(),
-              attemptCount: maxAttempts,
-              detectedStandard: "JORC_2012", // Placeholder
-              confidence: 0,
-              warnings: ["Parsing failed after all retry attempts"],
-              totalFields: 0,
-              uncertainFields: 0
-            } as any
-          }).where(eq(reports.id, reportId));
-
-          // TODO: Implementar notificação ao usuário via WebSocket ou polling
-          // await notifyUser(ctx.user.id, {
-          //   type: 'parsing_failed',
-          //   reportId,
-          //   fileName: input.fileName,
-          //   error: error.message,
-          // });
-        }
-      })();
+      // 4. Enqueue parsing job (non-blocking, processed in background)
+      // The parsing queue will:
+      // - Process the file asynchronously
+      // - Emit real-time progress events via SSE
+      // - Retry on failure with exponential backoff
+      // - Update database with results
+      await parsingQueue.enqueue(
+        reportId,
+        ctx.user.tenantId,
+        input.fileName,
+        buffer,
+        input.fileType
+      );
 
       // 4. Retornar sucesso imediato para o frontend
       return {

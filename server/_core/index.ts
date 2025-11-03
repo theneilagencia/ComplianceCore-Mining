@@ -288,6 +288,10 @@ async function startServer() {
   // Fix s3Url migration route
   app.use("/api", fixS3UrlRouter);
   
+  // Server-Sent Events (SSE) for real-time upload pipeline updates
+  const { eventsRouter } = await import("../modules/technical-reports/routers/events");
+  app.use("/api", eventsRouter);
+  
   // tRPC API (com rate limiting para uploads)
   // Note: uploadLimiter será aplicado especificamente no endpoint de upload via tRPC middleware
   app.use(
