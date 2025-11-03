@@ -68,6 +68,11 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
+  // Set server timeout to 5 minutes (300 seconds)
+  server.timeout = 300000; // 5 minutes
+  server.keepAliveTimeout = 305000; // Slightly longer than timeout
+  server.headersTimeout = 310000; // Slightly longer than keepAliveTimeout
+  
   // Configure CORS with credentials - Centralized on Render only
   const allowedOrigins = [
     'https://qivo-mining.onrender.com',
