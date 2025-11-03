@@ -20,6 +20,8 @@ services:
       pnpm install --frozen-lockfile
       echo "Running build script..."
       bash build.sh
+      echo "Running database migrations..."
+      pnpm drizzle-kit push || echo "⚠️  Migrations failed or DATABASE_URL not set"
 
     startCommand: pnpm run start
 
