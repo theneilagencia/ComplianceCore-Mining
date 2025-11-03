@@ -1,5 +1,6 @@
 import "dotenv/config";
 import express from "express";
+import compression from "compression";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { createServer } from "http";
@@ -97,6 +98,18 @@ async function startServer() {
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
+  }));
+  
+  // Gzip compression for all responses (should be early in middleware chain)
+  app.use(compression({
+    filter: (req, res) => {
+      if (req.headers['x-no-compression']) {
+        return false;
+      }
+      return compression.filter(req, res);
+    },
+    threshold: 1024, // Only compress responses > 1KB
+    level: 6, // Compression level (0-9, 6 is default balance)
   }));
   
   // Configure body parser with larger size limit for file uploads
