@@ -16,6 +16,7 @@ import { trpc } from "@/lib/trpc";
 import { FileText, Upload as UploadIcon, Download, AlertCircle, CheckCircle } from "lucide-react";
 import UploadModalAtomic from "../components/UploadModalAtomic";
 import { Badge } from "@/components/ui/badge";
+import { ReportListSkeleton } from "@/components/ui/skeleton";
 import { useLocation } from "wouter";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -407,23 +408,10 @@ export default function GenerateReport() {
  <h2 className="text-xl font-semibold mb-4">Relatórios Recentes</h2>
  
  {isLoading ? (
+ <ReportListSkeleton count={5} />
+ ) : reports && reports.items && reports.items.length > 0 ? (
  <div className="space-y-3">
- {Array.from({ length: 5 }).map((_, i) => (
- <div key={i} className="flex items-center justify-between p-4 border rounded-lg animate-pulse">
- <div className="flex items-center gap-3 flex-1">
- <div className="h-5 w-5 bg-gray-800/50 rounded" />
- <div className="flex-1 space-y-2">
- <div className="h-4 w-3/4 bg-gray-800/50 rounded" />
- <div className="h-3 w-1/2 bg-gray-800/50 rounded" />
- </div>
- </div>
- <div className="h-6 w-20 bg-gray-800/50 rounded" />
- </div>
- ))}
- </div>
- ) : reports && reports.length > 0 ? (
- <div className="space-y-3">
- {reports.map((report: any) => (
+ {reports.items.map((report: any) => (
  <div
  key={report.id}
  className="flex items-center justify-between p-4 border rounded-lg hover:bg-[#000020] cursor-pointer"
