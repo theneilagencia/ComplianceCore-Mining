@@ -20,9 +20,11 @@ import { HistoricalComparison } from "@/components/HistoricalComparison";
 import { OfficialSourcesValidation } from "@/components/OfficialSourcesValidation";
 import { useState } from "react";
 import { toast } from "sonner";
-import UploadModalV2 from '../components/UploadModalV2';
+import { useLocation } from "wouter";
+import UploadModalAtomic from '../components/UploadModalAtomic';
 
 export default function AuditKRCI() {
+  const [, navigate] = useLocation();
   const [selectedReport, setSelectedReport] = useState<string>("");
   const [showGuardRail, setShowGuardRail] = useState<boolean>(false);
   const [auditResult, setAuditResult] = useState<any>(null);
@@ -30,6 +32,7 @@ export default function AuditKRCI() {
   const [shouldGeneratePlan, setShouldGeneratePlan] = useState<boolean>(false);
   const [activeTab, setActiveTab] = useState<'select' | 'upload'>('select');
   const [advancedTab, setAdvancedTab] = useState<'trends' | 'comparison' | 'official'>('trends');
+  const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
 
   // Query para listar relatórios (sem polling)
   const { data: reports } = trpc.technicalReports.generate.list.useQuery(
@@ -270,7 +273,12 @@ export default function AuditKRCI() {
               </form>
             </div>
           ) : (
-            <UploadModalV2 open={true} onClose={() => {}} />
+            <div className="text-center py-8">
+              <p className="text-gray-400 mb-4">Faça upload de um relatório para auditar</p>
+              <Button onClick={() => setShowUploadModal(true)}>
+                Fazer Upload
+              </Button>
+            </div>
           )}
         </Card>
 
@@ -548,6 +556,16 @@ export default function AuditKRCI() {
           onClose={() => setShowGuardRail(false)}
           reportId={selectedReport}
           action="Auditoria"
+        />
+
+        {/* Upload Modal */}
+        <UploadModalAtomic
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={(result) => {
+            setShowUploadModal(false);
+            navigate(`/reports/${result.reportId}/review`);
+          }}
         />
       </div>
     </DashboardLayout>

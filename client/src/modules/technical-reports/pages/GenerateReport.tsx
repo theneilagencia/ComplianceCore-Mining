@@ -447,8 +447,10 @@ export default function GenerateReport() {
 		isOpen={showUploadModal} 
 		onClose={() => setShowUploadModal(false)}
 		onSuccess={(result) => {
-			console.log('[GenerateReport] Upload success! Navigating to review...');
-			console.log('[GenerateReport] Report ID:', result.reportId);
+			if (import.meta.env.DEV) {
+				console.log('[GenerateReport] Upload success! Navigating to review...');
+				console.log('[GenerateReport] Report ID:', result.reportId);
+			}
 			navigate(`/reports/${result.reportId}/review`);
 		}}
 	/>

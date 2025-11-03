@@ -41,9 +41,6 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
 
   const utils = trpc.useUtils();
 
-  // Debug logging
-  console.log('[UploadModalAtomic] Render - isOpen:', isOpen, 'uploading:', uploading);
-
   const uploadAndProcess = trpc.technicalReports.uploadsV2.uploadAndProcessReport.useMutation();
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -63,10 +60,14 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
 
   // Handle Dialog onOpenChange (from Radix)
   const handleDialogOpenChange = (open: boolean) => {
-    console.log('[UploadModalAtomic] Dialog onOpenChange:', open);
+    if (import.meta.env.DEV) {
+      console.log('[UploadModalAtomic] Dialog onOpenChange:', open);
+    }
     // Only allow closing when not uploading
     if (!uploading && !open) {
-      console.log('[UploadModalAtomic] Closing modal via onOpenChange');
+      if (import.meta.env.DEV) {
+        console.log('[UploadModalAtomic] Closing modal via onOpenChange');
+      }
       setFile(null);
       onClose();
     }
@@ -75,7 +76,9 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
   // Handle Cancel button click
   const handleCancelClick = () => {
     if (!uploading) {
-      console.log('[UploadModalAtomic] Cancel button clicked');
+      if (import.meta.env.DEV) {
+        console.log('[UploadModalAtomic] Cancel button clicked');
+      }
       setFile(null);
       onClose();
     }
@@ -172,13 +175,17 @@ export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: Upload
       // This prevents race conditions with the closing animation
       if (onSuccess) {
         setTimeout(() => {
-          console.log('[UploadModalAtomic] Calling onSuccess with reportId:', result.reportId);
+          if (import.meta.env.DEV) {
+            console.log('[UploadModalAtomic] Calling onSuccess with reportId:', result.reportId);
+          }
           onSuccess({ uploadId: result.uploadId, reportId: result.reportId });
         }, 400);
       }
 
     } catch (error: any) {
-      console.error('[UploadModalAtomic] Upload error:', error);
+      if (import.meta.env.DEV) {
+        console.error('[UploadModalAtomic] Upload error:', error);
+      }
       
       toast.dismiss('upload-process');
       
