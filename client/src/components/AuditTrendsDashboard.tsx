@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, memo } from "react";
 import { trpc } from "../lib/trpc";
 import {
   LineChart,
@@ -30,7 +30,7 @@ interface AuditTrendsDashboardProps {
   reportId: string;
 }
 
-export function AuditTrendsDashboard({ reportId }: AuditTrendsDashboardProps) {
+export const AuditTrendsDashboard = memo(function AuditTrendsDashboard({ reportId }: AuditTrendsDashboardProps) {
   const [activeTab, setActiveTab] = useState<"overview" | "trends" | "categories">("overview");
 
   const { data: trends, isLoading, error } = trpc.technicalReports.audit.getTrends.useQuery({
@@ -367,5 +367,5 @@ export function AuditTrendsDashboard({ reportId }: AuditTrendsDashboardProps) {
       </div>
     </div>
   );
-}
+});
 

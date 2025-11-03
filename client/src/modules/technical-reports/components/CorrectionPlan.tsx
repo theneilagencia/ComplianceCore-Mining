@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import { Download, Clock, AlertTriangle, CheckCircle2, Zap } from 'lucide-react';
 
 interface CorrectionItem {
@@ -50,7 +50,7 @@ const priorityColors = {
   low: 'text-blue-400',
 };
 
-export function CorrectionPlan({ plan, onExport }: CorrectionPlanProps) {
+export const CorrectionPlan = memo(function CorrectionPlan({ plan, onExport }: CorrectionPlanProps) {
   const [expandedItem, setExpandedItem] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'mustFix' | 'quickWins' | 'canDefer'>('all');
 
@@ -285,5 +285,5 @@ export function CorrectionPlan({ plan, onExport }: CorrectionPlanProps) {
       </div>
     </div>
   );
-}
+});
 

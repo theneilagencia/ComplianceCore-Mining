@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo } from "react";
 import { trpc } from "../lib/trpc";
 import {
   ArrowUp,
@@ -15,7 +15,7 @@ interface HistoricalComparisonProps {
   reportId: string;
 }
 
-export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
+export const HistoricalComparison = memo(function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
   const [previousAuditId, setPreviousAuditId] = useState<string>("");
   const [currentAuditId, setCurrentAuditId] = useState<string>("");
 
@@ -348,5 +348,5 @@ export function HistoricalComparison({ reportId }: HistoricalComparisonProps) {
       ) : null}
     </div>
   );
-}
+});
 
