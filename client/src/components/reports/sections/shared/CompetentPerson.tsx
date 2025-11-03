@@ -31,7 +31,7 @@ export const CompetentPerson: React.FC<CompetentPersonProps> = ({
           name="competentPerson.name"
           type="text"
           value={data.name}
-          onChange={(e) => onChange('competentPerson.name', e.target.value)}
+          onChange={(value) => onChange('competentPerson.name', value as string)}
           error={errors['competentPerson.name']}
           required
           placeholder="Ex: Dr. John Smith"
@@ -43,7 +43,7 @@ export const CompetentPerson: React.FC<CompetentPersonProps> = ({
           name="competentPerson.affiliation"
           type="text"
           value={data.affiliation}
-          onChange={(e) => onChange('competentPerson.affiliation', e.target.value)}
+          onChange={(value) => onChange('competentPerson.affiliation', value as string)}
           error={errors['competentPerson.affiliation']}
           required
           placeholder="Ex: SRK Consulting"
@@ -56,7 +56,7 @@ export const CompetentPerson: React.FC<CompetentPersonProps> = ({
         name="competentPerson.professionalRegistration"
         type="text"
         value={data.professionalRegistration}
-        onChange={(e) => onChange('competentPerson.professionalRegistration', e.target.value)}
+        onChange={(value) => onChange('competentPerson.professionalRegistration', value as string)}
         error={errors['competentPerson.professionalRegistration']}
         required
         placeholder={registrationPlaceholder}
@@ -70,7 +70,7 @@ export const CompetentPerson: React.FC<CompetentPersonProps> = ({
           name="competentPerson.contactDetails"
           type="text"
           value={data.contactDetails}
-          onChange={(e) => onChange('competentPerson.contactDetails', e.target.value)}
+          onChange={(value) => onChange('competentPerson.contactDetails', value as string)}
           error={errors['competentPerson.contactDetails']}
           placeholder="Ex: john.smith@srk.com | +61 8 9288 2000"
           helpText="Email e/ou telefone de contato"

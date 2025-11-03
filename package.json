@@ -4,6 +4,10 @@
   "description": "QIVO Mining Intelligence Platform - Regulatory Compliance & AI-Powered Reports",
   "type": "module",
   "license": "MIT",
+  "engines": {
+    "node": ">=24.0.0",
+    "pnpm": ">=10.0.0"
+  },
   "scripts": {
     "dev": "NODE_ENV=development tsx watch server/_core/index.ts",
     "build": "bash build.sh",

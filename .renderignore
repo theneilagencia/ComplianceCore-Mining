@@ -1,9 +1,22 @@
 # .renderignore
-# Impede que Render detecte automaticamente Python build
+# FORCE Node.js runtime - Ignore ALL Python files
 # Este projeto é Node.js/TypeScript em produção
-requirements.txt
-requirements-ai.txt
-wsgi.py
-pytest.ini
-app/__pycache__
+
+# Python files
+*.py
 *.pyc
+*.pyo
+*.pyd
+__pycache__/
+venv/
+env/
+.venv/
+.Python
+pip-log.txt
+requirements*.txt
+pytest.ini
+wsgi.py
+
+# Legacy Python application
+app/
+legacy/

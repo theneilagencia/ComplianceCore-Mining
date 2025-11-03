@@ -47,8 +47,8 @@ export function useServiceWorker() {
       setIsOnline(true);
       
       // Trigger background sync
-      if (registration && registration.sync) {
-        registration.sync.register('retry-queue').catch((error) => {
+      if (registration && 'sync' in registration) {
+        (registration as any).sync.register('retry-queue').catch((error: Error) => {
           console.error('Background sync registration failed:', error);
         });
       }
