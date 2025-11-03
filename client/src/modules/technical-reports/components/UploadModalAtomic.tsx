@@ -9,53 +9,39 @@ import {
 } from "@/components/ui/dialog";
 import { trpc } from "@/lib/trpc";
 import { Upload, FileText, X, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "sonner";
-import { useLocation } from "wouter";
 
 interface UploadModalProps {
-  open: boolean;
+  isOpen: boolean;
   onClose: () => void;
   onSuccess?: (result: { uploadId: string; reportId: string }) => void;
 }
 
 /**
- * UploadModalAtomic - Versão atômica do modal de upload
+ * UploadModalAtomic - Upload Modal V2 (Radix UI Safe)
  * 
- * Usa o endpoint uploadsV2.uploadAndProcessReport que faz tudo em uma única transação:
- * - Upload para storage
- * - Criação de registros no banco
- * - Parsing assíncrono
+ * DESIGN PRINCIPLES:
+ * 1. Controlled by parent via isOpen/onClose props
+ * 2. No internal state conflicts with Dialog open state
+ * 3. Clean close then callback then navigate flow
+ * 4. No useEffect polling or intervals
+ * 5. Radix Dialog fully respects onOpenChange
  * 
- * Elimina condições de corrida e garante consistência total.
- * 
- * CORREÇÕES APLICADAS:
- * 1. Substituído mutate() por mutateAsync() e aguardando Promise
- * 2. Adicionado estado "processing" após upload
- * 3. Implementado polling para status do parsing
- * 4. Modal fecha automaticamente quando parsing completa
- * 5. Logs de debug sem dados sensíveis
+ * FLOW:
+ * 1. User selects file
+ * 2. Click Iniciar Upload
+ * 3. Upload completes then onClose (modal closes)
+ * 4. After 150ms then onSuccess(result) then parent navigates
+ * 5. Modal unmounts cleanly from DOM
  */
-export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadModalProps) {
-  const [, setLocation] = useLocation();
+export default function UploadModalAtomic({ isOpen, onClose, onSuccess }: UploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
   const utils = trpc.useUtils();
 
-  // Reset estados quando o modal abre
-  useEffect(() => {
-    if (open) {
-      console.log('[UploadModalAtomic] Modal aberto - resetando estados');
-      setFile(null);
-      setUploading(false);
-    }
-  }, [open]);
-
-  // Usar o endpoint atômico V2
   const uploadAndProcess = trpc.technicalReports.uploadsV2.uploadAndProcessReport.useMutation();
-
-  // REMOVIDO: Polling complexo - Agora redirecionamento é imediato após upload
 
   const handleDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -72,96 +58,60 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
     }
   };
 
+  const handleModalClose = () => {
+    if (!uploading) {
+      setFile(null);
+      onClose();
+    }
+  };
+
   const handleUpload = async () => {
-    console.log('[UploadModalAtomic] ========== INÍCIO DO UPLOAD ==========');
-    
     if (!file) {
-      console.error('[UploadModalAtomic] ERRO: Nenhum arquivo selecionado');
-      toast.error("Selecione um arquivo");
+      toast.error("Nenhum arquivo selecionado");
       return;
     }
 
-    console.log('[UploadModalAtomic] Arquivo:', file.name, `(${file.size} bytes)`);
-
-    // Validar se o arquivo existe e não está vazio
-    if (file.size === 0) {
-      console.error('[UploadModalAtomic] ERRO: Arquivo vazio');
-      toast.error("Arquivo vazio", {
-        description: "O arquivo selecionado está vazio. Selecione um arquivo válido.",
-      });
-      return;
-    }
-
-    // Validar tamanho do arquivo (50MB max)
-    const maxSize = 50 * 1024 * 1024; // 50MB
-    if (file.size > maxSize) {
-      console.error('[UploadModalAtomic] ERRO: Arquivo muito grande:', file.size);
+    if (file.size > 50 * 1024 * 1024) {
       toast.error("Arquivo muito grande", {
         description: `Tamanho máximo: 50MB. Seu arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
       });
       return;
     }
 
-    // Validar tipo de arquivo
-    const allowedTypes = [
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-      'text/csv',
-      'application/zip',
-      'application/x-zip-compressed',
-    ];
-    
-    // Validar por extensão e MIME type
+    if (file.size < 1024) {
+      toast.error("Arquivo muito pequeno ou vazio");
+      return;
+    }
+
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     const validExtensions = ['pdf', 'docx', 'xlsx', 'csv', 'zip'];
     
     if (!validExtensions.includes(fileExtension || '')) {
-      console.error('[UploadModalAtomic] ERRO: Extensão inválida:', fileExtension);
       toast.error("Extensão de arquivo não suportada", {
-        description: `Extensão "${fileExtension}" não é aceita. Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP`,
+        description: `Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP`,
       });
       return;
     }
-    
-    if (file.type && !allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|docx|xlsx|csv|zip)$/i)) {
-      console.error('[UploadModalAtomic] ERRO: MIME type inválido:', file.type);
-      toast.error("Tipo de arquivo não suportado", {
-        description: "Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP",
-      });
-      return;
-    }
-
-    console.log('[UploadModalAtomic] ✅ Validações passaram');
 
     try {
       setUploading(true);
-      console.log('[UploadModalAtomic] Estado uploading=true');
-
       toast.loading("Enviando arquivo...", { id: 'upload-process' });
 
-      // Converter arquivo para base64
-      console.log('[UploadModalAtomic] Convertendo para base64...');
       const fileData = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         
         reader.onload = () => {
           try {
             const result = reader.result as string;
-            
             if (!result || !result.includes(',')) {
               reject(new Error("Formato de arquivo inválido"));
               return;
             }
-            
             const base64 = result.split(",")[1];
-            
             if (!base64) {
               reject(new Error("Não foi possível converter o arquivo"));
               return;
             }
-            
-            console.log('[UploadModalAtomic] ✅ Conversão para base64 concluída');
             resolve(base64);
           } catch (error) {
             reject(new Error(`Erro ao processar arquivo: ${error}`));
@@ -169,17 +119,12 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
         };
         
         reader.onerror = () => {
-          const errorMsg = reader.error?.message || 'desconhecido';
-          reject(new Error(`Erro ao ler arquivo: ${errorMsg}`));
+          reject(new Error(`Erro ao ler arquivo: ${reader.error?.message || 'desconhecido'}`));
         };
         
         reader.readAsDataURL(file);
       });
-      
-      console.log('[UploadModalAtomic] Base64 size:', fileData.length, 'chars');
 
-      // CORREÇÃO: Aguardar a Promise do mutateAsync()
-      console.log('[UploadModalAtomic] Chamando uploadAndProcess.mutateAsync...');
       const result = await uploadAndProcess.mutateAsync({
         fileName: file.name,
         fileSize: file.size,
@@ -187,61 +132,39 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
         fileData,
       });
 
-      console.log('[UploadModalAtomic] ✅ Upload concluído!');
-      console.log('[UploadModalAtomic] Result:', { uploadId: result.uploadId, reportId: result.reportId });
-      
       toast.dismiss('upload-process');
       toast.success("Upload concluído!", {
-        description: "Redirecionando para visualização...",
+        description: "Abrindo relatório...",
         duration: 2000,
       });
 
-      // SIMPLIFICADO: Fechar modal imediatamente e chamar onSuccess
       setUploading(false);
+      setFile(null);
       
-      // Fechar modal
-      console.log('[UploadModalAtomic] Fechando modal após upload');
+      utils.technicalReports.generate.list.invalidate();
+      utils.technicalReports.uploads.list.invalidate();
+      
       onClose();
       
-      // Chamar onSuccess se disponível
       if (onSuccess) {
-        console.log('[UploadModalAtomic] Chamando onSuccess com reportId:', result.reportId);
         setTimeout(() => {
           onSuccess({ uploadId: result.uploadId, reportId: result.reportId });
-        }, 100);
-      } else {
-        // Fallback: redirecionar para lista
-        console.log('[UploadModalAtomic] Sem callback, redirecionando para lista');
-        setTimeout(() => {
-          setLocation(`/reports/generate`);
-        }, 100);
+        }, 150);
       }
 
     } catch (error: any) {
-      console.error('[UploadModalAtomic] ❌ Erro:', error);
+      console.error('[UploadModalAtomic] Upload error:', error);
       
       toast.dismiss('upload-process');
       
-      // Mensagens de erro mais específicas
-      let errorMessage = "Erro no upload";
-      let errorDescription = "Tente novamente ou entre em contato com o suporte";
-      
-      if (error.message?.includes("ler arquivo")) {
-        errorMessage = "Erro ao ler arquivo";
-        errorDescription = "O arquivo pode estar corrompido ou em uso.";
-      } else if (error.message?.includes("Tipo de arquivo")) {
-        errorMessage = "Tipo de arquivo não suportado";
-        errorDescription = error.message;
-      } else if (error.message?.includes("muito grande")) {
-        errorMessage = "Arquivo muito grande";
-        errorDescription = error.message;
-      } else if (error.message) {
-        errorMessage = "Erro no upload";
-        errorDescription = error.message;
-      }
+      const errorMessage = error.message?.includes("ler arquivo")
+        ? "Erro ao ler arquivo"
+        : error.message?.includes("Tipo de arquivo")
+        ? "Tipo de arquivo não suportado"
+        : "Erro no upload";
       
       toast.error(errorMessage, {
-        description: errorDescription,
+        description: error.message || "Tente novamente",
         duration: 7000,
       });
       
@@ -249,19 +172,8 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
     }
   };
 
-  const handleClose = () => {
-    if (!uploading) {
-      console.log('[UploadModalAtomic] Fechando modal e limpando estados');
-      setFile(null);
-      setUploading(false);
-      toast.dismiss('processing-toast');
-      toast.dismiss('upload-process');
-      onClose();
-    }
-  };
-
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
+    <Dialog open={isOpen} onOpenChange={handleModalClose}>
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle>Upload de Relatório Externo (V2)</DialogTitle>
@@ -271,8 +183,6 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
         </DialogHeader>
 
         <div className="space-y-4">
-
-          {/* Área de drop */}
           <div
             onDrop={handleDrop}
             onDragOver={(e) => e.preventDefault()}
@@ -332,7 +242,6 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
             )}
           </div>
 
-          {/* Informações sobre o processo */}
           <Card className="p-4 bg-muted/50">
             <div className="flex items-start gap-3">
               <AlertCircle className="h-5 w-5 text-blue-500 mt-0.5" />
@@ -348,7 +257,6 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
             </div>
           </Card>
 
-          {/* Estimativa de tempo */}
           {file && (
             <Card className="p-3 bg-blue-50 dark:bg-blue-950/20 border-blue-200 dark:border-blue-800">
               <div className="flex items-center gap-2 text-sm text-blue-700 dark:text-blue-300">
@@ -358,11 +266,10 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
             </Card>
           )}
 
-          {/* Botões de ação */}
           <div className="flex justify-end gap-3">
             <Button
               variant="outline"
-              onClick={handleClose}
+              onClick={handleModalClose}
               disabled={uploading}
             >
               Cancelar
