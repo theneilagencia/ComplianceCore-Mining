@@ -55,7 +55,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
   };
 
   const handleUpload = async () => {
-    console.log('[Upload Atomic] ========== INÍCIO DO UPLOAD ==========');
     
     if (!file) {
       console.error('[Upload Atomic] ERRO: Nenhum arquivo selecionado');
@@ -63,7 +62,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
       return;
     }
 
-    console.log('[Upload Atomic] Arquivo selecionado:', {
       name: file.name,
       size: file.size,
       type: file.type,
@@ -103,7 +101,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     const validExtensions = ['pdf', 'docx', 'xlsx', 'csv', 'zip'];
     
-    console.log('[Upload Atomic] Validação:', {
       extensão: fileExtension,
       válida: validExtensions.includes(fileExtension || ''),
       mimeType: file.type,
@@ -125,41 +122,29 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
       return;
     }
 
-    console.log('[Upload Atomic] ✅ Validações passaram');
 
     try {
       setUploading(true);
-      console.log('[Upload Atomic] Estado uploading=true');
-      console.log('[Upload Atomic] Iniciando conversão para base64...');
 
       toast.loading("Enviando arquivo...", { id: 'upload-process' });
 
       // Converter arquivo para base64
-      console.log('[Upload Atomic] Criando FileReader...');
       const fileData = await new Promise<string>((resolve, reject) => {
-        console.log('[Upload Atomic] Dentro da Promise do FileReader');
         
         const reader = new FileReader();
-        console.log('[Upload Atomic] FileReader criado:', reader);
         
         reader.onloadstart = () => {
-          console.log('[Upload Atomic] FileReader.onloadstart - Leitura iniciada');
         };
         
         reader.onprogress = (e) => {
           if (e.lengthComputable) {
             const percentComplete = (e.loaded / e.total) * 100;
-            console.log(`[Upload Atomic] FileReader.onprogress - ${percentComplete.toFixed(0)}%`);
           }
         };
         
         reader.onload = () => {
-          console.log('[Upload Atomic] FileReader.onload - Leitura completa!');
           try {
             const result = reader.result as string;
-            console.log('[Upload Atomic] Resultado tipo:', typeof result);
-            console.log('[Upload Atomic] Resultado length:', result?.length);
-            console.log('[Upload Atomic] Resultado preview:', result?.substring(0, 50));
             
             if (!result || !result.includes(',')) {
               console.error('[Upload Atomic] ERRO: Formato inválido, não contém vírgula');
@@ -168,7 +153,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
             }
             
             const base64 = result.split(",")[1];
-            console.log('[Upload Atomic] Base64 extraído, length:', base64?.length);
             
             if (!base64) {
               console.error('[Upload Atomic] ERRO: Base64 vazio após split');
@@ -176,7 +160,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
               return;
             }
             
-            console.log('[Upload Atomic] ✅ Conversão para base64 bem-sucedida!');
             resolve(base64);
           } catch (error) {
             console.error('[Upload Atomic] ERRO no try/catch de onload:', error);
@@ -205,22 +188,15 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
           reject(new Error("Leitura do arquivo foi cancelada"));
         };
         
-        console.log('[Upload Atomic] Chamando reader.readAsDataURL...');
         try {
           reader.readAsDataURL(file);
-          console.log('[Upload Atomic] reader.readAsDataURL chamado com sucesso');
         } catch (error) {
           console.error('[Upload Atomic] ERRO ao chamar readAsDataURL:', error);
           reject(new Error(`Erro ao iniciar leitura: ${error}`));
         }
       });
       
-      console.log('[Upload Atomic] ✅ Arquivo convertido para base64!');
-      console.log('[Upload Atomic] Base64 size:', fileData.length, 'chars');
-      console.log('[Upload Atomic] Base64 preview (primeiros 100 chars):', fileData.substring(0, 100));
 
-      console.log('[Upload Atomic] Preparando chamada para backend...');
-      console.log('[Upload Atomic] Payload:', {
         fileName: file.name,
         fileSize: file.size,
         fileType: file.type || "application/pdf",
@@ -228,7 +204,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
       });
 
       // ÚNICA CHAMADA: Upload + Storage + Banco (Parsing é assíncrono)
-      console.log('[Upload Atomic] Chamando uploadAndProcess.mutateAsync...');
       const result = await uploadAndProcess.mutateAsync({
         fileName: file.name,
         fileSize: file.size,
@@ -236,8 +211,6 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
         fileData,
       });
 
-      console.log('[Upload Atomic] ✅ Upload completed!');
-      console.log('[Upload Atomic] Result:', result);
       setReportId(result.reportId);
 
       // Invalidar queries
