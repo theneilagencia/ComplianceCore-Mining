@@ -65,17 +65,8 @@ export default function UploadModalAtomic({ open, onClose, onSuccess }: UploadMo
       console.log(`[UploadModalAtomic] Poll #${pollCount}/${maxPolls} para reportId:`, reportId);
 
       try {
-        // Fazer requisição para verificar status
-        const response = await fetch(`/api/reports/status/${reportId}`, {
-          credentials: 'include',
-        });
-
-        if (!response.ok) {
-          console.warn('[UploadModalAtomic] Erro ao verificar status:', response.status);
-          return; // Continua tentando
-        }
-
-        const data = await response.json();
+        // CORREÇÃO: Usar tRPC em vez de fetch
+        const data = await utils.client.technicalReports.generate.getStatus.query({ reportId });
         console.log('[UploadModalAtomic] Status do report:', data);
 
         // Verificar se o parsing foi concluído
