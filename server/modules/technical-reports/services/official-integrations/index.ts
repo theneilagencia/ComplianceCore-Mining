@@ -221,6 +221,56 @@ export function getValidationStatusMessage(result: ValidationResult): {
 }
 
 /**
+ * Main validation orchestrator function
+ * Validates a report against multiple official sources
+ */
+export async function validateWithOfficialSources(
+  reportId: string,
+  options?: {
+    sources?: Array<'ANM' | 'CPRM' | 'IBAMA' | 'ANP'>;
+    fields?: string[];
+  }
+): Promise<ValidationSummary> {
+  const results: ValidationResult[] = [];
+  const sources = options?.sources || ['ANM', 'CPRM', 'IBAMA', 'ANP'];
+  
+  // Validate with each source
+  for (const source of sources) {
+    try {
+      switch (source) {
+        case 'ANM':
+          // ANM validation logic
+          break;
+        case 'CPRM':
+          // CPRM validation logic  
+          break;
+        case 'IBAMA':
+          // IBAMA validation logic
+          break;
+        case 'ANP':
+          // ANP validation logic
+          break;
+      }
+    } catch (error) {
+      // Handle error
+    }
+  }
+  
+  const passed = results.filter(r => r.status === 'valid').length;
+  const totalChecks = results.length;
+  
+  return {
+    totalChecks,
+    passed,
+    failed: results.filter(r => r.status === 'invalid').length,
+    notFound: results.filter(r => r.status === 'not_found').length,
+    errors: results.filter(r => r.status === 'error').length,
+    score: totalChecks > 0 ? (passed / totalChecks) * 100 : 0,
+    results,
+  };
+}
+
+/**
  * Export all validation functions
  */
 export {

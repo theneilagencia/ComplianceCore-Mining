@@ -806,3 +806,4 @@ router.patch('/notifications/:id/read', async (req: Request, res: Response) => {
   }
 });
 
+export default router;
