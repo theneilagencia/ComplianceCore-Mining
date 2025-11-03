@@ -46,25 +46,15 @@ echo "✅ Client built in ${BUILD_CLIENT_TIME}s"
 # Build server (esbuild)
 echo "🚀 Building server..."
 BUILD_SERVER_START=$(date +%s)
-pnpm esbuild server/_core/index.ts \
-  --platform=node \
-  --packages=external \
-  --bundle \
-  --format=esm \
-  --outdir=dist \
-  --sourcemap \
-  --minify-whitespace \
-  --minify-syntax \
-  --target=node24 \
-  --legal-comments=none
+node esbuild.config.js
 BUILD_SERVER_END=$(date +%s)
 BUILD_SERVER_TIME=$((BUILD_SERVER_END - BUILD_SERVER_START))
 echo "✅ Server built in ${BUILD_SERVER_TIME}s"
 
 # Validate build outputs
 echo "🔍 Validating build outputs..."
-if [ ! -f "dist/index.html" ]; then
-  echo "❌ ERROR: Client build failed - dist/index.html not found"
+if [ ! -f "dist/public/index.html" ]; then
+  echo "❌ ERROR: Client build failed - dist/public/index.html not found"
   exit 1
 fi
 if [ ! -f "dist/index.js" ]; then

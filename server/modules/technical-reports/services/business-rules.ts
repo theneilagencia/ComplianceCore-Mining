@@ -4,7 +4,9 @@
  */
 
 import { TRPCError } from "@trpc/server";
-import { eq, and, count } from "drizzle-orm";
+import { eq, and, count, sql, ne } from "drizzle-orm";
+import { getDb } from "../../../db.js";
+import { licenses, reports } from "../../../../drizzle/schema.js";
 
 interface QuotaValidationResult {
   allowed: boolean;
@@ -51,10 +53,8 @@ const PLAN_QUOTAS = {
  * Get tenant plan information including quotas
  */
 export async function getTenantPlan(tenantId: string): Promise<TenantPlanInfo | null> {
-  const db = await import("../../db").then((m) => m.getDb());
+  const db = await getDb();
   if (!db) return null;
-
-  const { licenses } = await import("../../../drizzle/schema");
 
   // Get most recent active license for tenant
   const license = await db
@@ -148,11 +148,8 @@ export async function validateReportCreation(
  * Increment report usage counter for tenant
  */
 export async function incrementReportUsage(tenantId: string): Promise<void> {
-  const db = await import("../../db").then((m) => m.getDb());
+  const db = await getDb();
   if (!db) throw new Error("Database not available");
-
-  const { licenses } = await import("../../../drizzle/schema");
-  const { sql } = await import("drizzle-orm");
 
   // Increment reportsUsed atomically
   await db
@@ -177,11 +174,8 @@ export async function checkDuplicateReport(
   title: string,
   excludeReportId?: string
 ): Promise<boolean> {
-  const db = await import("../../db").then((m) => m.getDb());
+  const db = await getDb();
   if (!db) return false;
-
-  const { reports } = await import("../../../drizzle/schema");
-  const { ne } = await import("drizzle-orm");
 
   const conditions = [
     eq(reports.tenantId, tenantId),
