@@ -2,7 +2,7 @@ import { z } from "zod";
 import { randomUUID } from "crypto";
 import { protectedProcedure, router } from "../../../_core/trpc";
 import { TRPCError } from "@trpc/server";
-import { runAudit } from "../services/audit";
+import { runAuditOptimized as runAudit } from "../services/audit.optimized";
 import { runKRCIScan, getKRCIStats, ScanMode } from "../services/krci-extended";
 import { generateCorrectionPlan, exportCorrectionPlan } from "../services/correction-plan";
 import { compareWithAI } from "../services/ai-comparison";

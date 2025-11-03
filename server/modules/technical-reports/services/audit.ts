@@ -5,7 +5,7 @@
  * conforme padrões internacionais (JORC, NI 43-101, PERC, SAMREC, CRIRSCO)
  */
 
-interface NormalizedReport {
+export interface NormalizedReport {
   metadata?: {
     title?: string;
     projectName?: string;
@@ -58,7 +58,7 @@ interface AuditRule {
   check: (report: NormalizedReport) => boolean;
 }
 
-interface KRCI {
+export interface KRCI {
   code: string;
   section: string;
   message: string;
@@ -66,7 +66,7 @@ interface KRCI {
   weight: number;
 }
 
-interface AuditResult {
+export interface AuditResult {
   score: number;
   totalRules: number;
   passedRules: number;
