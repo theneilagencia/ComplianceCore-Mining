@@ -20,7 +20,7 @@ import { HistoricalComparison } from "@/components/HistoricalComparison";
 import { OfficialSourcesValidation } from "@/components/OfficialSourcesValidation";
 import { useState } from "react";
 import { toast } from "sonner";
-import DocumentUploadValidator from "@/components/DocumentUploadValidator";
+import UploadModalV2 from '../components/UploadModalV2';
 
 export default function AuditKRCI() {
   const [selectedReport, setSelectedReport] = useState<string>("");
@@ -270,13 +270,7 @@ export default function AuditKRCI() {
               </form>
             </div>
           ) : (
-            <DocumentUploadValidator
-              onValidationComplete={(result) => {
-                toast.success('Validação concluída!', {
-                  description: `Score: ${result.score}% - ${result.criteria.length} critérios verificados`
-                });
-              }}
-            />
+            <UploadModalV2 open={true} onClose={() => {}} />
           )}
         </Card>
 
