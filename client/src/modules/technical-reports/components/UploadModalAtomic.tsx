@@ -55,13 +55,24 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
   };
 
   const handleUpload = async () => {
+    console.log('[Upload Atomic] ========== INÍCIO DO UPLOAD ==========');
+    
     if (!file) {
+      console.error('[Upload Atomic] ERRO: Nenhum arquivo selecionado');
       toast.error("Selecione um arquivo");
       return;
     }
 
+    console.log('[Upload Atomic] Arquivo selecionado:', {
+      name: file.name,
+      size: file.size,
+      type: file.type,
+      lastModified: file.lastModified,
+    });
+
     // Validar se o arquivo existe e não está vazio
     if (file.size === 0) {
+      console.error('[Upload Atomic] ERRO: Arquivo vazio');
       toast.error("Arquivo vazio", {
         description: "O arquivo selecionado está vazio. Selecione um arquivo válido.",
       });
@@ -71,6 +82,7 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     // Validar tamanho do arquivo (50MB max)
     const maxSize = 50 * 1024 * 1024; // 50MB
     if (file.size > maxSize) {
+      console.error('[Upload Atomic] ERRO: Arquivo muito grande:', file.size);
       toast.error("Arquivo muito grande", {
         description: `Tamanho máximo: 50MB. Seu arquivo: ${(file.size / 1024 / 1024).toFixed(2)}MB`,
       });
@@ -91,7 +103,14 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     const fileExtension = file.name.split('.').pop()?.toLowerCase();
     const validExtensions = ['pdf', 'docx', 'xlsx', 'csv', 'zip'];
     
+    console.log('[Upload Atomic] Validação:', {
+      extensão: fileExtension,
+      válida: validExtensions.includes(fileExtension || ''),
+      mimeType: file.type,
+    });
+    
     if (!validExtensions.includes(fileExtension || '')) {
+      console.error('[Upload Atomic] ERRO: Extensão inválida:', fileExtension);
       toast.error("Extensão de arquivo não suportada", {
         description: `Extensão "${fileExtension}" não é aceita. Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP`,
       });
@@ -99,52 +118,117 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
     }
     
     if (file.type && !allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|docx|xlsx|csv|zip)$/i)) {
+      console.error('[Upload Atomic] ERRO: MIME type inválido:', file.type);
       toast.error("Tipo de arquivo não suportado", {
         description: "Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP",
       });
       return;
     }
 
+    console.log('[Upload Atomic] ✅ Validações passaram');
+
     try {
       setUploading(true);
-      console.log('[Upload Atomic] Starting atomic upload');
-      console.log('[Upload Atomic] File:', file.name, file.size, file.type);
+      console.log('[Upload Atomic] Estado uploading=true');
+      console.log('[Upload Atomic] Iniciando conversão para base64...');
 
       toast.loading("Enviando arquivo...", { id: 'upload-process' });
 
       // Converter arquivo para base64
+      console.log('[Upload Atomic] Criando FileReader...');
       const fileData = await new Promise<string>((resolve, reject) => {
+        console.log('[Upload Atomic] Dentro da Promise do FileReader');
+        
         const reader = new FileReader();
+        console.log('[Upload Atomic] FileReader criado:', reader);
+        
+        reader.onloadstart = () => {
+          console.log('[Upload Atomic] FileReader.onloadstart - Leitura iniciada');
+        };
+        
+        reader.onprogress = (e) => {
+          if (e.lengthComputable) {
+            const percentComplete = (e.loaded / e.total) * 100;
+            console.log(`[Upload Atomic] FileReader.onprogress - ${percentComplete.toFixed(0)}%`);
+          }
+        };
+        
         reader.onload = () => {
+          console.log('[Upload Atomic] FileReader.onload - Leitura completa!');
           try {
             const result = reader.result as string;
+            console.log('[Upload Atomic] Resultado tipo:', typeof result);
+            console.log('[Upload Atomic] Resultado length:', result?.length);
+            console.log('[Upload Atomic] Resultado preview:', result?.substring(0, 50));
+            
             if (!result || !result.includes(',')) {
+              console.error('[Upload Atomic] ERRO: Formato inválido, não contém vírgula');
               reject(new Error("Formato de arquivo inválido"));
               return;
             }
+            
             const base64 = result.split(",")[1];
+            console.log('[Upload Atomic] Base64 extraído, length:', base64?.length);
+            
             if (!base64) {
+              console.error('[Upload Atomic] ERRO: Base64 vazio após split');
               reject(new Error("Não foi possível converter o arquivo"));
               return;
             }
+            
+            console.log('[Upload Atomic] ✅ Conversão para base64 bem-sucedida!');
             resolve(base64);
           } catch (error) {
+            console.error('[Upload Atomic] ERRO no try/catch de onload:', error);
             reject(new Error(`Erro ao processar arquivo: ${error}`));
           }
         };
-        reader.onerror = (error) => {
-          console.error('[Upload Atomic] FileReader error:', error);
-          reject(new Error(`Erro ao ler arquivo: ${file.name}. Verifique se o arquivo não está corrompido.`));
+        
+        reader.onerror = (event) => {
+          console.error('[Upload Atomic] ❌ FileReader.onerror DISPARADO!');
+          console.error('[Upload Atomic] Event:', event);
+          console.error('[Upload Atomic] Reader.error:', reader.error);
+          console.error('[Upload Atomic] Reader.error.name:', reader.error?.name);
+          console.error('[Upload Atomic] Reader.error.message:', reader.error?.message);
+          console.error('[Upload Atomic] File.name:', file.name);
+          console.error('[Upload Atomic] File.size:', file.size);
+          console.error('[Upload Atomic] File.type:', file.type);
+          
+          const errorMsg = reader.error?.message || 'desconhecido';
+          const errorName = reader.error?.name || 'UnknownError';
+          
+          reject(new Error(`Erro ao ler arquivo "${file.name}": ${errorName} - ${errorMsg}. Verifique se o arquivo não está corrompido ou em uso por outro programa.`));
         };
+        
         reader.onabort = () => {
+          console.error('[Upload Atomic] ❌ FileReader.onabort - Leitura cancelada!');
           reject(new Error("Leitura do arquivo foi cancelada"));
         };
-        reader.readAsDataURL(file);
+        
+        console.log('[Upload Atomic] Chamando reader.readAsDataURL...');
+        try {
+          reader.readAsDataURL(file);
+          console.log('[Upload Atomic] reader.readAsDataURL chamado com sucesso');
+        } catch (error) {
+          console.error('[Upload Atomic] ERRO ao chamar readAsDataURL:', error);
+          reject(new Error(`Erro ao iniciar leitura: ${error}`));
+        }
       });
       
-      console.log('[Upload Atomic] File converted to base64, size:', fileData.length);
+      console.log('[Upload Atomic] ✅ Arquivo convertido para base64!');
+      console.log('[Upload Atomic] Base64 size:', fileData.length, 'chars');
+      console.log('[Upload Atomic] Base64 preview (primeiros 100 chars):', fileData.substring(0, 100));
+
+      console.log('[Upload Atomic] Preparando chamada para backend...');
+      console.log('[Upload Atomic] Payload:', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type || "application/pdf",
+        fileDataLength: fileData.length,
+      });
 
       // ÚNICA CHAMADA: Upload + Storage + Banco (Parsing é assíncrono)
+      console.log('[Upload Atomic] Chamando uploadAndProcess.mutateAsync...');
       const result = await uploadAndProcess.mutateAsync({
         fileName: file.name,
         fileSize: file.size,
@@ -152,7 +236,8 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
         fileData,
       });
 
-      console.log('[Upload Atomic] Upload completed:', result);
+      console.log('[Upload Atomic] ✅ Upload completed!');
+      console.log('[Upload Atomic] Result:', result);
       setReportId(result.reportId);
 
       // Invalidar queries
