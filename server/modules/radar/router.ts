@@ -223,6 +223,9 @@ const MOCK_OPERATIONS = [
 /**
  * GET /api/radar/operations
  * Returns aggregated mining operations from 12 global sources
+ * 
+ * NOTE: Uses real data from aggregator with mock fallback.
+ * Check `dataSource` field in response to see if using real or mock data.
  */
 router.get('/operations', async (req: Request, res: Response) => {
   try {
@@ -232,6 +235,11 @@ router.get('/operations', async (req: Request, res: Response) => {
     // If no real data available, fallback to mock data
     const finalOperations = operations.length > 0 ? operations : MOCK_OPERATIONS;
     const activeSources = sources.filter(s => s.status === 'active').length;
+    
+    // Log warning if using mock data
+    if (operations.length === 0) {
+      console.warn('[Radar] Using MOCK_OPERATIONS - no real data available from aggregator');
+    }
     
     res.json({
       success: true,
@@ -349,11 +357,18 @@ router.get('/sources', async (req: Request, res: Response) => {
   });
 });
 
-export default router;
-
-
-
-// Mock regulatory changes data
+/**
+ * GET /api/radar/regulatory-changes
+ * Returns regulatory changes from global sources
+ * 
+ * NOTE: Currently returns mock data pending DOU scraper integration.
+ * Real implementation will use DOUScraper service once scheduler is fully enabled.
+ * 
+ * TODO Phase 3: Integrate real DOU scraping with scheduler
+ *   - Enable DOU scraper job in production
+ *   - Store results in database
+ *   - Return real regulatory changes from DB
+ */
 const MOCK_REGULATORY_CHANGES = [
   {
     id: 'reg-001',
@@ -480,12 +495,13 @@ router.get('/regulatory-changes', async (req: Request, res: Response) => {
     // - Legal databases
     // - News agencies
 
-    // For now, return mock data
+    // For now, return mock data (real data coming in Phase 3)
     res.json({
       success: true,
       changes: MOCK_REGULATORY_CHANGES,
       total: MOCK_REGULATORY_CHANGES.length,
       lastUpdate: new Date().toISOString(),
+      dataSource: 'mock', // Explicitly mark as mock data
     });
   } catch (error: any) {
     console.error('[Radar] Error fetching regulatory changes:', error);
@@ -495,6 +511,21 @@ router.get('/regulatory-changes', async (req: Request, res: Response) => {
     });
   }
 });
+
+/**
+ * GET /api/radar/notifications
+ * Returns notifications from radar monitoring system
+ * 
+ * NOTE: Currently returns mock data. Real notifications will come from:
+ *   - DOU Scraper (scheduled job - every 12 hours)
+ *   - External API changes detected by aggregator
+ *   - Regulatory updates from integrated sources
+ * 
+ * TODO Phase 3: Connect to real notification service
+ *   - Store notifications in database
+ *   - Integrate with webhook notification system
+ *   - Support real-time notifications via SSE
+ */
 
 // Mock notifications data from all radar sources
 const MOCK_NOTIFICATIONS = [
