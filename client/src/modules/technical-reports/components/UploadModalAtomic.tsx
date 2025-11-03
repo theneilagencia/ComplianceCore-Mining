@@ -60,6 +60,14 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
       return;
     }
 
+    // Validar se o arquivo existe e não está vazio
+    if (file.size === 0) {
+      toast.error("Arquivo vazio", {
+        description: "O arquivo selecionado está vazio. Selecione um arquivo válido.",
+      });
+      return;
+    }
+
     // Validar tamanho do arquivo (50MB max)
     const maxSize = 50 * 1024 * 1024; // 50MB
     if (file.size > maxSize) {
@@ -79,6 +87,17 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
       'application/x-zip-compressed',
     ];
     
+    // Validar por extensão e MIME type
+    const fileExtension = file.name.split('.').pop()?.toLowerCase();
+    const validExtensions = ['pdf', 'docx', 'xlsx', 'csv', 'zip'];
+    
+    if (!validExtensions.includes(fileExtension || '')) {
+      toast.error("Extensão de arquivo não suportada", {
+        description: `Extensão "${fileExtension}" não é aceita. Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP`,
+      });
+      return;
+    }
+    
     if (file.type && !allowedTypes.includes(file.type) && !file.name.match(/\.(pdf|docx|xlsx|csv|zip)$/i)) {
       toast.error("Tipo de arquivo não suportado", {
         description: "Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP",
@@ -97,16 +116,35 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
       const fileData = await new Promise<string>((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
-          const base64 = (reader.result as string).split(",")[1];
-          resolve(base64);
+          try {
+            const result = reader.result as string;
+            if (!result || !result.includes(',')) {
+              reject(new Error("Formato de arquivo inválido"));
+              return;
+            }
+            const base64 = result.split(",")[1];
+            if (!base64) {
+              reject(new Error("Não foi possível converter o arquivo"));
+              return;
+            }
+            resolve(base64);
+          } catch (error) {
+            reject(new Error(`Erro ao processar arquivo: ${error}`));
+          }
         };
-        reader.onerror = () => reject(new Error("Erro ao ler arquivo"));
+        reader.onerror = (error) => {
+          console.error('[Upload Atomic] FileReader error:', error);
+          reject(new Error(`Erro ao ler arquivo: ${file.name}. Verifique se o arquivo não está corrompido.`));
+        };
+        reader.onabort = () => {
+          reject(new Error("Leitura do arquivo foi cancelada"));
+        };
         reader.readAsDataURL(file);
       });
       
       console.log('[Upload Atomic] File converted to base64, size:', fileData.length);
 
-      // ÚNICA CHAMADA: Upload + Storage + Banco + Parsing
+      // ÚNICA CHAMADA: Upload + Storage + Banco (Parsing é assíncrono)
       const result = await uploadAndProcess.mutateAsync({
         fileName: file.name,
         fileSize: file.size,
@@ -124,37 +162,52 @@ export default function UploadModalAtomic({ open, onClose }: UploadModalProps) {
       // Exibir resultado
       toast.dismiss('upload-process');
       
-      if (result.status === "needs_review") {
-        toast.warning("Revisão necessária", {
-          description: `${result.summary.uncertainFields} campos precisam de validação`,
-          duration: 5000,
-          action: {
-            label: "Revisar agora",
-            onClick: () => {
-              onClose();
-              setLocation(`/reports/${result.reportId}/review`);
-            },
-          },
-        });
-      } else {
-        toast.success("Relatório processado com sucesso!", {
-          description: `Padrão detectado: ${result.summary.detectedStandard}`,
-          duration: 3000,
-        });
-      }
+      toast.success("Upload concluído com sucesso!", {
+        description: "Seu relatório está sendo processado em segundo plano. Você será notificado quando estiver pronto.",
+        duration: 5000,
+      });
 
-      // Fechar modal após 2 segundos
+      // Fechar modal e redirecionar para lista de relatórios
       setTimeout(() => {
         onClose();
-        setLocation(`/reports/${result.reportId}`);
+        setLocation(`/reports/generate`); // Redireciona para lista
       }, 2000);
 
     } catch (error: any) {
       console.error('[Upload Atomic] Error:', error);
+      console.error('[Upload Atomic] Error stack:', error?.stack);
+      console.error('[Upload Atomic] File details:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+      });
+      
       toast.dismiss('upload-process');
-      toast.error("Erro no upload", {
-        description: error.message || "Erro desconhecido",
-        duration: 5000,
+      
+      // Mensagens de erro mais específicas
+      let errorMessage = "Erro desconhecido";
+      let errorDescription = "Tente novamente ou entre em contato com o suporte";
+      
+      if (error.message?.includes("ler arquivo")) {
+        errorMessage = "Erro ao ler arquivo";
+        errorDescription = "O arquivo pode estar corrompido ou em uso por outro programa. Feche o arquivo e tente novamente.";
+      } else if (error.message?.includes("Tipo de arquivo")) {
+        errorMessage = "Tipo de arquivo não suportado";
+        errorDescription = error.message;
+      } else if (error.message?.includes("muito grande")) {
+        errorMessage = "Arquivo muito grande";
+        errorDescription = error.message;
+      } else if (error.message?.includes("Database")) {
+        errorMessage = "Erro de banco de dados";
+        errorDescription = "Houve um problema ao salvar o relatório. Tente novamente.";
+      } else if (error.message) {
+        errorMessage = "Erro no upload";
+        errorDescription = error.message;
+      }
+      
+      toast.error(errorMessage, {
+        description: errorDescription,
+        duration: 7000,
       });
     } finally {
       setUploading(false);
