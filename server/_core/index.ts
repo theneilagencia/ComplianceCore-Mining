@@ -152,26 +152,61 @@ async function startServer() {
   // Aplicar rate limiting geral a todas as rotas /api
   app.use('/api/', generalLimiter);
   
-  // Health check endpoint
+  // Health check endpoint (enhanced v2.0)
   app.get('/api/health', async (req, res) => {
+    const startTime = Date.now();
+    
     try {
+      // Check database connection
       const { getDb } = await import('../db');
       const db = await getDb();
+      const dbHealthy = !!db;
       
-      res.json({
-        status: 'healthy',
+      // Get system metrics
+      const memUsage = process.memoryUsage();
+      const uptime = process.uptime();
+      
+      // Response time
+      const responseTime = Date.now() - startTime;
+      
+      // Overall health status
+      const isHealthy = dbHealthy && responseTime < 1000;
+      
+      res.status(isHealthy ? 200 : 503).json({
+        status: isHealthy ? 'healthy' : 'degraded',
         version: '2.0.0',
         timestamp: new Date().toISOString(),
         environment: process.env.NODE_ENV || 'development',
-        database: !!db ? 'connected' : 'disconnected',
-        uptime: process.uptime(),
-        service: 'QIVO Mining Platform'
+        service: 'QIVO Mining Platform',
+        checks: {
+          database: {
+            status: dbHealthy ? 'connected' : 'disconnected',
+            healthy: dbHealthy
+          },
+          memory: {
+            used: Math.round(memUsage.heapUsed / 1024 / 1024),
+            total: Math.round(memUsage.heapTotal / 1024 / 1024),
+            unit: 'MB',
+            healthy: memUsage.heapUsed / memUsage.heapTotal < 0.9
+          },
+          uptime: {
+            seconds: Math.round(uptime),
+            formatted: `${Math.floor(uptime / 3600)}h ${Math.floor((uptime % 3600) / 60)}m`,
+            healthy: uptime > 60 // Healthy if running for > 1min
+          }
+        },
+        performance: {
+          responseTime: `${responseTime}ms`,
+          healthy: responseTime < 100
+        }
       });
     } catch (error) {
-      res.status(500).json({
+      res.status(503).json({
         status: 'unhealthy',
+        version: '2.0.0',
         error: error instanceof Error ? error.message : 'Unknown error',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        service: 'QIVO Mining Platform'
       });
     }
   });
