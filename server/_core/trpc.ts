@@ -7,8 +7,31 @@ const t = initTRPC.context<TrpcContext>().create({
   transformer: superjson,
 });
 
+// Performance tracking middleware
+const performanceMiddleware = t.middleware(async (opts) => {
+  const { path, type, next } = opts;
+  const start = Date.now();
+  
+  const result = await next();
+  
+  const duration = Date.now() - start;
+  
+  // Log slow requests (> 1s)
+  if (duration > 1000) {
+    console.warn(`[TRPC Performance] Slow ${type} request: ${path} took ${duration}ms`);
+  }
+  
+  // Log in dev mode
+  if (process.env.NODE_ENV === 'development') {
+    console.log(`[TRPC] ${type} ${path} - ${duration}ms`);
+  }
+  
+  return result;
+});
+
 export const router = t.router;
-export const publicProcedure = t.procedure;
+export const publicProcedure = t.procedure.use(performanceMiddleware);
+
 
 const requireUser = t.middleware(async opts => {
   const { ctx, next } = opts;
@@ -25,7 +48,9 @@ const requireUser = t.middleware(async opts => {
   });
 });
 
-export const protectedProcedure = t.procedure.use(requireUser);
+export const protectedProcedure = t.procedure
+  .use(performanceMiddleware)
+  .use(requireUser);
 
 export const adminProcedure = t.procedure.use(
   t.middleware(async opts => {
