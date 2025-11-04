@@ -37,8 +37,8 @@ services:
     # Start command
     startCommand: pnpm start
     
-    # DISABLED: Health check and auto-deploy
-    autoDeploy: false
+    # ENABLED: Auto-deploy on push to main branch
+    autoDeploy: true
 
     envVars:
       - key: NODE_ENV
