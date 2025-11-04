@@ -35,6 +35,8 @@ import { useLocation } from "wouter";
 interface UnifiedUploadModalProps {
   isOpen: boolean;
   onClose: () => void;
+  skipAutoRedirect?: boolean;
+  onUploadComplete?: (reportId: string, status: string) => void;
 }
 
 type ProcessingStage = 
@@ -58,7 +60,7 @@ interface ProcessingState {
   retryable: boolean;
 }
 
-export default function UnifiedUploadModal({ isOpen, onClose }: UnifiedUploadModalProps) {
+export default function UnifiedUploadModal({ isOpen, onClose, skipAutoRedirect = false, onUploadComplete }: UnifiedUploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [state, setState] = useState<ProcessingState>({
     stage: "idle",
@@ -202,14 +204,24 @@ export default function UnifiedUploadModal({ isOpen, onClose }: UnifiedUploadMod
         // Invalidate queries
         utils.technicalReports.generate.list.invalidate();
 
-        // Auto-redirect after 1.5s
+        // Auto-redirect after 1.5s (unless skipAutoRedirect is true)
         setTimeout(() => {
           onClose();
           
-          if (event.data.status === "needs_review") {
-            setLocation(`/reports/${state.reportId}/review`);
+          if (skipAutoRedirect) {
+            // Call callback instead of redirecting
+            if (onUploadComplete && state.reportId) {
+              onUploadComplete(state.reportId, event.data.status);
+            }
           } else {
-            setLocation(`/audits/create?reportId=${state.reportId}`);
+            // TEMPORARILY DISABLED: auto-redirect
+            // Investigating redirect issue in audit module
+            console.log('[UnifiedUploadModal] Auto-redirect DISABLED. Status:', event.data.status, 'ReportId:', state.reportId);
+            // if (event.data.status === "needs_review") {
+            //   setLocation(`/reports/${state.reportId}/review`);
+            // } else {
+            //   setLocation(`/audits/create?reportId=${state.reportId}`);
+            // }
           }
         }, 1500);
         break;
