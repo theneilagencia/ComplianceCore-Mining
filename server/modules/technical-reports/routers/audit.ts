@@ -65,7 +65,11 @@ export const auditRouter = router({
       if (!parsedReport) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Normalized data not found. Report may not be fully processed. Please ensure the report has been parsed successfully.",
+          message: "❌ Erro ao ler arquivo de dados normalizado. Possíveis causas:\n\n" +
+                   "1. O relatório ainda não foi processado completamente\n" +
+                   "2. O arquivo normalized.json não existe ou foi corrompido\n" +
+                   "3. Problema de permissões no sistema de arquivos\n\n" +
+                   "✅ Solução: Tente fazer upload do relatório novamente ou verifique o status do processamento.",
         });
       }
 
@@ -261,7 +265,8 @@ export const auditRouter = router({
       if (!parsedReport) {
         throw new TRPCError({
           code: "NOT_FOUND",
-          message: "Normalized data not found for extended scan.",
+          message: "❌ Erro ao ler arquivo de dados normalizado para scan estendido.\n\n" +
+                   "Verifique se o relatório foi processado corretamente e tente novamente.",
         });
       }
 

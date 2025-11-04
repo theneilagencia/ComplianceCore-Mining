@@ -431,17 +431,37 @@ export async function loadNormalizedFromS3(
 ): Promise<NormalizedReport | null> {
   try {
     const s3Key = `reports/${reportId}/normalized.json`;
-    const { url } = await storageGet(s3Key);
+    console.log(`[loadNormalizedFromS3] Loading ${s3Key}...`);
     
-    const response = await fetch(url);
+    const result = await storageGet(s3Key);
+    console.log(`[loadNormalizedFromS3] Got storage result:`, { key: result.key, hasBuffer: !!result.buffer, url: result.url });
+    
+    // Se temos o buffer direto (Render Disk), usar ele
+    if (result.buffer) {
+      console.log(`[loadNormalizedFromS3] Using buffer from Render Disk`);
+      const normalized = JSON.parse(result.buffer.toString('utf-8'));
+      return normalized as NormalizedReport;
+    }
+    
+    // Caso contrário, fazer fetch da URL (CDN)
+    console.log(`[loadNormalizedFromS3] Fetching from URL: ${result.url}`);
+    const response = await fetch(result.url);
+    
     if (!response.ok) {
+      console.error(`[loadNormalizedFromS3] Fetch failed with status ${response.status}: ${response.statusText}`);
       return null;
     }
     
     const normalized = await response.json();
+    console.log(`[loadNormalizedFromS3] Successfully loaded normalized.json`);
     return normalized as NormalizedReport;
-  } catch (error) {
-    console.error("Error loading normalized.json:", error);
+  } catch (error: any) {
+    console.error("[loadNormalizedFromS3] Error loading normalized.json:", {
+      error: error.message,
+      stack: error.stack,
+      reportId,
+      tenantId
+    });
     return null;
   }
 }
