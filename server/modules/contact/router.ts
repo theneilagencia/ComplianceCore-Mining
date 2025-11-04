@@ -14,8 +14,7 @@ router.post('/', async (req, res) => {
       });
     }
     
-    // TODO: Implement email sending logic
-    // For now, just log and return success
+    // Implement email sending logic
     console.log('Contact form submission:', {
       nome,
       email,
@@ -24,13 +23,57 @@ router.post('/', async (req, res) => {
       timestamp: new Date().toISOString()
     });
     
-    // In production, you would send an email here using nodemailer or similar
-    // const transporter = nodemailer.createTransport({...});
-    // await transporter.sendMail({
-    //   to: 'vinicius@qivomining.com',
-    //   subject: `Novo contato: ${nome}`,
-    //   text: `Nome: ${nome}\nEmail: ${email}\nEmpresa: ${empresa || 'N/A'}\n\nMensagem:\n${mensagem}`
-    // });
+    try {
+      const { sendGenericEmail } = await import('../radar/services/emailService');
+      
+      const supportEmail = process.env.SUPPORT_EMAIL || 'vinicius@qivomining.com';
+      const subject = `📧 Novo Contato: ${nome}`;
+      
+      const text = `
+Novo contato recebido através do formulário do site:
+
+Nome: ${nome}
+Email: ${email}
+Empresa: ${empresa || 'N/A'}
+
+Mensagem:
+${mensagem}
+
+---
+Recebido em: ${new Date().toLocaleString('pt-BR')}
+      `;
+      
+      const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #2563eb;">📧 Novo Contato Recebido</h2>
+    <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0;">
+      <p style="margin: 5px 0;"><strong>Nome:</strong> ${nome}</p>
+      <p style="margin: 5px 0;"><strong>Email:</strong> <a href="mailto:${email}">${email}</a></p>
+      <p style="margin: 5px 0;"><strong>Empresa:</strong> ${empresa || 'N/A'}</p>
+    </div>
+    <div style="background-color: #ffffff; border: 1px solid #e5e7eb; padding: 15px; border-radius: 5px; margin: 20px 0;">
+      <p style="margin: 0 0 10px;"><strong>Mensagem:</strong></p>
+      <p style="margin: 0; white-space: pre-wrap;">${mensagem}</p>
+    </div>
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+    <p style="font-size: 12px; color: #6b7280;">Recebido em: ${new Date().toLocaleString('pt-BR')}</p>
+  </div>
+</body>
+</html>
+      `;
+      
+      await sendGenericEmail(supportEmail, subject, text, html);
+      console.log(`[Contact] Email sent to ${supportEmail}`);
+    } catch (emailError: any) {
+      console.error('[Contact] Failed to send email:', emailError.message);
+      // Don't fail the request if email fails, just log it
+    }
     
     res.json({
       success: true,

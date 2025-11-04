@@ -29,10 +29,12 @@ export interface RegulatoryUpdate {
 }
 
 export interface NotificationChannel {
-  type: 'slack' | 'teams' | 'discord' | 'webhook';
+  type: 'slack' | 'teams' | 'discord' | 'webhook' | 'email' | 'whatsapp';
   webhookUrl: string;
   enabled: boolean;
   name: string;
+  // Optional fields for email/whatsapp
+  recipient?: string; // email address or phone number
 }
 
 export interface NotificationConfig {
@@ -111,6 +113,28 @@ function loadChannelsFromEnv(): NotificationChannel[] {
       webhookUrl: process.env.CUSTOM_WEBHOOK_URL,
       enabled: process.env.CUSTOM_WEBHOOK_ENABLED !== 'false',
       name: process.env.CUSTOM_WEBHOOK_NAME || 'Custom Webhook',
+    });
+  }
+
+  // Email (SendGrid)
+  if (process.env.SENDGRID_API_KEY && process.env.EMAIL_TO) {
+    channels.push({
+      type: 'email',
+      webhookUrl: '', // Not used for email
+      enabled: process.env.EMAIL_ENABLED !== 'false',
+      name: 'Email Notifications',
+      recipient: process.env.EMAIL_TO,
+    });
+  }
+
+  // WhatsApp (Twilio)
+  if (process.env.TWILIO_ACCOUNT_SID && process.env.TWILIO_AUTH_TOKEN && process.env.WHATSAPP_TO) {
+    channels.push({
+      type: 'whatsapp',
+      webhookUrl: '', // Not used for WhatsApp
+      enabled: process.env.WHATSAPP_ENABLED !== 'false',
+      name: 'WhatsApp Notifications',
+      recipient: process.env.WHATSAPP_TO,
     });
   }
 
@@ -399,8 +423,27 @@ export class NotificationService {
 
     for (let attempt = 1; attempt <= this.config.retryAttempts; attempt++) {
       try {
-        const message = this.formatMessage(channel.type, update);
+        // Email e WhatsApp têm tratamento especial
+        if (channel.type === 'email') {
+          const { sendEmailNotification } = await import('./emailService');
+          if (!channel.recipient) {
+            throw new Error('Email recipient not configured');
+          }
+          await sendEmailNotification(channel.recipient, update);
+          return;
+        }
         
+        if (channel.type === 'whatsapp') {
+          const { sendWhatsAppNotification } = await import('./whatsappService');
+          if (!channel.recipient) {
+            throw new Error('WhatsApp recipient not configured');
+          }
+          await sendWhatsAppNotification(channel.recipient, update);
+          return;
+        }
+        
+        // Webhooks (Slack, Teams, Discord, Custom)
+        const message = this.formatMessage(channel.type, update);
         await this.httpClient.post(channel.webhookUrl, message);
         
         return; // Sucesso
@@ -438,6 +481,10 @@ export class NotificationService {
         return MessageFormatter.formatDiscordMessage(update);
       case 'webhook':
         return MessageFormatter.formatCustomMessage(update);
+      case 'email':
+      case 'whatsapp':
+        // Email e WhatsApp são tratados diretamente em sendToChannel
+        throw new Error('Email and WhatsApp should not use formatMessage');
       default:
         throw new Error(`Tipo de canal não suportado: ${channelType}`);
     }
