@@ -37,6 +37,8 @@ export const tenants = pgTable("tenants", {
   id: varchar("id", { length: 64 }).primaryKey(),
   name: text("name").notNull(),
   logoUrl: text("logoUrl"),
+  primaryColor: varchar("primaryColor", { length: 7 }), // Hex color (e.g., #FF5733)
+  secondaryColor: varchar("secondaryColor", { length: 7 }), // Hex color (e.g., #33FF57)
   s3Prefix: varchar("s3Prefix", { length: 128 }).notNull(),
   createdAt: timestamp("createdAt").defaultNow(),
 });
