@@ -88,23 +88,21 @@ export default function AuditKRCI() {
   const [advancedTab, setAdvancedTab] = useState<'trends' | 'comparison' | 'official'>('trends');
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
 
-  // Query para listar relatórios (polling ativo após audit - BUG-007 fix)
-  const { data: reports } = trpc.technicalReports.generate.list.useQuery(
+  // Query para listar relatórios (sem polling - atualiza apenas quando necessário)
+  const { data: reports, refetch: refetchReports } = trpc.technicalReports.generate.list.useQuery(
     { limit: 20 },
     {
-      refetchInterval: auditResult ? 30000 : false, // Poll a cada 30s se há resultado
-      refetchOnWindowFocus: true, // Atualiza ao voltar para tab
-      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity, // Cache permanente até refetch manual
     }
   );
 
-  // Query para listar auditorias (polling ativo após audit - BUG-007 fix)
-  const { data: audits, isLoading: auditsLoading } = trpc.technicalReports.audit.list.useQuery(
+  // Query para listar auditorias (sem polling - atualiza apenas quando necessário)
+  const { data: audits, isLoading: auditsLoading, refetch: refetchAudits } = trpc.technicalReports.audit.list.useQuery(
     { limit: 10 },
     {
-      refetchInterval: auditResult ? 30000 : false, // Poll a cada 30s se há resultado
-      refetchOnWindowFocus: true, // Atualiza ao voltar para tab
-      staleTime: 5 * 60 * 1000,
+      refetchOnWindowFocus: false,
+      staleTime: Infinity, // Cache permanente até refetch manual
     }
   );
 
@@ -138,7 +136,7 @@ export default function AuditKRCI() {
 
   // Mutation para executar auditoria
   const runAudit = trpc.technicalReports.audit.run.useMutation({
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       console.log("[AuditKRCI] Audit completed successfully:", data);
       toast.success("Auditoria concluída!", {
         description: `Score: ${data.score}% - ${data.totalRules} regras verificadas`,
@@ -146,6 +144,10 @@ export default function AuditKRCI() {
       });
       setAuditResult(data);
       setSelectedReport("");
+      
+      // Refetch IMEDIATO após sucesso
+      console.log("[AuditKRCI] Triggering immediate refetch...");
+      await Promise.all([refetchReports(), refetchAudits()]);
     },
     onError: (error) => {
       console.error("[AuditKRCI] Audit failed:", error);
@@ -358,6 +360,26 @@ export default function AuditKRCI() {
             </div>
           )}
         </Card>
+
+        {/* Indicador de Processamento */}
+        {runAudit.isPending && (
+          <Card className="p-6 bg-blue-900/20 border-blue-600">
+            <div className="flex items-center gap-4">
+              <div className="animate-spin text-4xl">⏳</div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-blue-400 mb-1">
+                  Processamento em andamento...
+                </h3>
+                <p className="text-sm text-gray-300">
+                  O relatório está sendo analisado. Aguarde enquanto validamos as 22 regras KRCI.
+                </p>
+                <div className="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse" style={{width: '70%'}} />
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Resultado da Auditoria */}
         {auditResult && (
