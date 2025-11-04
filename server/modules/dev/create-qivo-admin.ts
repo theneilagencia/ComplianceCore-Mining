@@ -63,16 +63,16 @@ export async function createQivoAdmin() {
   await db.insert(licenses).values({
     id: licenseId,
     userId: adminId,
+    tenantId,
     plan: 'ENTERPRISE',
     status: 'active',
     reportsUsed: 0,
     reportsLimit: 999,
-    projectsActive: 0,
     projectsLimit: 999,
     billingPeriod: 'annual',
+    validFrom: new Date(),
     createdAt: new Date(),
     updatedAt: new Date(),
-    expiresAt: null, // Never expires
   });
   
   console.log('[Create QIVO Admin] ✅ Admin user created successfully');

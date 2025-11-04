@@ -255,7 +255,7 @@ router.get('/init-db/status', async (req, res) => {
       SELECT COUNT(*) as count FROM users WHERE email IN ('admin@jorc.com', 'test@jorc.com', 'pro@jorc.com')
     `);
 
-    const count = parseInt((userCount.rows[0] as any).count || '0');
+    const count = parseInt((userCount[0] as any).count || '0');
 
     return res.json({
       initialized: count === 3,

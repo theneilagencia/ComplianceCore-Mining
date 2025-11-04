@@ -28,6 +28,7 @@ export const users = pgTable("users", {
   role: roleEnum("role").default('user').notNull(),
   tenantId: varchar("tenantId", { length: 64 }).notNull(),
   refreshToken: text("refreshToken"), // JWT refresh token
+  stripeCustomerId: varchar("stripeCustomerId", { length: 128 }), // Stripe customer ID
   createdAt: timestamp("createdAt").defaultNow(),
   lastSignedIn: timestamp("lastSignedIn").defaultNow(),
 });
