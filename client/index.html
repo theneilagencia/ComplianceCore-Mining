@@ -16,10 +16,23 @@
   <body>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- 
+      ⚠️ FIX: Umami Analytics desabilitado temporariamente
+      Problema: URL /umami.js retornava index.html, causando erro "Unexpected token '<'"
+      Solução: Remover até configurar URL válida do Umami
+      
+      Para reativar:
+      1. Configurar variável VITE_UMAMI_URL no .env
+      2. Descomentar linha abaixo
+      3. Trocar src="/umami.js" por src="${VITE_UMAMI_URL}"
+    -->
+    <!-- 
     <script
       defer
       src="/umami.js"
       data-website-id=""
     ></script>
+    -->
   </body>
 </html>

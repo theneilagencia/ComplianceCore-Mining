@@ -64,27 +64,36 @@ export function serveStatic(app: Express) {
     );
   }
 
-  // Serve static files with proper cache headers
+  // ⚠️ FIX CRÍTICO: Serve static files com headers anti-cache para JS/CSS
   app.use(express.static(distPath, {
-    maxAge: '1y', // Default cache for 1 year (will be overridden below)
-    etag: true,
-    lastModified: true,
+    maxAge: 0, // ← MUDOU: Sem cache padrão (será definido por arquivo)
+    etag: false, // ← MUDOU: Desabilita ETag (previne 304)
+    lastModified: false, // ← MUDOU: Desabilita Last-Modified (previne 304)
     setHeaders: (res, filePath) => {
-      // No cache for HTML files to ensure new deploys are picked up immediately
+      // HTML: No cache (para garantir nova versão após deploy)
       if (filePath.endsWith('.html')) {
-        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
       }
-      // Long cache for hashed assets (JS, CSS with hash in filename)
-      else if (/\.(js|css|woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|ico)$/.test(filePath)) {
-        // Check if file has hash in name (e.g., index.abc123.js)
-        if (/\.[a-f0-9]{8,}\.(js|css)/.test(filePath)) {
-          res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-        } else {
-          // Non-hashed assets, shorter cache
-          res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hour
-        }
+      // ⚠️ FIX CRÍTICO: JS/CSS NUNCA usa cache (mesmo com hash)
+      // Problema anterior: Cache de 1 ano causava versões antigas persistentes
+      else if (/\.(js|css|mjs|ts|tsx)$/.test(filePath)) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        // Security headers (bonus)
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+      }
+      // Imagens e fontes: Cache curto (1 hora - pode ser atualizado)
+      else if (/\.(woff2?|ttf|eot|svg|png|jpg|jpeg|gif|webp|ico)$/.test(filePath)) {
+        res.setHeader('Cache-Control', 'public, max-age=3600'); // 1 hora
+      }
+      // Service Worker: NUNCA cacheia (sempre versão nova)
+      else if (filePath.endsWith('sw.js')) {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
       }
     }
   }));
