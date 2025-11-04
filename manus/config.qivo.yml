@@ -61,14 +61,78 @@ modules:
 
 # 🤖 Automação Manus
 automation:
-  enabled: true
-  features:
-    - recovery          # Recuperação automática de falhas
-    - deploy           # Deploy automatizado via Render API
-    - audit            # Auditoria técnica diária
-    - documentation    # Geração automática de docs
-    - monitoring       # Monitoramento contínuo
-    - rollback         # Rollback automático em caso de erro
+  recovery: true
+  deploy: true
+  audit: true
+  documentation: true
+  monitoring: true
+  rollback: true
+  design_system: true
+
+design_system:
+  framework: shadcn/ui
+  style: new-york
+  base_color: neutral
+  components_count: 53
+  custom_colors: 5
+  css_variables: true
+  validation_enabled: true
+  components:
+    - accordion
+    - alert
+    - alert-dialog
+    - aspect-ratio
+    - avatar
+    - badge
+    - breadcrumb
+    - button
+    - button-group
+    - calendar
+    - card
+    - carousel
+    - chart
+    - checkbox
+    - collapsible
+    - command
+    - context-menu
+    - dialog
+    - drawer
+    - dropdown-menu
+    - field
+    - hover-card
+    - input
+    - input-group
+    - input-otp
+    - label
+    - menubar
+    - navigation-menu
+    - pagination
+    - popover
+    - progress
+    - radio-group
+    - resizable
+    - scroll-area
+    - select
+    - separator
+    - sheet
+    - skeleton
+    - slider
+    - sonner
+    - switch
+    - table
+    - tabs
+    - textarea
+    - toast
+    - toaster
+    - toggle
+    - toggle-group
+    - tooltip
+  custom_qivo_colors:
+    - qivo-bg
+    - qivo-secondary
+    - qivo-accent
+    - qivo-warm
+    - qivo-soft
   
   schedule:
     audit: "0 3 * * *"        # 3h da manhã (UTC)

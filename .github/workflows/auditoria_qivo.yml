@@ -96,6 +96,12 @@ jobs:
           curl -o /dev/null -s -w "Response Time: %{time_total}s\n" https://qivo-mining.onrender.com/ || echo "⚠️ Aplicação offline"
         continue-on-error: true
       
+      - name: 🎨 Validação de Design System
+        run: |
+          echo "🎨 Validando Design System shadcn/ui..."
+          python3 scripts/manus_design_system.py
+        continue-on-error: true
+      
       - name: Generate Audit Report
         run: |
           echo "📝 Gerando relatório consolidado..."
