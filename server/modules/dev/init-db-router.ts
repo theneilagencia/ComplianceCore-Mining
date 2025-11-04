@@ -222,7 +222,7 @@ router.post('/init-db', async (req, res) => {
         test: { email: 'test@jorc.com', password: 'Test@2025', plan: 'START' },
         pro: { email: 'pro@jorc.com', password: 'Pro@2025', plan: 'PRO' },
       },
-      loginUrl: 'https://compliancecore-mining.onrender.com/login',
+      loginUrl: 'https://qivomining.com/login',
     });
 
   } catch (error: any) {

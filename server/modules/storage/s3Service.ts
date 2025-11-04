@@ -2,38 +2,42 @@
  * S3 Storage Service - QIVO Mining
  * 
  * Features:
- * - Generate presigned URLs for uploads
+ * - Generate presigned URLs for uploads (AWS SDK v3)
  * - Tenant-based folder structure: tenants/{TENANT_ID}/
- * - Auto-detect AWS credentials or use mock
+ * - Auto-detect AWS credentials
  * - Support for multiple file types
  */
 
-const S3_BUCKET = process.env.S3_BUCKET;
-const S3_REGION = process.env.S3_REGION || 'us-east-1';
+import { S3Client, PutObjectCommand, GetObjectCommand, DeleteObjectCommand, ListObjectsV2Command } from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
+
+const S3_BUCKET = process.env.S3_BUCKET || process.env.S3_BUCKET_NAME;
+const S3_REGION = process.env.S3_REGION || process.env.AWS_REGION || 'us-east-1';
 const AWS_ACCESS_KEY = process.env.AWS_ACCESS_KEY_ID;
 const AWS_SECRET_KEY = process.env.AWS_SECRET_ACCESS_KEY;
 
-/**
- * NOTE: This service uses AWS SDK v2 with CommonJS require().
- * AWS SDK v3 migration is tracked as a separate task due to breaking API changes.
- * For now, we comment out the require() to avoid ESM conflicts and use mock mode.
- * 
- * TODO: Migrate to @aws-sdk/client-s3 (v3) when time permits
- * - Replace getSignedUrlPromise with getSignedUrl from @aws-sdk/s3-request-presigner
- * - Replace putObject with PutObjectCommand
- * - Replace deleteObject with DeleteObjectCommand
- * - Replace listObjectsV2 with ListObjectsV2Command
- */
-
 const IS_MOCK = !S3_BUCKET || !AWS_ACCESS_KEY || !AWS_SECRET_KEY;
 
-// S3 Client - Disabled until AWS SDK v3 migration
-// Using mock mode for now to avoid ESM/CommonJS conflicts
-let s3Client: any = null;
+// S3 Client (AWS SDK v3)
+let s3Client: S3Client | null = null;
 
-// NOTE: AWS SDK v2 require() commented out for ESM compatibility
-// Migration to v3 required before re-enabling
-console.log('⚠️ S3 Service: Using mock mode (AWS SDK v2 → v3 migration pending)')
+if (!IS_MOCK) {
+  try {
+    s3Client = new S3Client({
+      region: S3_REGION,
+      credentials: {
+        accessKeyId: AWS_ACCESS_KEY!,
+        secretAccessKey: AWS_SECRET_KEY!,
+      },
+    });
+    console.log('✅ S3 Service: Initialized with AWS SDK v3');
+  } catch (error) {
+    console.error('❌ S3 Service: Failed to initialize:', error);
+    s3Client = null;
+  }
+} else {
+  console.log('⚠️  S3 Service: Running in mock mode (credentials not configured)');
+}
 
 /**
  * Generate presigned URL for upload
@@ -66,13 +70,13 @@ export async function generatePresignedUploadURL(params: {
   }
 
   try {
-    const uploadUrl = await s3Client.getSignedUrlPromise('putObject', {
+    const command = new PutObjectCommand({
       Bucket: S3_BUCKET,
       Key: key,
       ContentType: fileType,
-      Expires: expiresIn,
     });
 
+    const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn });
     const fileUrl = `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com/${key}`;
 
     return {
@@ -108,11 +112,12 @@ export async function generatePresignedDownloadURL(params: {
   }
 
   try {
-    const downloadUrl = await s3Client.getSignedUrlPromise('getObject', {
+    const command = new GetObjectCommand({
       Bucket: S3_BUCKET,
       Key: key,
-      Expires: expiresIn,
     });
+
+    const downloadUrl = await getSignedUrl(s3Client, command, { expiresIn });
 
     return {
       downloadUrl,
@@ -154,13 +159,15 @@ export async function uploadFile(params: {
   }
 
   try {
-    await s3Client.putObject({
+    const command = new PutObjectCommand({
       Bucket: S3_BUCKET,
       Key: key,
       Body: fileBuffer,
       ContentType: fileType,
       Metadata: metadata,
-    }).promise();
+    });
+
+    await s3Client.send(command);
 
     const fileUrl = `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com/${key}`;
 
@@ -191,10 +198,12 @@ export async function deleteFile(key: string): Promise<{
   }
 
   try {
-    await s3Client.deleteObject({
+    const command = new DeleteObjectCommand({
       Bucket: S3_BUCKET,
       Key: key,
-    }).promise();
+    });
+
+    await s3Client.send(command);
 
     return {
       success: true,
@@ -248,16 +257,18 @@ export async function listFiles(params: {
   }
 
   try {
-    const response = await s3Client.listObjectsV2({
+    const command = new ListObjectsV2Command({
       Bucket: S3_BUCKET,
       Prefix: prefix,
       MaxKeys: maxKeys,
-    }).promise();
+    });
 
-    const files = (response.Contents || []).map((item: any) => ({
-      key: item.Key,
-      size: item.Size,
-      lastModified: item.LastModified,
+    const response = await s3Client.send(command);
+
+    const files = (response.Contents || []).map((item) => ({
+      key: item.Key!,
+      size: item.Size!,
+      lastModified: item.LastModified!,
       url: `https://${S3_BUCKET}.s3.${S3_REGION}.amazonaws.com/${item.Key}`,
     }));
 
@@ -283,4 +294,3 @@ export function getS3Status() {
     hasCredentials: !!AWS_ACCESS_KEY && !!AWS_SECRET_KEY,
   };
 }
-
