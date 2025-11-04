@@ -1,11 +1,30 @@
 import { defineConfig } from "vitest/config";
+import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig({
+  plugins: [react()],
   root: path.resolve(import.meta.dirname),
+  resolve: {
+    alias: {
+      "@": path.resolve(import.meta.dirname, "./client/src"),
+      "@server": path.resolve(import.meta.dirname, "./server"),
+      "@shared": path.resolve(import.meta.dirname, "./shared"),
+    },
+  },
   test: {
-    environment: "node",
-    include: ["tests/unit/**/*.test.ts", "tests/unit/**/*.spec.ts", "server/**/*.test.ts", "server/**/*.spec.ts"],
+    globals: true,
+    environment: "jsdom",
+    setupFiles: ["./vitest.setup.ts"],
+    include: [
+      "tests/unit/**/*.test.ts", 
+      "tests/unit/**/*.test.tsx",
+      "tests/unit/**/*.spec.ts", 
+      "server/**/*.test.ts", 
+      "server/**/*.spec.ts",
+      "client/**/*.test.tsx",
+      "client/**/*.test.ts"
+    ],
     exclude: ["tests/e2e/**", "tests/fixtures/**", "**/node_modules/**", "**/dist/**"],
     coverage: {
       enabled: true,

@@ -121,9 +121,25 @@ async function readFromRenderDisk(relKey: string): Promise<Buffer> {
   const normalizedKey = normalizeKey(relKey);
   const localPath = path.join(RENDER_DISK_PATH, normalizedKey);
   
-  const buffer = await fs.readFile(localPath);
-  console.log('✅ Read from Render Disk:', localPath);
-  return buffer;
+  try {
+    // Verificar se o arquivo existe primeiro
+    try {
+      await fs.access(localPath, fs.constants.R_OK);
+    } catch (accessError: any) {
+      throw new Error(`File not accessible or does not exist: ${localPath}. Error: ${accessError.message}`);
+    }
+    
+    const buffer = await fs.readFile(localPath);
+    console.log('✅ Read from Render Disk:', localPath, `(${buffer.length} bytes)`);
+    return buffer;
+  } catch (error: any) {
+    console.error('❌ Error reading from Render Disk:', {
+      path: localPath,
+      error: error.message,
+      code: error.code,
+    });
+    throw error;
+  }
 }
 
 // ============================================================================
