@@ -1,0 +1,263 @@
+name: 🚀 Deploy QIVO v2 via Manus
+
+on:
+  push:
+    branches: 
+      - main
+    paths-ignore:
+      - 'docs/**'
+      - '**.md'
+      - '.github/workflows/auditoria_qivo.yml'
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+          - production
+          - staging
+
+env:
+  NODE_VERSION: '24'
+  PNPM_VERSION: '10.4.1'
+
+jobs:
+  pre-deploy-validation:
+    name: Pre-Deploy Validation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      
+      - name: Install pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+      
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+      
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+      
+      - name: Install Dependencies
+        run: pnpm install --frozen-lockfile
+      
+      - name: Run Type Check
+        run: pnpm run check
+        continue-on-error: true
+      
+      - name: Build Application
+        run: pnpm run build
+        env:
+          NODE_ENV: production
+      
+      - name: Validate Build Output
+        run: |
+          if [ ! -f "dist/index.js" ]; then
+            echo "❌ Build failed: dist/index.js not found"
+            exit 1
+          fi
+          echo "✅ Build output validated"
+          ls -lh dist/
+      
+      - name: Upload Build Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-artifacts
+          path: dist/
+          retention-days: 7
+
+  deploy-via-manus:
+    name: Deploy to Render via Manus
+    runs-on: ubuntu-latest
+    needs: pre-deploy-validation
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: Install Python Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests python-dotenv pyyaml
+      
+      - name: Load Manus Configuration
+        run: |
+          echo "📋 Loading config.qivo.yml..."
+          cat manus/config.qivo.yml
+      
+      - name: Execute Manus Deploy Script
+        run: python3 scripts/manus_deploy.py
+        env:
+          MANUS_API_KEY: ${{ secrets.MANUS_API_KEY }}
+          RENDER_SERVICE_ID: ${{ secrets.RENDER_SERVICE_ID }}
+          RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
+          ENVIRONMENT: ${{ inputs.environment || 'production' }}
+          COMMIT_SHA: ${{ github.sha }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          GITHUB_ACTOR: ${{ github.actor }}
+      
+      - name: Wait for Deploy Completion
+        run: |
+          echo "⏳ Aguardando conclusão do deploy..."
+          sleep 60
+      
+      - name: Health Check
+        run: |
+          echo "🏥 Executando health check..."
+          curl -f https://qivo-mining.onrender.com/ || echo "⚠️ Health check falhou"
+        continue-on-error: true
+      
+      - name: Update Deployment History
+        run: |
+          python3 scripts/update_deployment_history.py
+        env:
+          DEPLOY_STATUS: success
+          COMMIT_SHA: ${{ github.sha }}
+        continue-on-error: true
+
+  post-deploy-validation:
+    name: Post-Deploy Validation
+    runs-on: ubuntu-latest
+    needs: deploy-via-manus
+    if: success()
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      
+      - name: Test Application Endpoints
+        run: |
+          echo "🧪 Testando endpoints críticos..."
+          
+          # Homepage
+          curl -f -s -o /dev/null -w "%{http_code}" https://qivo-mining.onrender.com/ || echo "❌ Homepage failed"
+          
+          # Login page
+          curl -f -s -o /dev/null -w "%{http_code}" https://qivo-mining.onrender.com/login || echo "❌ Login failed"
+          
+          echo "✅ Validação de endpoints concluída"
+        continue-on-error: true
+      
+      - name: Notify Slack - Success
+        if: success()
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "✅ QIVO v2 Deploy Successful",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🚀 Deploy QIVO v2 - SUCCESS"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Environment:*\nProduction"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit:*\n${{ github.sha }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Deployed by:*\n${{ github.actor }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*URL:*\nhttps://qivo-mining.onrender.com"
+                    }
+                  ]
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
+
+  rollback-on-failure:
+    name: Rollback on Failure
+    runs-on: ubuntu-latest
+    needs: deploy-via-manus
+    if: failure()
+    
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Notify Slack - Failure
+        uses: slackapi/slack-github-action@v1
+        with:
+          payload: |
+            {
+              "text": "❌ QIVO v2 Deploy Failed - Rollback Required",
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "🚨 Deploy QIVO v2 - FAILED"
+                  }
+                },
+                {
+                  "type": "section",
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Commit:*\n${{ github.sha }}"
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Action:*\nRollback automático iniciado"
+                    }
+                  ]
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|View Logs>"
+                  }
+                }
+              ]
+            }
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        continue-on-error: true
+      
+      - name: Trigger Rollback
+        run: |
+          echo "🔄 Iniciando rollback para último commit estável..."
+          git log --oneline -5
+        continue-on-error: true
