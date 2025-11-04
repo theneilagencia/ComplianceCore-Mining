@@ -7,7 +7,7 @@ export default function PricingPage() {
   const [loading, setLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleCheckout = async (plan: 'PRO' | 'ENTERPRISE') => {
+  const handleCheckout = async (plan: 'START' | 'PRO' | 'ENTERPRISE') => {
     setLoading(plan);
     setError(null);
     
@@ -22,9 +22,10 @@ export default function PricingPage() {
   const plans = [
     {
       name: 'START',
-      price: billingPeriod === 'monthly' ? 0 : 0,
-      period: 'Gratuito',
-      description: 'Para começar e testar a plataforma',
+      price: billingPeriod === 'monthly' ? 2500 : 27000, // 10% desconto anual
+      period: billingPeriod === 'monthly' ? '/mês' : '/ano',
+      savings: billingPeriod === 'annual' ? 'Economize US$ 3.000/ano' : null,
+      description: 'Para consultores e pequenas mineradoras',
       icon: Sparkles,
       features: [
         '1 relatório técnico/mês',
@@ -32,34 +33,31 @@ export default function PricingPage() {
         'Geração de relatórios JORC',
         'Auditoria básica KRCI',
         'Exportação em PDF',
-        'Radar Regulatória Brasil',
-        'Watermark nos PDFs',
+        'Radar Regulatória Local',
+        'Suporte por email',
       ],
-      cta: 'Começar Grátis',
+      cta: 'Assinar START',
       popular: false,
-      action: () => window.location.href = '/register',
+      action: () => handleCheckout('START'),
     },
     {
       name: 'PRO',
-      price: billingPeriod === 'monthly' ? 899 : 9600,
+      price: billingPeriod === 'monthly' ? 12500 : 135000, // 10% desconto anual
       period: billingPeriod === 'monthly' ? '/mês' : '/ano',
-      savings: billingPeriod === 'annual' ? 'Economize US$ 1.188/ano' : null,
-      description: 'Para empresas que precisam de compliance completo',
+      savings: billingPeriod === 'annual' ? 'Economize US$ 15.000/ano' : null,
+      description: 'Para consultorias regionais',
       icon: Zap,
       features: [
         '5 relatórios técnicos/mês',
         '3 projetos ativos',
         'Todos os padrões (JORC, NI 43-101, PERC, SAMREC)',
-        'Auditoria completa KRCI (22 regras)',
-        'Pré-certificação (ASX, TSX, JSE, CRIRSCO)',
+        'Auditoria completa KRCI',
+        'Pré-certificação (ASX, TSX, JSE)',
         'Exportação multi-formato (PDF, DOCX, XLSX)',
-        '**Módulo ESG completo** (GRI, SASB, IFC, IRMA)',
-        'Dashboard ESG com métricas',
-        'Gestão de compensações ambientais',
-        'Radar Regulatória Internacional',
-        'Branding completo (logo, cores)',
-        'Sem watermark',
-        'Suporte por email',
+        'Radar Regulatória Global',
+        'Conversão multinormativa',
+        'Branding personalizado',
+        'Suporte prioritário',
       ],
       cta: 'Assinar PRO',
       popular: true,
@@ -67,22 +65,21 @@ export default function PricingPage() {
     },
     {
       name: 'ENTERPRISE',
-      price: billingPeriod === 'monthly' ? 1990 : 21000,
+      price: billingPeriod === 'monthly' ? 18900 : 170100, // 25% desconto anual
       period: billingPeriod === 'monthly' ? '/mês' : '/ano',
-      savings: billingPeriod === 'annual' ? 'Economize US$ 2.880/ano' : null,
-      description: 'Para grandes empresas com múltiplos projetos',
+      savings: billingPeriod === 'annual' ? 'Economize US$ 56.700/ano' : null,
+      description: 'Para mineradoras e órgãos reguladores',
       icon: Building2,
       features: [
-        '15 relatórios técnicos/mês',
+        'Relatórios técnicos ilimitados',
         'Projetos ilimitados',
         'Todos os recursos PRO',
-
-        '**APIs de preços em tempo real** (8 APIs integradas)',
-        'Dados macroeconômicos (câmbio, inflação, juros)',
-        'Extração automática de dados de PDFs',
-        'Análise de comparáveis de mercado',
+        'Auditoria profunda',
+        'Integrações corporativas',
+        'APIs de preços em tempo real',
+        'Dados macroeconômicos',
         'REST API corporativa (50+ endpoints)',
-        'Suporte prioritário',
+        'Suporte dedicado 24/7',
         'SLA 99.9%',
         'Onboarding dedicado',
       ],
@@ -97,21 +94,21 @@ export default function PricingPage() {
       {/* Header */}
       <div className="container mx-auto px-4 py-16">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-white mb-4">
+          <h1 className="text-5xl font-bold text-gray-900 mb-4">
             Planos e Preços
           </h1>
-          <p className="text-xl text-gray-400 mb-8">
+          <p className="text-xl text-gray-600 mb-8">
             Escolha o plano ideal para sua empresa
           </p>
 
           {/* Billing Toggle */}
-          <div className="inline-flex items-center bg-white/5 rounded-full p-1 shadow-md">
+          <div className="inline-flex items-center bg-white rounded-full p-1 shadow-md">
             <button
               onClick={() => setBillingPeriod('monthly')}
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 billingPeriod === 'monthly'
                   ? 'bg-[#2f2c79] text-white'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Mensal
@@ -121,12 +118,12 @@ export default function PricingPage() {
               className={`px-6 py-2 rounded-full font-medium transition-all ${
                 billingPeriod === 'annual'
                   ? 'bg-[#2f2c79] text-white'
-                  : 'text-gray-400 hover:text-white'
+                  : 'text-gray-600 hover:text-gray-900'
               }`}
             >
               Anual
               <span className="ml-2 text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
-                Economize até 12%
+                Economize até 25%
               </span>
             </button>
           </div>
@@ -148,68 +145,65 @@ export default function PricingPage() {
             return (
               <div
                 key={plan.name}
-                className={`relative bg-white/5 rounded-2xl shadow-xl overflow-hidden transition-transform hover:scale-105 ${
-                  plan.popular ? 'ring-4 ring-blue-500' : ''
+                className={`relative bg-white rounded-2xl shadow-xl p-8 ${
+                  plan.popular ? 'ring-2 ring-[#2f2c79] scale-105' : ''
                 }`}
               >
                 {plan.popular && (
-                  <div className="absolute top-0 right-0 bg-[#2f2c79] text-white px-4 py-1 text-sm font-bold rounded-bl-lg">
-                    MAIS POPULAR
+                  <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
+                    <span className="bg-gradient-to-r from-[#2f2c79] to-indigo-600 text-white px-4 py-1 rounded-full text-sm font-semibold">
+                      POPULAR
+                    </span>
                   </div>
                 )}
 
-                <div className="p-8">
-                  {/* Icon */}
-                  <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-xl flex items-center justify-center mb-4">
-                    <Icon className="w-8 h-8 text-white" />
-                  </div>
-
-                  {/* Plan Name */}
-                  <h3 className="text-2xl font-bold text-white mb-2">
+                <div className="text-center mb-6">
+                  <Icon className="w-12 h-12 mx-auto mb-4 text-[#2f2c79]" />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-2">
                     {plan.name}
                   </h3>
-                  <p className="text-gray-400 mb-6">{plan.description}</p>
-
-                  {/* Price */}
-                  <div className="mb-6">
-                    <div className="flex items-baseline">
-                      <span className="text-5xl font-bold text-white">
-                        {plan.price === 0 ? 'Grátis' : `$${plan.price.toLocaleString()}`}
-                      </span>
-                      {plan.price > 0 && (
-                        <span className="text-gray-400 ml-2">{plan.period}</span>
-                      )}
-                    </div>
-                    {plan.savings && (
-                      <p className="text-sm text-green-600 font-medium mt-2">
-                        {plan.savings}
-                      </p>
-                    )}
+                  <p className="text-gray-600 text-sm mb-4">{plan.description}</p>
+                  
+                  <div className="mb-2">
+                    <span className="text-4xl font-bold text-gray-900">
+                      US$ {plan.price.toLocaleString('pt-BR')}
+                    </span>
+                    <span className="text-gray-600">{plan.period}</span>
                   </div>
-
-                  {/* CTA Button */}
-                  <button
-                    onClick={plan.action}
-                    disabled={isLoading}
-                    className={`w-full py-3 px-6 rounded-lg font-semibold transition-all ${
-                      plan.popular
-                        ? 'bg-[#2f2c79] text-white hover:bg-[#b96e48]'
-                        : 'bg-[#171a4a] text-white hover:bg-gray-200'
-                    } disabled:opacity-50 disabled:cursor-not-allowed`}
-                  >
-                    {isLoading ? 'Processando...' : plan.cta}
-                  </button>
-
-                  {/* Features */}
-                  <ul className="mt-8 space-y-4">
-                    {plan.features.map((feature, index) => (
-                      <li key={index} className="flex items-start">
-                        <Check className="w-5 h-5 text-green-500 mr-3 flex-shrink-0 mt-0.5" />
-                        <span className="text-gray-300">{feature}</span>
-                      </li>
-                    ))}
-                  </ul>
+                  
+                  {plan.savings && (
+                    <p className="text-green-600 text-sm font-semibold">
+                      {plan.savings}
+                    </p>
+                  )}
                 </div>
+
+                <ul className="space-y-3 mb-8">
+                  {plan.features.map((feature, idx) => (
+                    <li key={idx} className="flex items-start">
+                      <Check className="w-5 h-5 text-green-500 mr-2 flex-shrink-0 mt-0.5" />
+                      <span className="text-gray-700 text-sm">{feature}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <button
+                  onClick={plan.action}
+                  disabled={isLoading}
+                  className={`w-full py-3 px-6 rounded-lg font-semibold transition-all ${
+                    plan.popular
+                      ? 'bg-[#2f2c79] text-white hover:bg-indigo-700'
+                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                  } ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                >
+                  {isLoading ? 'Processando...' : plan.cta}
+                </button>
+
+                {plan.name !== 'START' && (
+                  <p className="text-center text-xs text-gray-500 mt-4">
+                    ✓ Garantia de 30 dias | ✓ Cancele quando quiser
+                  </p>
+                )}
               </div>
             );
           })}
@@ -217,32 +211,34 @@ export default function PricingPage() {
 
         {/* FAQ Section */}
         <div className="mt-20 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-white mb-8">
-            Perguntas Frequentes
-          </h2>
+          <h2 className="text-3xl font-bold text-center mb-8">Perguntas Frequentes</h2>
+          
           <div className="space-y-6">
-            <div className="bg-white/5 rounded-lg p-6 shadow-md">
-              <h3 className="font-semibold text-lg text-white mb-2">
-                Posso cancelar a qualquer momento?
-              </h3>
-              <p className="text-gray-400">
-                Sim! Você pode cancelar sua assinatura a qualquer momento através do portal de gerenciamento. Não há taxas de cancelamento.
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <h3 className="font-semibold text-lg mb-2">Posso mudar de plano depois?</h3>
+              <p className="text-gray-600">
+                Sim! Você pode fazer upgrade ou downgrade a qualquer momento. O valor será ajustado proporcionalmente.
               </p>
             </div>
-            <div className="bg-white/5 rounded-lg p-6 shadow-md">
-              <h3 className="font-semibold text-lg text-white mb-2">
-                Como funciona o período de teste?
-              </h3>
-              <p className="text-gray-400">
-                O plano START é completamente gratuito e não requer cartão de crédito. Você pode testar a plataforma sem compromisso.
+
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <h3 className="font-semibold text-lg mb-2">O que acontece se eu exceder o limite de relatórios?</h3>
+              <p className="text-gray-600">
+                Você será notificado e poderá fazer upgrade para um plano superior ou aguardar a renovação mensal do seu limite.
               </p>
             </div>
-            <div className="bg-white/5 rounded-lg p-6 shadow-md">
-              <h3 className="font-semibold text-lg text-white mb-2">
-                Posso fazer upgrade ou downgrade?
-              </h3>
-              <p className="text-gray-400">
-                Sim! Você pode alterar seu plano a qualquer momento. O valor será ajustado proporcionalmente.
+
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <h3 className="font-semibold text-lg mb-2">Há garantia de reembolso?</h3>
+              <p className="text-gray-600">
+                Sim! Oferecemos garantia de 30 dias. Se não ficar satisfeito, devolvemos seu dinheiro sem perguntas.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-lg p-6 shadow-md">
+              <h3 className="font-semibold text-lg mb-2">Quais métodos de pagamento são aceitos?</h3>
+              <p className="text-gray-600">
+                Aceitamos cartões de crédito (Visa, Mastercard, Amex) e débito através do Stripe, nossa plataforma de pagamentos segura.
               </p>
             </div>
           </div>
@@ -251,4 +247,3 @@ export default function PricingPage() {
     </div>
   );
 }
-

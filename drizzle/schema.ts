@@ -155,3 +155,22 @@ export type InsertLicense = typeof licenses.$inferInsert;
 export type SelectLicense = typeof licenses.$inferSelect;
 export type License = SelectLicense;
 
+
+/**
+ * Regulatory Changes table for Radar module
+ * Stores scraped regulatory updates from government sources
+ */
+export const regulatoryChanges = pgTable("regulatoryChanges", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  title: text("title").notNull(),
+  summary: text("summary"),
+  fullText: text("fullText"),
+  source: text("source").notNull(), // "DOU", "ANM", "IBAMA", etc.
+  sourceUrl: text("sourceUrl"),
+  country: varchar("country", { length: 2 }).notNull(), // ISO 3166-1 alpha-2
+  category: varchar("category", { length: 64 }), // "licensing", "taxation", "safety", etc.
+  severity: varchar("severity", { length: 16 }), // "low", "medium", "high", "critical"
+  publishedAt: timestamp("publishedAt").notNull(),
+  scrapedAt: timestamp("scrapedAt").defaultNow(),
+  metadata: jsonb("metadata"), // Additional structured data
+});
