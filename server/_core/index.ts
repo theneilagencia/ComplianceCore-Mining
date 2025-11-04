@@ -75,15 +75,13 @@ async function startServer() {
   server.keepAliveTimeout = 305000; // Slightly longer than timeout
   server.headersTimeout = 310000; // Slightly longer than keepAliveTimeout
   
-  // Configure CORS with credentials - GCP + Render + localhost
+  // Configure CORS with credentials - GCP + localhost
   const allowedOrigins = [
-    // GCP (Production)
+    // Production (GCP)
     'https://qivo-mining-586444405059.southamerica-east1.run.app',
     'https://www.qivomining.com',
     'http://www.qivomining.com',
-    // Render (Legacy)
-    'https://qivo-mining.onrender.com',
-    'https://compliancecore-mining-1.onrender.com',
+    'https://qivomining.com',
     // Development
     'http://localhost:5173',
     'http://localhost:3000',
