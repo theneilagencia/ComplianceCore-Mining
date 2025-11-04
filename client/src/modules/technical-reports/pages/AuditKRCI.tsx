@@ -148,6 +148,14 @@ export default function AuditKRCI() {
       // Refetch IMEDIATO após sucesso
       console.log("[AuditKRCI] Triggering immediate refetch...");
       await Promise.all([refetchReports(), refetchAudits()]);
+      
+      // Scroll automático para os resultados após 500ms
+      setTimeout(() => {
+        const resultsElement = document.getElementById('audit-results');
+        if (resultsElement) {
+          resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500);
     },
     onError: (error) => {
       console.error("[AuditKRCI] Audit failed:", error);
@@ -383,7 +391,7 @@ export default function AuditKRCI() {
 
         {/* Resultado da Auditoria */}
         {auditResult && (
-          <Card className="p-6">
+          <Card id="audit-results" className="p-6">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-xl font-semibold">Resultado da Auditoria</h2>
               <Badge variant="secondary" className="text-xs">
