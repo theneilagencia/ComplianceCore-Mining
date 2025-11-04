@@ -61,10 +61,17 @@ export async function validateWithANP_Real(
       };
     }
 
+    // PRODUCTION MODE: Require API key
     const apiKey = process.env.ANP_API_KEY;
     if (!apiKey) {
-      console.warn('[ANP] API Key not configured, using mock validation');
-      return validateWithANP_Mock(concessionNumber);
+      console.error('[ANP] API key not configured - set ANP_API_KEY');
+      return {
+        source: 'ANP',
+        field: 'concessionNumber',
+        status: 'error',
+        message: 'ANP API key not configured. Contact system administrator.',
+        reportValue: concessionNumber,
+      };
     }
 
     console.log('[ANP] Validating concession:', concessionNumber);

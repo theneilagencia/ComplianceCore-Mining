@@ -52,11 +52,17 @@ export async function validateWithCPRM_Real(
       };
     }
 
-    // Check for API key
+    // PRODUCTION MODE: Require API key
     const apiKey = process.env.CPRM_API_KEY;
     if (!apiKey) {
-      console.warn('[CPRM] API Key not configured, using mock validation');
-      return validateWithCPRM_Mock(latitude, longitude, formation);
+      console.error('[CPRM] API key not configured - set CPRM_API_KEY');
+      return {
+        source: 'CPRM',
+        field: 'geologicalFormation',
+        status: 'error',
+        message: 'CPRM API key not configured. Contact system administrator.',
+        reportValue: { latitude, longitude, formation },
+      };
     }
 
     console.log('[CPRM] Validating geology at:', { latitude, longitude });

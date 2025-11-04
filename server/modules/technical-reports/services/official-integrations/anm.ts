@@ -51,12 +51,18 @@ export async function validateWithANM_Real(
   const startTime = Date.now();
   
   try {
-    const apiKey = process.env.ANM_API_KEY;
+    const apiKey = process.env.SIGMINE_API_KEY || process.env.ANM_API_KEY;
 
-    // If no API key, use MOCK validation
+    // PRODUCTION MODE: Require API key
     if (!apiKey) {
-      console.warn('[ANM] API key not configured - using MOCK validation');
-      return validateWithANM_Mock(miningTitleNumber);
+      console.error('[ANM] API key not configured - set SIGMINE_API_KEY or ANM_API_KEY');
+      return {
+        source: 'ANM',
+        field: 'miningTitleNumber',
+        status: 'error',
+        message: 'ANM API key not configured. Contact system administrator.',
+        reportValue: miningTitleNumber,
+      };
     }
 
     // Basic validation

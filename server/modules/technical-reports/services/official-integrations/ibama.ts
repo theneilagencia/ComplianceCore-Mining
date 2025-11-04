@@ -57,10 +57,17 @@ export async function validateWithIBAMA_Real(
       };
     }
 
+    // PRODUCTION MODE: Require API key
     const apiKey = process.env.IBAMA_API_KEY;
     if (!apiKey) {
-      console.warn('[IBAMA] API Key not configured, using mock validation');
-      return validateWithIBAMA_Mock(licenseNumber);
+      console.error('[IBAMA] API key not configured - set IBAMA_API_KEY');
+      return {
+        source: 'IBAMA',
+        field: 'environmentalLicense',
+        status: 'error',
+        message: 'IBAMA API key not configured. Contact system administrator.',
+        reportValue: licenseNumber,
+      };
     }
 
     console.log('[IBAMA] Validating license:', licenseNumber);
