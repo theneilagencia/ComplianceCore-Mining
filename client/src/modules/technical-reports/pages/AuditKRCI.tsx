@@ -91,10 +91,15 @@ export default function AuditKRCI() {
   
   // GUARD: Bloquear redirecionamento para /review quando estamos processando upload
   useEffect(() => {
+    console.log('[AuditKRCI] Location changed:', location, 'Block active:', blockNavigationRef.current);
     if (location.includes('/review') && blockNavigationRef.current) {
-      console.log('[AuditKRCI] BLOCKED navigation to /review, staying in audit module');
+      console.warn('[AuditKRCI] ⛔ BLOCKED navigation to /review, staying in audit module');
       navigate('/reports/audit', { replace: true });
-      blockNavigationRef.current = false;
+      // Manter bloqueio ativo por mais tempo
+      setTimeout(() => {
+        blockNavigationRef.current = false;
+        console.log('[AuditKRCI] Block deactivated');
+      }, 3000);
     }
   }, [location, navigate]);
 
@@ -655,6 +660,7 @@ export default function AuditKRCI() {
             
             // ATIVAR bloqueio de navegação para /review
             blockNavigationRef.current = true;
+            console.log('[AuditKRCI] 🛡️ Navigation block ACTIVATED');
             
             // Módulo de auditoria: executar auditoria diretamente após upload
             // (não redireciona para revisão humana)
@@ -669,10 +675,11 @@ export default function AuditKRCI() {
                 reportId: result.reportId,
                 auditType: "full",
               });
-              // Desativar bloqueio após 2 segundos
+              // Desativar bloqueio após 5 segundos (tempo suficiente para auditoria iniciar)
               setTimeout(() => {
                 blockNavigationRef.current = false;
-              }, 2000);
+                console.log('[AuditKRCI] Block deactivated after timeout');
+              }, 5000);
             }, 500);
           }}
         />
