@@ -67,24 +67,46 @@ export async function getFileUrl(key: string, expiresIn = 3600): Promise<string>
 }
 
 /**
- * Gera URL pré-assinada para upload direto do cliente
- * (Placeholder - implementação real requer SDK AWS)
+ * Gera URL pré-assinada para upload direto ao S3
+ * Implementação real com AWS SDK v3
  */
-export function generatePresignedUploadUrl(
+export async function generatePresignedUploadUrl(
   tenantId: string,
   filename: string,
   contentType: string
-): { uploadUrl: string; key: string; expiresIn: number } {
+): Promise<{ uploadUrl: string; key: string; expiresIn: number }> {
   const timestamp = Date.now();
   const sanitizedFilename = filename.replace(/[^a-zA-Z0-9._-]/g, "_");
   const key = `tenants/${tenantId}/uploads/${timestamp}-${sanitizedFilename}`;
 
-  // TODO: Implementar geração real de URL pré-assinada com AWS SDK
-  return {
-    uploadUrl: `https://placeholder-s3-upload.com/${key}`,
-    key,
-    expiresIn: 3600,
-  };
+  // Generate real pre-signed URL with AWS SDK
+  const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+  const { PutObjectCommand } = require('@aws-sdk/client-s3');
+  const { getS3Client } = require('../../storage/s3Service');
+  
+  const s3Client = getS3Client();
+  const bucketName = process.env.S3_BUCKET_NAME || 'qivo-mining-uploads';
+  
+  const command = new PutObjectCommand({
+    Bucket: bucketName,
+    Key: key,
+    ContentType: contentType,
+  });
+  
+  const expiresIn = 3600; // 1 hour
+  
+  try {
+    const uploadUrl = await getSignedUrl(s3Client, command, { expiresIn });
+    
+    return {
+      uploadUrl,
+      key,
+      expiresIn,
+    };
+  } catch (error) {
+    console.error('[Upload] Error generating pre-signed URL:', error);
+    throw new Error('Failed to generate upload URL');
+  }
 }
 
 /**

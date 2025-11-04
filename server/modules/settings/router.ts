@@ -103,8 +103,48 @@ router.put('/password', requireAuth, async (req: any, res) => {
       return res.status(400).json({ error: 'Current and new password are required' });
     }
 
-    // TODO: Implement password change logic with bcrypt
-    // For now, return success
+    // Implement password change logic with bcrypt
+    const db = await getDb();
+    const userId = req.user.id;
+    const bcrypt = require('bcryptjs');
+    
+    // Get user from database
+    const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    
+    if (!user || user.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const currentUser = user[0];
+    
+    // Verify current password
+    if (!currentUser.passwordHash) {
+      return res.status(400).json({ error: 'Password not set. Please use password reset.' });
+    }
+    
+    const isValidPassword = await bcrypt.compare(currentPassword, currentUser.passwordHash);
+    
+    if (!isValidPassword) {
+      return res.status(401).json({ error: 'Current password is incorrect' });
+    }
+    
+    // Validate new password strength
+    if (newPassword.length < 8) {
+      return res.status(400).json({ error: 'New password must be at least 8 characters long' });
+    }
+    
+    // Hash new password
+    const saltRounds = 10;
+    const newPasswordHash = await bcrypt.hash(newPassword, saltRounds);
+    
+    // Update password in database
+    await db
+      .update(users)
+      .set({ passwordHash: newPasswordHash })
+      .where(eq(users.id, userId));
+    
+    console.log(`[Settings] Password changed for user ${userId}`);
+    
     res.json({
       success: true,
       message: 'Password changed successfully',
@@ -121,12 +161,55 @@ router.delete('/account', requireAuth, async (req: any, res) => {
     const db = await getDb();
     const userId = req.user.id;
 
-    // TODO: Implement account deletion logic
-    // Should delete user data, cancel subscriptions, etc.
+    // Implement account deletion logic (soft delete)
+    const { password } = req.body;
+    const bcrypt = require('bcryptjs');
+    
+    if (!password) {
+      return res.status(400).json({ error: 'Password confirmation required to delete account' });
+    }
+    
+    // Get user from database
+    const user = await db.select().from(users).where(eq(users.id, userId)).limit(1);
+    
+    if (!user || user.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    
+    const currentUser = user[0];
+    
+    // Verify password
+    if (currentUser.passwordHash) {
+      const isValidPassword = await bcrypt.compare(password, currentUser.passwordHash);
+      
+      if (!isValidPassword) {
+        return res.status(401).json({ error: 'Password is incorrect' });
+      }
+    }
+    
+    // Soft delete: anonymize user data instead of hard delete
+    const anonymizedEmail = `deleted_${userId}@qivomining.com`;
+    
+    await db
+      .update(users)
+      .set({
+        name: 'Deleted User',
+        email: anonymizedEmail,
+        passwordHash: null,
+        googleId: null,
+        refreshToken: null,
+      })
+      .where(eq(users.id, userId));
+    
+    // TODO: Cancel active subscriptions in Stripe
+    // const { licenses } = await import('../../../drizzle/schema');
+    // await db.update(licenses).set({ status: 'cancelled' }).where(eq(licenses.userId, userId));
+    
+    console.log(`[Settings] Account soft-deleted for user ${userId}`);
     
     res.json({
       success: true,
-      message: 'Account deletion requested. You will receive a confirmation email.',
+      message: 'Account has been deleted. Your data has been anonymized.',
     });
   } catch (error) {
     console.error('[Settings] Account deletion error:', error);
