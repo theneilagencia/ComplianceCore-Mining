@@ -1,0 +1,167 @@
+# ⚙️ QIVO v2 - Configuração Central Manus
+# Arquivo de configuração unificado para automação completa do ciclo SaaS
+
+project: qivo
+version: 2.0.0
+repository: theneilagencia/ComplianceCore-Mining
+environment: production
+
+# 🚀 Deploy Configuration
+deploy:
+  provider: render
+  service_id: ${RENDER_SERVICE_ID}
+  service_name: qivo-mining
+  api_key: ${RENDER_API_KEY}
+  build_command: npm install -g pnpm@latest && pnpm install && pnpm run build
+  start_command: pnpm start
+  health_check: false
+  auto_deploy: false
+  region: oregon
+  plan: free
+
+# 🗄️ Database Configuration
+database:
+  provider: supabase
+  type: postgresql
+  url: ${DATABASE_URL}
+  key: ${SUPABASE_KEY}
+  pool_size: 10
+  ssl_mode: require
+
+# 📦 Módulos do Sistema
+modules:
+  - name: radar
+    status: active
+    path: server/modules/radar
+    tests: tests/unit/radar
+  - name: report
+    status: active
+    path: server/modules/reports
+    tests: tests/unit/reports
+  - name: bridge
+    status: active
+    path: server/modules/bridge
+    tests: tests/unit/bridge
+  - name: krci
+    status: active
+    path: server/modules/technical-reports
+    tests: tests/unit/technical-reports
+  - name: admin
+    status: active
+    path: server/modules/admin
+    tests: tests/unit/admin
+  - name: billing
+    status: active
+    path: server/modules/billing
+    tests: tests/unit/billing
+  - name: sse
+    status: active
+    path: server/modules/sse
+    tests: tests/unit/sse
+
+# 🤖 Automação Manus
+automation:
+  enabled: true
+  features:
+    - recovery          # Recuperação automática de falhas
+    - deploy           # Deploy automatizado via Render API
+    - audit            # Auditoria técnica diária
+    - documentation    # Geração automática de docs
+    - monitoring       # Monitoramento contínuo
+    - rollback         # Rollback automático em caso de erro
+  
+  schedule:
+    audit: "0 3 * * *"        # 3h da manhã (UTC)
+    health_check: "*/15 * * * *"  # A cada 15 minutos
+    backup: "0 2 * * 0"        # Domingo 2h da manhã
+
+# 🔔 Alertas e Notificações
+alerts:
+  via: slack
+  channels:
+    - "#qivo-ops"
+    - "#qivo-deploys"
+  events:
+    - deploy_success
+    - deploy_failure
+    - health_check_failed
+    - audit_completed
+    - rollback_triggered
+  
+  thresholds:
+    error_rate: 5          # % de erros antes de alertar
+    response_time: 5000    # ms - tempo de resposta máximo
+    memory_usage: 80       # % de uso de memória
+
+# 🔐 Segurança
+security:
+  secrets_required:
+    - MANUS_API_KEY
+    - RENDER_SERVICE_ID
+    - RENDER_API_KEY
+    - DATABASE_URL
+    - SESSION_SECRET
+    - GOOGLE_CLIENT_ID
+    - GOOGLE_CLIENT_SECRET
+    - OPENAI_API_KEY
+    - STRIPE_SECRET_KEY
+    - CLOUDINARY_API_KEY
+
+# 📊 Métricas e Monitoramento
+monitoring:
+  enabled: true
+  providers:
+    - render_metrics
+    - custom_logs
+  metrics:
+    - uptime
+    - response_time
+    - error_rate
+    - request_count
+    - memory_usage
+    - cpu_usage
+
+# 🧪 Testes
+testing:
+  frameworks:
+    - vitest
+    - playwright
+  coverage_threshold: 70
+  run_before_deploy: true
+  
+# 📝 Documentação
+documentation:
+  auto_generate: true
+  formats:
+    - markdown
+    - json
+  outputs:
+    - docs/AUDITORIA_CONFORMIDADE_QIVO_V2.md
+    - docs/CHANGELOG_AUTOMATICO.md
+    - docs/GUIA_RECUPERACAO_AUTOMATICA.md
+    - docs/DEPLOYMENT_HISTORY.json
+
+# 🔄 Backup e Recuperação
+backup:
+  enabled: true
+  retention_days: 30
+  include:
+    - database
+    - uploads
+    - configuration
+  exclude:
+    - node_modules
+    - dist
+    - .git
+
+# 🎯 Performance
+performance:
+  optimization:
+    - tree_shaking
+    - code_splitting
+    - compression
+    - caching
+  targets:
+    first_contentful_paint: 1.8s
+    time_to_interactive: 3.5s
+    largest_contentful_paint: 2.5s
