@@ -47,13 +47,9 @@ export const auditRouter = router({
         });
       }
 
-      // GUARD-RAIL: Verificar se relatório está pronto para auditoria
-      if (report.status !== "ready_for_audit") {
-        throw new TRPCError({
-          code: "PRECONDITION_FAILED",
-          message: `Relatório não está pronto para auditoria. Status atual: ${report.status}`,
-        });
-      }
+      // Auditoria pode ser executada em qualquer relatório que tenha normalized.json
+      // (não requer revisão humana - isso é apenas para geração de relatórios)
+      console.log(`[Audit] Running audit on report ${report.id} with status: ${report.status}`);
 
       // Carregar normalized.json do S3 (DADOS REAIS)
       const { loadNormalizedFromS3 } = await import("../services/parsing");
@@ -82,7 +78,15 @@ export const auditRouter = router({
       );
 
       // Executar auditoria
+      console.log(`[Audit] Running ${input.auditType} audit on normalized report...`);
       const auditResult = runAudit(normalizedReport, input.auditType);
+      console.log(`[Audit] Audit completed:`, {
+        score: auditResult.score,
+        totalRules: auditResult.totalRules,
+        passedRules: auditResult.passedRules,
+        failedRules: auditResult.failedRules,
+        krcisCount: auditResult.krcis.length,
+      });
 
       // Gerar PDF (com error handling)
       let pdfUrl: string | null = null;
@@ -135,7 +139,14 @@ export const auditRouter = router({
         .set({ status: "audited" })
         .where(eq(reports.id, report.id));
 
-      return {
+      console.log(`[Audit] Audit saved successfully:`, {
+        auditId,
+        reportId: report.id,
+        score: auditResult.score,
+        pdfUrl: pdfUrl || "not generated",
+      });
+
+      const result = {
         auditId,
         reportId: report.id,
         score: auditResult.score,
@@ -147,6 +158,14 @@ export const auditRouter = router({
         pdfUrl,
         timestamp: new Date().toISOString(),
       };
+
+      console.log(`[Audit] Returning result to client:`, {
+        auditId: result.auditId,
+        score: result.score,
+        krcisCount: result.krcis.length,
+      });
+
+      return result;
     }),
 
   // Listar auditorias
@@ -677,28 +696,10 @@ export const auditRouter = router({
         });
       }
 
-      // Get parsed report summary
-      const { getParsingSummary } = await import("../types/parsing");
-      const parsingSummary = getParsingSummary(report.parsingSummary);
-
-      // Prepare report data for validation from parsingSummary
-      const reportData = {
-        miningTitleNumber: parsingSummary?.miningTitleNumber,
-        commodity: parsingSummary?.commodity,
-        location: parsingSummary?.location,
-        geologicalFormation: parsingSummary?.geologicalFormation,
-        geologicalAge: parsingSummary?.geologicalAge,
-        coordinates: parsingSummary?.coordinates,
-        environmentalLicense: parsingSummary?.environmentalLicense,
-        licenseType: parsingSummary?.licenseType,
-        hasEIA: parsingSummary?.hasEIA,
-      };
-
-      // Run validation
-      const result = await validateWithOfficialSources(
-        input.reportId,
-        reportData
-      );
+      // Run validation with all official sources
+      const result = await validateWithOfficialSources(input.reportId, {
+        sources: ['ANM', 'CPRM', 'IBAMA', 'ANP'],
+      });
 
       return result;
     }),

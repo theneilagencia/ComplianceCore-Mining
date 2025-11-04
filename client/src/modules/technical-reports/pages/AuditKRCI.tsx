@@ -14,7 +14,6 @@ import {
 import { AuditListSkeleton } from "@/components/ui/skeleton";
 import { trpc } from "@/lib/trpc";
 import { Shield, CheckCircle, AlertTriangle, FileSearch, Download, ExternalLink } from "lucide-react";
-import GuardRailModal from "../components/GuardRailModal";
 import { CorrectionPlan } from "../components/CorrectionPlan";
 import { AuditTrendsDashboard } from "@/components/AuditTrendsDashboard";
 import { HistoricalComparison } from "@/components/HistoricalComparison";
@@ -82,7 +81,6 @@ interface CorrectionPlanData {
 export default function AuditKRCI() {
   const [, navigate] = useLocation();
   const [selectedReport, setSelectedReport] = useState<string>("");
-  const [showGuardRail, setShowGuardRail] = useState<boolean>(false);
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
   const [correctionPlan, setCorrectionPlan] = useState<CorrectionPlanData | null>(null);
   const [shouldGeneratePlan, setShouldGeneratePlan] = useState<boolean>(false);
@@ -141,15 +139,19 @@ export default function AuditKRCI() {
   // Mutation para executar auditoria
   const runAudit = trpc.technicalReports.audit.run.useMutation({
     onSuccess: (data) => {
+      console.log("[AuditKRCI] Audit completed successfully:", data);
       toast.success("Auditoria concluída!", {
         description: `Score: ${data.score}% - ${data.totalRules} regras verificadas`,
+        duration: 5000,
       });
       setAuditResult(data);
       setSelectedReport("");
     },
     onError: (error) => {
+      console.error("[AuditKRCI] Audit failed:", error);
       toast.error("Erro ao executar auditoria", {
         description: error.message,
+        duration: 10000,
       });
     },
   });
@@ -162,20 +164,20 @@ export default function AuditKRCI() {
       return;
     }
 
-    // GUARD-RAIL: Verificar se o relatório precisa de revisão
     const report = reports?.items?.find((r) => r.id === selectedReport);
-    if (report?.status === "needs_review") {
-      setShowGuardRail(true);
-      return;
-    }
+    console.log("[AuditKRCI] Starting audit for report:", {
+      reportId: selectedReport,
+      reportTitle: report?.title,
+      reportStatus: report?.status,
+    });
 
-    if (report?.status !== "ready_for_audit") {
-      toast.error("Relatório não está pronto para auditoria", {
-        description: `Status atual: ${report?.status}`,
-      });
-      return;
-    }
+    toast.info("Iniciando auditoria...", {
+      description: "Processando relatório...",
+      duration: 3000,
+    });
 
+    // Auditoria pode ser executada diretamente em qualquer relatório processado
+    // (não precisa de revisão humana - isso é apenas para geração de relatórios)
     runAudit.mutate({
       reportId: selectedReport,
       auditType: "full",
@@ -592,14 +594,6 @@ export default function AuditKRCI() {
             </p>
           )}
         </Card>
-
-        {/* Guard-Rail Modal */}
-        <GuardRailModal
-          open={showGuardRail}
-          onClose={() => setShowGuardRail(false)}
-          reportId={selectedReport}
-          action="Auditoria"
-        />
 
         {/* Upload Modal */}
         <UploadModalAtomic
