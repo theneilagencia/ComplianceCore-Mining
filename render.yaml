@@ -28,16 +28,16 @@ services:
         - "tsconfig.json"
         - "build.sh"
 
-    # Build command (uses pre-build.sh to install pnpm first)
-    buildCommand: bash pre-build.sh
+    # Build command - ULTRA SIMPLIFICADO
+    buildCommand: |
+      npm install -g pnpm@latest
+      pnpm install
+      pnpm run build
 
     # Start command
-    startCommand: node dist/index.js
+    startCommand: pnpm start
     
-    # Health check disabled temporarily (causing loops)
-    # healthCheckPath: /api/health
-    
-    # DISABLED: Auto-deploy causing loops
+    # DISABLED: Health check and auto-deploy
     autoDeploy: false
 
     envVars:
