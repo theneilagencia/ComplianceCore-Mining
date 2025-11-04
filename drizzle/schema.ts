@@ -175,3 +175,25 @@ export const regulatoryChanges = pgTable("regulatoryChanges", {
   scrapedAt: timestamp("scrapedAt").defaultNow(),
   metadata: jsonb("metadata"), // Additional structured data
 });
+
+/**
+ * On-Demand Reports table
+ * Tracks one-time report purchases
+ */
+export const onDemandReports = pgTable("onDemandReports", {
+  id: varchar("id", { length: 64 }).primaryKey(),
+  userId: varchar("userId", { length: 64 }).notNull().references(() => users.id),
+  tenantId: varchar("tenantId", { length: 64 }).notNull(),
+  reportType: varchar("reportType", { length: 64 }).notNull(), // simplified, complete, multinorm, auditable, esg
+  projectId: varchar("projectId", { length: 64 }),
+  projectName: text("projectName"),
+  status: varchar("status", { length: 32 }).default('pending_payment').notNull(), // pending_payment, paid, generating, completed, failed
+  priceUSD: real("priceUSD").notNull(),
+  stripeSessionId: varchar("stripeSessionId", { length: 128 }),
+  stripePaymentIntentId: varchar("stripePaymentIntentId", { length: 128 }),
+  paidAt: timestamp("paidAt"),
+  completedAt: timestamp("completedAt"),
+  reportUrl: text("reportUrl"),
+  createdAt: timestamp("createdAt").defaultNow(),
+  updatedAt: timestamp("updatedAt").defaultNow(),
+});
