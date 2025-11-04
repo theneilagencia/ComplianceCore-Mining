@@ -1,18 +1,28 @@
 /**
  * Service Worker - QIVO Mining PWA
  * 
- * Features:
- * - Offline caching (static assets, API responses)
- * - Background sync (retry queue for failed requests)
- * - Push notifications (optional)
+ * ⚠️ VERSÃO CORRIGIDA - Nov 2024
+ * 
+ * PROBLEMAS RESOLVIDOS:
+ * 1. ❌ Cache agressivo de JS/CSS causava versões antigas em produção
+ * 2. ❌ Bundle JS com hash não era atualizado após deploy
+ * 3. ❌ Network First agora é padrão para JS/CSS (não Cache First)
+ * 4. ✅ HTML continua com Cache First para PWA offline
+ * 
+ * ESTRATÉGIAS:
+ * - JS/CSS/Assets: Network First (sempre busca nova versão)
+ * - HTML: Cache First + revalidation (offline PWA)
+ * - API: Network First com fallback
+ * - Images: Cache First (imagens não mudam com frequência)
  */
 
-const CACHE_VERSION = 'qivo-v1.2.0';
+// IMPORTANTE: Incrementar a cada deploy para forçar limpeza de cache
+const CACHE_VERSION = 'qivo-v1.2.1-fix'; // ← MUDOU: versão com fix de cache
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const API_CACHE = `${CACHE_VERSION}-api`;
 const IMAGE_CACHE = `${CACHE_VERSION}-images`;
 
-// Assets to cache on install
+// Assets to cache on install (APENAS HTML e manifests, NÃO JS/CSS)
 const STATIC_ASSETS = [
   '/',
   '/index.html',
@@ -22,41 +32,54 @@ const STATIC_ASSETS = [
 
 // Install event
 self.addEventListener('install', (event) => {
-  console.log('[SW] Install event');
+  console.log('[SW] Install event - Version:', CACHE_VERSION);
   
   event.waitUntil(
     caches.open(STATIC_CACHE).then((cache) => {
-      console.log('[SW] Caching static assets');
-      return cache.addAll(STATIC_ASSETS);
+      console.log('[SW] Caching static assets (HTML only, no JS/CSS)');
+      return cache.addAll(STATIC_ASSETS).catch((err) => {
+        console.warn('[SW] Failed to cache some assets:', err);
+        // Não falhar se alguns assets não existirem
+        return Promise.resolve();
+      });
     })
   );
   
-  // Force activation
+  // Force activation IMEDIATA
   self.skipWaiting();
 });
 
-// Activate event
+// Activate event - LIMPEZA AGRESSIVA DE CACHE ANTIGO
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activate event');
+  console.log('[SW] Activate event - Clearing old caches');
   
   event.waitUntil(
     caches.keys().then((cacheNames) => {
       return Promise.all(
         cacheNames
-          .filter((name) => name.startsWith('qivo-') && name !== STATIC_CACHE && name !== API_CACHE && name !== IMAGE_CACHE)
-          .map((name) => {
-            console.log('[SW] Deleting old cache:', name);
-            return caches.delete(name);
+          .filter((name) => {
+            // Deletar TODOS os caches que não sejam a versão atual
+            const isOldCache = name.startsWith('qivo-') && 
+                               name !== STATIC_CACHE && 
+                               name !== API_CACHE && 
+                               name !== IMAGE_CACHE;
+            if (isOldCache) {
+              console.log('[SW] 🗑️ Deleting old cache:', name);
+            }
+            return isOldCache;
           })
+          .map((name) => caches.delete(name))
       );
+    }).then(() => {
+      console.log('[SW] ✅ Cache cleanup complete');
     })
   );
   
-  // Take control immediately
+  // Take control immediately (sem esperar reload)
   return self.clients.claim();
 });
 
-// Fetch event
+// Fetch event - ESTRATÉGIA CORRIGIDA
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
@@ -77,18 +100,72 @@ self.addEventListener('fetch', (event) => {
     return;
   }
   
-  // Images: Cache first, fallback to network
-  if (request.destination === 'image') {
+  // ⚠️ FIX CRÍTICO: JS/CSS sempre busca da rede primeiro (Network First)
+  // Isso garante que após deploy, novos bundles sejam carregados
+  if (url.pathname.match(/\.(js|css|mjs|ts|tsx)$/)) {
+    console.log('[SW] JS/CSS detected - Network First:', url.pathname);
+    event.respondWith(networkFirstNoCacheStrategy(request));
+    return;
+  }
+  
+  // Images: Cache first (imagens não mudam com frequência)
+  if (request.destination === 'image' || url.pathname.match(/\.(png|jpg|jpeg|gif|svg|webp|ico)$/)) {
     event.respondWith(cacheFirstStrategy(request, IMAGE_CACHE));
     return;
   }
   
-  // Static assets: Cache first, fallback to network
-  event.respondWith(cacheFirstStrategy(request, STATIC_CACHE));
+  // HTML: Cache first + revalidation (para PWA offline)
+  if (request.destination === 'document' || url.pathname.endsWith('.html') || url.pathname === '/') {
+    event.respondWith(cacheFirstWithRevalidation(request, STATIC_CACHE));
+    return;
+  }
+  
+  // Outros assets: Network First (fontes, JSON, etc)
+  event.respondWith(networkFirstNoCacheStrategy(request));
 });
 
 /**
- * Cache first strategy
+ * Cache first strategy (com revalidação em background)
+ * Usado para HTML (PWA offline)
+ */
+async function cacheFirstWithRevalidation(request, cacheName) {
+  const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+  
+  // Retorna cache imediatamente
+  if (cached) {
+    console.log('[SW] Cache hit (with revalidation):', request.url);
+    
+    // Revalidar em background (não bloqueia resposta)
+    fetch(request).then((response) => {
+      if (response.ok) {
+        cache.put(request, response.clone());
+        console.log('[SW] Cache updated in background:', request.url);
+      }
+    }).catch(() => {
+      // Falha silenciosa na revalidação
+    });
+    
+    return cached;
+  }
+  
+  // Cache miss: buscar da rede
+  console.log('[SW] Cache miss, fetching:', request.url);
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch (error) {
+    console.error('[SW] Fetch failed:', error);
+    return new Response('Offline', { status: 503, statusText: 'Service Unavailable' });
+  }
+}
+
+/**
+ * Cache first strategy (tradicional)
+ * Usado para imagens
  */
 async function cacheFirstStrategy(request, cacheName) {
   const cache = await caches.open(cacheName);
@@ -113,7 +190,39 @@ async function cacheFirstStrategy(request, cacheName) {
 }
 
 /**
- * Network first strategy
+ * Network First strategy (SEM cache de JS/CSS)
+ * ⚠️ FIX CRÍTICO: JS/CSS nunca usa cache - sempre busca versão nova
+ */
+async function networkFirstNoCacheStrategy(request) {
+  try {
+    console.log('[SW] Network First (no cache):', request.url);
+    const response = await fetch(request, {
+      cache: 'no-cache', // ← Força bypass de cache HTTP
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+      },
+    });
+    
+    if (response.ok) {
+      console.log('[SW] ✅ Fresh version fetched:', request.url);
+      return response;
+    }
+    
+    throw new Error(`HTTP ${response.status}`);
+  } catch (error) {
+    console.error('[SW] Network failed:', error);
+    // NÃO tenta cache - retorna erro direto
+    return new Response('Network Error', { 
+      status: 503, 
+      statusText: 'Service Unavailable - No Cache Available' 
+    });
+  }
+}
+
+/**
+ * Network first strategy (para APIs)
+ * Usado para /api/ e /trpc/ com fallback para cache
  */
 async function networkFirstStrategy(request, cacheName) {
   const cache = await caches.open(cacheName);
@@ -121,6 +230,7 @@ async function networkFirstStrategy(request, cacheName) {
   try {
     const response = await fetch(request);
     if (response.ok) {
+      // Cacheia apenas respostas 200 OK
       cache.put(request, response.clone());
     }
     return response;
@@ -128,6 +238,7 @@ async function networkFirstStrategy(request, cacheName) {
     console.log('[SW] Network failed, trying cache:', request.url);
     const cached = await cache.match(request);
     if (cached) {
+      console.log('[SW] Using cached API response:', request.url);
       return cached;
     }
     

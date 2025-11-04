@@ -29,6 +29,8 @@ export default defineConfig({
     chunkSizeWarningLimit: 1000,
     rollupOptions: {
       output: {
+        // ⚠️ FIX CRÍTICO: Hash em TODOS os assets para cache busting
+        // Cada deploy gera novos hashes, forçando navegador a baixar versão nova
         entryFileNames: `assets/[name].[hash].js`,
         chunkFileNames: `assets/[name].[hash].js`,
         assetFileNames: `assets/[name].[hash].[ext]`,
@@ -70,6 +72,31 @@ export default defineConfig({
     fs: {
       strict: true,
       deny: ["**/.*"],
+    },
+    // ⚠️ FIX: Headers anti-cache em desenvolvimento
+    headers: {
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+    },
+  },
+  
+  // ⚠️ FIX CRÍTICO: Preview server (usado no Render) com headers anti-cache
+  preview: {
+    host: true,
+    port: 10000,
+    headers: {
+      // Headers HTTP que previnem cache de JS/CSS
+      'Cache-Control': 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0',
+      'Pragma': 'no-cache',
+      'Expires': '0',
+      'Surrogate-Control': 'no-store',
+      
+      // Security headers (bonus)
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Referrer-Policy': 'strict-origin-when-cross-origin',
     },
   },
 });
