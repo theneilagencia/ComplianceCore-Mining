@@ -612,7 +612,21 @@ export default function AuditKRCI() {
           onClose={() => setShowUploadModal(false)}
           onSuccess={(result) => {
             setShowUploadModal(false);
-            navigate(`/reports/${result.reportId}/review`);
+            
+            // Módulo de auditoria: executar auditoria diretamente após upload
+            // (não redireciona para revisão humana)
+            toast.info("Upload concluído! Iniciando auditoria...", {
+              description: "Processando relatório...",
+              duration: 3000,
+            });
+            
+            // Aguarda 500ms para garantir que o modal fechou antes de iniciar auditoria
+            setTimeout(() => {
+              runAudit.mutate({
+                reportId: result.reportId,
+                auditType: "full",
+              });
+            }, 500);
           }}
         />
       </div>
