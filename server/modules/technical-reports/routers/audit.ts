@@ -117,21 +117,39 @@ export const auditRouter = router({
       // Salvar auditoria no banco
       const auditId = `aud_${randomUUID()}`;
 
-      await db.insert(audits).values({
-        id: auditId,
+      console.log('[Audit] Attempting to save audit to database:', {
+        auditId,
         reportId: report.id,
         tenantId: report.tenantId,
         userId: ctx.user.id,
         auditType: input.auditType,
         score: auditResult.score,
-        totalRules: auditResult.totalRules,
-        passedRules: auditResult.passedRules,
-        failedRules: auditResult.failedRules,
-        krcisJson: auditResult.krcis,
-        recommendationsJson: auditResult.recommendations,
-        pdfUrl,
-        createdAt: new Date(),
       });
+
+      try {
+        await db.insert(audits).values({
+          id: auditId,
+          reportId: report.id,
+          tenantId: report.tenantId,
+          userId: ctx.user.id,
+          auditType: input.auditType,
+          score: auditResult.score,
+          totalRules: auditResult.totalRules,
+          passedRules: auditResult.passedRules,
+          failedRules: auditResult.failedRules,
+          krcisJson: auditResult.krcis,
+          recommendationsJson: auditResult.recommendations,
+          pdfUrl,
+          createdAt: new Date(),
+        });
+        console.log('[Audit] ✅ Audit saved successfully to database');
+      } catch (error: any) {
+        console.error('[Audit] ❌ Failed to save audit to database:', error);
+        throw new TRPCError({
+          code: 'INTERNAL_SERVER_ERROR',
+          message: `Failed to save audit: ${error.message}`,
+        });
+      }
 
       // Atualizar status do relatório para "audited"
       await db
@@ -193,13 +211,24 @@ export const auditRouter = router({
         conditions.push(eq(audits.reportId, input.reportId));
       }
 
-      const auditsList = await db.select().from(audits).where(conditions.length > 1 ? and(...conditions) : conditions[0]).limit(input.limit);
-
-      /* const auditsList = await db.query.audits.findMany({
-        where: conditions.length > 1 ? conditions : conditions[0],
+      console.log('[Audit.list] Fetching audits with conditions:', {
+        tenantId: ctx.user.tenantId,
+        reportId: input.reportId,
         limit: input.limit,
-        orderBy: (audits, { desc }) => [desc(audits.createdAt)],
-      }); */
+      });
+
+      const { desc } = await import('drizzle-orm');
+      const auditsList = await db
+        .select()
+        .from(audits)
+        .where(conditions.length > 1 ? and(...conditions) : conditions[0])
+        .orderBy(desc(audits.createdAt))
+        .limit(input.limit);
+
+      console.log('[Audit.list] Found audits:', {
+        count: auditsList.length,
+        auditIds: auditsList.map(a => a.id),
+      });
 
       return auditsList;
     }),
