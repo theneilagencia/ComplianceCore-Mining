@@ -164,12 +164,23 @@ export default function AuditKRCI() {
       return;
     }
 
+    // Módulo de auditoria não requer validação humana prévia
+    // Permite auditoria direta em relatórios com status 'needs_review' ou 'ready_for_audit'
     const report = reports?.items?.find((r) => r.id === selectedReport);
+    
     console.log("[AuditKRCI] Starting audit for report:", {
       reportId: selectedReport,
       reportTitle: report?.title,
       reportStatus: report?.status,
     });
+    
+    // Apenas bloqueia se o relatório ainda estiver em parsing
+    if (report?.status === "parsing") {
+      toast.error("Relatório ainda está sendo processado", {
+        description: "Aguarde o parsing completar antes de auditar",
+      });
+      return;
+    }
 
     toast.info("Iniciando auditoria...", {
       description: "Processando relatório...",
