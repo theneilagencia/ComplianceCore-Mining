@@ -19,6 +19,7 @@ router.post('/make-admin', async (req, res) => {
     }
 
     const db = await getDb();
+  if (!db) throw new Error("Database not available");
 
     // Find user
     const userResult = await db

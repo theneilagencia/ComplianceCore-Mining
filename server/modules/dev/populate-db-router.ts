@@ -50,6 +50,7 @@ router.post('/populate-db', async (req, res) => {
   try {
     console.log('[Populate DB] Starting database population...');
     const db = await getDb();
+  if (!db) throw new Error("Database not available");
     
     const stats = {
       users: 0,

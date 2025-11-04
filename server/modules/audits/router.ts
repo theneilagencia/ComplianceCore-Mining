@@ -72,6 +72,7 @@ router.get('/:id', requireAuth, async (req: any, res) => {
 router.post('/', requireAuth, async (req: any, res) => {
   try {
     const db = await getDb();
+    if (!db) throw new Error("Database not available");
     const userId = req.user.id;
     const { title, type, reportId, findings } = req.body;
 
@@ -80,13 +81,16 @@ router.post('/', requireAuth, async (req: any, res) => {
       .values({
         id: `audit_${randomUUID()}`,
         userId,
-        reportId: reportId || null,
-        title: title || 'Nova Auditoria KRCI',
-        type: type || 'KRCI',
-        status: 'in_progress',
-        findings: findings || {},
+        tenantId: req.user.tenantId,
+        reportId: reportId || `report_${randomUUID()}`,
+        auditType: 'full',
+        score: 0,
+        totalRules: 0,
+        passedRules: 0,
+        failedRules: 0,
+        krcisJson: findings || {},
+        recommendationsJson: {},
         createdAt: new Date(),
-        updatedAt: new Date(),
       })
       .returning();
 
@@ -104,6 +108,7 @@ router.post('/', requireAuth, async (req: any, res) => {
 router.put('/:id', requireAuth, async (req: any, res) => {
   try {
     const db = await getDb();
+    if (!db) throw new Error("Database not available");
     const userId = req.user.id;
     const auditId = req.params.id;
     const { title, type, status, findings } = req.body;
@@ -111,11 +116,9 @@ router.put('/:id', requireAuth, async (req: any, res) => {
     const updated = await db
       .update(audits)
       .set({
-        title,
-        type,
-        status,
-        findings,
-        updatedAt: new Date(),
+        // Only update allowed fields
+        krcisJson: findings || {},
+        // Note: audits table doesn't have updatedAt field
       })
       .where(and(
         eq(audits.id, auditId),

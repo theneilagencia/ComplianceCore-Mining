@@ -594,7 +594,6 @@ router.get('/subscriptions', requireAdmin, async (req, res) => {
         status: licenses.status,
         reportsUsed: licenses.reportsUsed,
         reportsLimit: licenses.reportsLimit,
-        projectsActive: licenses.projectsActive,
         projectsLimit: licenses.projectsLimit,
         stripeSubscriptionId: licenses.stripeSubscriptionId,
         createdAt: licenses.createdAt,
