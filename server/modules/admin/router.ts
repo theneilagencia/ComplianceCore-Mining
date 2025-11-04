@@ -310,6 +310,62 @@ router.post('/users', requireAdmin, async (req, res) => {
     });
     console.log('[Admin] License inserted:', { licenseId, userId, plan: plan || 'START', status: 'active' });
 
+    // Send welcome email with credentials
+    try {
+      const { sendGenericEmail } = await import('../radar/services/emailService');
+      
+      const subject = 'Bem-vindo ao QIVO Mining - Suas Credenciais de Acesso';
+      const text = `
+Olá ${fullName || ''},
+
+Sua conta foi criada com sucesso no QIVO Mining!
+
+Email: ${email}
+Senha temporária: ${password}
+Plano: ${plan || 'START'}
+
+Por favor, faça login e altere sua senha no primeiro acesso.
+
+Link de acesso: ${process.env.FRONTEND_URL || 'https://qivomining.com'}
+
+Atenciosamente,
+Equipe QIVO Mining
+      `;
+      
+      const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #2563eb;">Bem-vindo ao QIVO Mining!</h2>
+    <p>Olá <strong>${fullName || ''}</strong>,</p>
+    <p>Sua conta foi criada com sucesso. Abaixo estão suas credenciais de acesso:</p>
+    <div style="background-color: #f3f4f6; padding: 15px; border-radius: 5px; margin: 20px 0;">
+      <p style="margin: 5px 0;"><strong>Email:</strong> ${email}</p>
+      <p style="margin: 5px 0;"><strong>Senha temporária:</strong> <code style="background-color: #e5e7eb; padding: 2px 6px; border-radius: 3px;">${password}</code></p>
+      <p style="margin: 5px 0;"><strong>Plano:</strong> ${plan || 'START'}</p>
+    </div>
+    <p style="color: #dc2626;"><strong>Importante:</strong> Por favor, faça login e altere sua senha no primeiro acesso.</p>
+    <p>
+      <a href="${process.env.FRONTEND_URL || 'https://qivomining.com'}" style="display: inline-block; background-color: #2563eb; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 10px;">Acessar Plataforma</a>
+    </p>
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+    <p style="font-size: 12px; color: #6b7280;">Atenciosamente,<br>Equipe QIVO Mining</p>
+  </div>
+</body>
+</html>
+      `;
+      
+      await sendGenericEmail(email, subject, text, html);
+      console.log(`[Admin] Welcome email sent to ${email}`);
+    } catch (emailError: any) {
+      console.error('[Admin] Failed to send welcome email:', emailError.message);
+      // Don't fail user creation if email fails
+    }
+
     res.json({ success: true, message: 'User created successfully', userId, licenseId });
   } catch (error) {
     console.error('[Admin] Create user error:', error);
@@ -406,15 +462,62 @@ router.post('/users/:userId/reset-password', requireAdmin, async (req, res) => {
       })
       .where(eq(users.id, userId));
 
-    // TODO: Send email with temporary password
-    // For now, return it in the response (in production, only send via email)
-    console.log(`[Admin] Password reset for ${user.email}: ${tempPassword}`);
+    // Send email with temporary password
+    try {
+      const { sendGenericEmail } = await import('../radar/services/emailService');
+      
+      const subject = 'QIVO Mining - Senha Redefinida';
+      const text = `
+Olá,
+
+Sua senha foi redefinida por um administrador.
+
+Nova senha temporária: ${tempPassword}
+
+Por favor, faça login e altere sua senha imediatamente.
+
+Link de acesso: ${process.env.FRONTEND_URL || 'https://qivomining.com'}
+
+Atenciosamente,
+Equipe QIVO Mining
+      `;
+      
+      const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+</head>
+<body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+  <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+    <h2 style="color: #dc2626;">Senha Redefinida</h2>
+    <p>Olá,</p>
+    <p>Sua senha foi redefinida por um administrador. Abaixo está sua nova senha temporária:</p>
+    <div style="background-color: #fef2f2; padding: 15px; border-radius: 5px; border-left: 4px solid #dc2626; margin: 20px 0;">
+      <p style="margin: 5px 0;"><strong>Nova senha temporária:</strong></p>
+      <p style="margin: 5px 0; font-size: 18px;"><code style="background-color: #fee2e2; padding: 5px 10px; border-radius: 3px; font-weight: bold;">${tempPassword}</code></p>
+    </div>
+    <p style="color: #dc2626;"><strong>Importante:</strong> Por favor, faça login e altere sua senha imediatamente.</p>
+    <p>
+      <a href="${process.env.FRONTEND_URL || 'https://qivomining.com'}" style="display: inline-block; background-color: #2563eb; color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; margin-top: 10px;">Acessar Plataforma</a>
+    </p>
+    <hr style="margin: 30px 0; border: none; border-top: 1px solid #e5e7eb;">
+    <p style="font-size: 12px; color: #6b7280;">Atenciosamente,<br>Equipe QIVO Mining</p>
+  </div>
+</body>
+</html>
+      `;
+      
+      await sendGenericEmail(user.email, subject, text, html);
+      console.log(`[Admin] Password reset email sent to ${user.email}`);
+    } catch (emailError: any) {
+      console.error('[Admin] Failed to send password reset email:', emailError.message);
+      // Don't fail the password reset if email fails
+    }
 
     res.json({ 
       success: true, 
       message: 'Password reset successfully. Temporary password sent to user email.',
-      // Remove this in production:
-      tempPassword: tempPassword,
     });
   } catch (error) {
     console.error('[Admin] Reset password error:', error);
