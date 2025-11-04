@@ -219,3 +219,127 @@ router.delete('/account', requireAuth, async (req: any, res) => {
 
 export default router;
 
+
+// ==================== BRANDING ====================
+
+/**
+ * GET /api/settings/branding - Get tenant branding
+ */
+router.get('/branding', requireAuth, async (req: any, res) => {
+  try {
+    const db = await getDb();
+    const { tenants } = await import('../../../drizzle/schema');
+    const tenantId = req.user.tenantId;
+    
+    const tenant = await db
+      .select({
+        id: tenants.id,
+        name: tenants.name,
+        logoUrl: tenants.logoUrl,
+        primaryColor: tenants.primaryColor,
+        secondaryColor: tenants.secondaryColor,
+      })
+      .from(tenants)
+      .where(eq(tenants.id, tenantId))
+      .limit(1);
+
+    if (!tenant || tenant.length === 0) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    res.json({
+      branding: tenant[0],
+    });
+  } catch (error) {
+    console.error('[Settings] Get branding error:', error);
+    res.status(500).json({ error: 'Failed to fetch branding' });
+  }
+});
+
+/**
+ * PUT /api/settings/branding - Update tenant branding
+ */
+router.put('/branding', requireAuth, async (req: any, res) => {
+  try {
+    const db = await getDb();
+    const { tenants } = await import('../../../drizzle/schema');
+    const tenantId = req.user.tenantId;
+    const { name, logoUrl, primaryColor, secondaryColor } = req.body;
+
+    // Validate colors (hex format)
+    const hexColorRegex = /^#[0-9A-F]{6}$/i;
+    if (primaryColor && !hexColorRegex.test(primaryColor)) {
+      return res.status(400).json({ error: 'Invalid primary color format. Use hex format (e.g., #FF5733)' });
+    }
+    if (secondaryColor && !hexColorRegex.test(secondaryColor)) {
+      return res.status(400).json({ error: 'Invalid secondary color format. Use hex format (e.g., #FF5733)' });
+    }
+
+    const updated = await db
+      .update(tenants)
+      .set({
+        name: name || undefined,
+        logoUrl: logoUrl || undefined,
+        primaryColor: primaryColor || undefined,
+        secondaryColor: secondaryColor || undefined,
+      })
+      .where(eq(tenants.id, tenantId))
+      .returning({
+        id: tenants.id,
+        name: tenants.name,
+        logoUrl: tenants.logoUrl,
+        primaryColor: tenants.primaryColor,
+        secondaryColor: tenants.secondaryColor,
+      });
+
+    if (!updated || updated.length === 0) {
+      return res.status(404).json({ error: 'Tenant not found' });
+    }
+
+    console.log(`[Settings] Branding updated for tenant ${tenantId}`);
+
+    res.json({
+      success: true,
+      branding: updated[0],
+    });
+  } catch (error) {
+    console.error('[Settings] Update branding error:', error);
+    res.status(500).json({ error: 'Failed to update branding' });
+  }
+});
+
+/**
+ * POST /api/settings/branding/logo - Upload logo
+ * Returns pre-signed URL for direct S3 upload
+ */
+router.post('/branding/logo', requireAuth, async (req: any, res) => {
+  try {
+    const { generateUploadUrl } = await import('../technical-reports/services/upload');
+    const tenantId = req.user.tenantId;
+    const { fileName, fileType } = req.body;
+
+    if (!fileName || !fileType) {
+      return res.status(400).json({ error: 'fileName and fileType are required' });
+    }
+
+    // Validate file type (only images)
+    const allowedTypes = ['image/png', 'image/jpeg', 'image/jpg', 'image/svg+xml', 'image/webp'];
+    if (!allowedTypes.includes(fileType)) {
+      return res.status(400).json({ error: 'Invalid file type. Only images are allowed (PNG, JPEG, SVG, WebP)' });
+    }
+
+    // Generate upload URL
+    const key = `tenants/${tenantId}/logo/${Date.now()}_${fileName}`;
+    const result = await generateUploadUrl(key, fileType);
+
+    res.json({
+      uploadUrl: result.uploadUrl,
+      key: result.key,
+      logoUrl: `https://${process.env.S3_BUCKET_NAME}.s3.amazonaws.com/${result.key}`,
+    });
+  } catch (error: any) {
+    console.error('[Settings] Logo upload URL error:', error);
+    res.status(500).json({ error: 'Failed to generate upload URL' });
+  }
+});
+
