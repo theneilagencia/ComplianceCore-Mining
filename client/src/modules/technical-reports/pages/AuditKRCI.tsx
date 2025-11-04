@@ -18,7 +18,7 @@ import { CorrectionPlan } from "../components/CorrectionPlan";
 import { AuditTrendsDashboard } from "@/components/AuditTrendsDashboard";
 import { HistoricalComparison } from "@/components/HistoricalComparison";
 import { OfficialSourcesValidation } from "@/components/OfficialSourcesValidation";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { toast } from "sonner";
 import { useLocation } from "wouter";
 import UploadModalAtomic from '../components/UploadModalAtomic';
@@ -79,7 +79,7 @@ interface CorrectionPlanData {
 }
 
 export default function AuditKRCI() {
-  const [, navigate] = useLocation();
+  const [location, navigate] = useLocation();
   const [selectedReport, setSelectedReport] = useState<string>("");
   const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
   const [correctionPlan, setCorrectionPlan] = useState<CorrectionPlanData | null>(null);
@@ -87,6 +87,16 @@ export default function AuditKRCI() {
   const [activeTab, setActiveTab] = useState<'select' | 'upload'>('select');
   const [advancedTab, setAdvancedTab] = useState<'trends' | 'comparison' | 'official'>('trends');
   const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
+  const blockNavigationRef = useRef<boolean>(false);
+  
+  // GUARD: Bloquear redirecionamento para /review quando estamos processando upload
+  useEffect(() => {
+    if (location.includes('/review') && blockNavigationRef.current) {
+      console.log('[AuditKRCI] BLOCKED navigation to /review, staying in audit module');
+      navigate('/reports/audit', { replace: true });
+      blockNavigationRef.current = false;
+    }
+  }, [location, navigate]);
 
   // Query para listar relatórios (sem polling - atualiza apenas quando necessário)
   const { data: reports, refetch: refetchReports } = trpc.technicalReports.generate.list.useQuery(
@@ -643,6 +653,9 @@ export default function AuditKRCI() {
           onSuccess={(result) => {
             setShowUploadModal(false);
             
+            // ATIVAR bloqueio de navegação para /review
+            blockNavigationRef.current = true;
+            
             // Módulo de auditoria: executar auditoria diretamente após upload
             // (não redireciona para revisão humana)
             toast.info("Upload concluído! Iniciando auditoria...", {
@@ -656,6 +669,10 @@ export default function AuditKRCI() {
                 reportId: result.reportId,
                 auditType: "full",
               });
+              // Desativar bloqueio após 2 segundos
+              setTimeout(() => {
+                blockNavigationRef.current = false;
+              }, 2000);
             }, 500);
           }}
         />
