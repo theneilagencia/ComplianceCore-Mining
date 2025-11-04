@@ -126,28 +126,53 @@ async function startServer() {
   // Rate limiting - General API protection
   const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 100, // Máximo 100 requisições por IP por janela
-    message: 'Muitas requisições deste IP, tente novamente em 15 minutos',
+    max: 300, // Máximo 300 requisições por IP por janela (20 req/min)
     standardHeaders: true,
     legacyHeaders: false,
+    // Handler customizado que retorna JSON em vez de texto
+    handler: (req, res) => {
+      res.status(429).json({
+        error: {
+          message: 'Muitas requisições. Aguarde 15 minutos.',
+          code: 'TOO_MANY_REQUESTS',
+          retryAfter: 15 * 60, // segundos
+        }
+      });
+    },
   });
   
   // Rate limiting - Strict para uploads
   const uploadLimiter = rateLimit({
     windowMs: 60 * 60 * 1000, // 1 hora
-    max: 20, // Máximo 20 uploads por IP por hora
-    message: 'Limite de uploads excedido, tente novamente em 1 hora',
+    max: 50, // Máximo 50 uploads por IP por hora
     standardHeaders: true,
     legacyHeaders: false,
+    handler: (req, res) => {
+      res.status(429).json({
+        error: {
+          message: 'Limite de uploads excedido. Aguarde 1 hora.',
+          code: 'TOO_MANY_UPLOADS',
+          retryAfter: 60 * 60,
+        }
+      });
+    },
   });
   
   // Rate limiting - Muito strict para autenticação
   const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
-    max: 100, // Máximo 100 tentativas de login por IP (aumentado temporariamente)
-    message: 'Muitas tentativas de login, tente novamente em 15 minutos',
+    max: 100, // Máximo 100 tentativas de login por IP
     standardHeaders: true,
     legacyHeaders: false,
+    handler: (req, res) => {
+      res.status(429).json({
+        error: {
+          message: 'Muitas tentativas de login. Aguarde 15 minutos.',
+          code: 'TOO_MANY_AUTH_ATTEMPTS',
+          retryAfter: 15 * 60,
+        }
+      });
+    },
   });
   
   // Aplicar rate limiting geral a todas as rotas /api
