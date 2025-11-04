@@ -23,12 +23,20 @@ export default function ReviewReport() {
 
  const utils = trpc.useUtils();
 
- // Query para buscar o report e fazer polling se estiver em parsing
+ // Query para buscar o report e fazer polling APENAS se estiver em parsing
  const { data: reportStatus } = trpc.technicalReports.generate.get.useQuery(
  { reportId },
  {
  enabled: !!reportId,
- refetchInterval: 3000, // Sempre faz polling a cada 3s enquanto a página está aberta
+ // Polling condicional: apenas quando status === 'parsing'
+ refetchInterval: (data) => {
+ if (data?.status === 'parsing') {
+ return 5000; // Polling a cada 5s durante parsing
+ }
+ return false; // Para polling após parsing completar
+ },
+ refetchOnWindowFocus: false,
+ staleTime: 30000, // Cache de 30s
  }
  );
 
