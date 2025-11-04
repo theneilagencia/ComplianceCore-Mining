@@ -60,6 +60,17 @@ jobs:
       - name: Install Dependencies
         run: pnpm install --frozen-lockfile
       
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      
+      - name: 🎨 Design System Validation
+        run: |
+          echo "🎨 Validando Design System antes do deploy..."
+          python3 scripts/manus_design_system.py
+        continue-on-error: false
+      
       - name: Run Type Check
         run: pnpm run check
         continue-on-error: true
