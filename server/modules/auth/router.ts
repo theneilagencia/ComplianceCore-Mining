@@ -36,10 +36,42 @@ router.post('/register', async (req: Request, res: Response) => {
       return;
     }
 
-    // Validate password strength (min 8 chars)
+    // Validate password strength (robust validation)
     if (password.length < 8) {
       res.status(400).json({
-        error: 'Password must be at least 8 characters long',
+        error: 'Senha deve ter no mínimo 8 caracteres',
+      });
+      return;
+    }
+
+    // Check for uppercase letter
+    if (!/[A-Z]/.test(password)) {
+      res.status(400).json({
+        error: 'Senha deve conter pelo menos uma letra maiúscula',
+      });
+      return;
+    }
+
+    // Check for lowercase letter
+    if (!/[a-z]/.test(password)) {
+      res.status(400).json({
+        error: 'Senha deve conter pelo menos uma letra minúscula',
+      });
+      return;
+    }
+
+    // Check for number
+    if (!/[0-9]/.test(password)) {
+      res.status(400).json({
+        error: 'Senha deve conter pelo menos um número',
+      });
+      return;
+    }
+
+    // Check for special character
+    if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)) {
+      res.status(400).json({
+        error: 'Senha deve conter pelo menos um caractere especial (!@#$%^&*)',
       });
       return;
     }
