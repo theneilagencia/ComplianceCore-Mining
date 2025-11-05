@@ -143,6 +143,7 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.0",
     "@builder.io/vite-plugin-jsx-loc": "^0.1.1",
     "@playwright/test": "^1.56.1",
     "@tailwindcss/typography": "^0.5.15",
@@ -170,6 +171,7 @@
     "@vitest/ui": "^4.0.6",
     "add": "^2.0.6",
     "autoprefixer": "^10.4.20",
+    "axe-core": "^4.11.0",
     "drizzle-kit": "^0.31.6",
     "esbuild": "^0.25.0",
     "jsdom": "^27.1.0",
