@@ -3,8 +3,7 @@
  * APENAS PARA DESENVOLVIMENTO/DEPLOY
  */
 import { Router } from 'express';
-import { getDb } from '../../db.js';
-import { sql } from 'drizzle-orm';
+import postgres from 'postgres';
 
 const router = Router();
 
@@ -13,18 +12,25 @@ const router = Router();
  * Executa todas as migrações pendentes
  */
 router.post('/run-migrations', async (req, res) => {
+  let client: ReturnType<typeof postgres> | null = null;
+  
   try {
-    const db = getDb();
+    const dbUrl = process.env.DATABASE_URL || process.env.DB_URL;
     
-    if (!db) {
-      return res.status(503).json({ error: 'Database not available' });
+    if (!dbUrl) {
+      return res.status(503).json({ error: 'DATABASE_URL not configured' });
     }
+
+    client = postgres(dbUrl, {
+      ssl: 'require',
+      max: 1,
+    });
 
     const results = [];
 
     // Migração 0004: regulatoryChanges
     try {
-      await db.execute(sql`
+      await client.unsafe(`
         CREATE TABLE IF NOT EXISTS "regulatoryChanges" (
           "id" SERIAL PRIMARY KEY,
           "title" VARCHAR(500) NOT NULL,
@@ -40,9 +46,9 @@ router.post('/run-migrations', async (req, res) => {
         )
       `);
       
-      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_published" ON "regulatoryChanges" ("publishedAt" DESC)`);
-      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_country" ON "regulatoryChanges" ("country")`);
-      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_severity" ON "regulatoryChanges" ("severity")`);
+      await client.unsafe(`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_published" ON "regulatoryChanges" ("publishedAt" DESC)`);
+      await client.unsafe(`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_country" ON "regulatoryChanges" ("country")`);
+      await client.unsafe(`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_severity" ON "regulatoryChanges" ("severity")`);
       
       results.push({ migration: '0004_add_regulatory_changes', status: 'success' });
     } catch (error: any) {
@@ -51,8 +57,8 @@ router.post('/run-migrations', async (req, res) => {
 
     // Migração 0005: stripeCustomerId
     try {
-      await db.execute(sql`ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "stripeCustomerId" VARCHAR(255)`);
-      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_users_stripe_customer" ON "users" ("stripeCustomerId")`);
+      await client.unsafe(`ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "stripeCustomerId" VARCHAR(255)`);
+      await client.unsafe(`CREATE INDEX IF NOT EXISTS "idx_users_stripe_customer" ON "users" ("stripeCustomerId")`);
       
       results.push({ migration: '0005_add_stripe_customer_id', status: 'success' });
     } catch (error: any) {
@@ -61,7 +67,7 @@ router.post('/run-migrations', async (req, res) => {
 
     // Migração 0006: onDemandReports
     try {
-      await db.execute(sql`
+      await client.unsafe(`
         CREATE TABLE IF NOT EXISTS "onDemandReports" (
           "id" SERIAL PRIMARY KEY,
           "userId" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
@@ -79,14 +85,16 @@ router.post('/run-migrations', async (req, res) => {
         )
       `);
       
-      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_user" ON "onDemandReports" ("userId")`);
-      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_status" ON "onDemandReports" ("status")`);
-      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_stripe_session" ON "onDemandReports" ("stripeSessionId")`);
+      await client.unsafe(`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_user" ON "onDemandReports" ("userId")`);
+      await client.unsafe(`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_status" ON "onDemandReports" ("status")`);
+      await client.unsafe(`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_stripe_session" ON "onDemandReports" ("stripeSessionId")`);
       
       results.push({ migration: '0006_add_on_demand_reports', status: 'success' });
     } catch (error: any) {
       results.push({ migration: '0006_add_on_demand_reports', status: 'error', message: error.message });
     }
+
+    await client.end();
 
     res.json({
       success: true,
@@ -96,6 +104,9 @@ router.post('/run-migrations', async (req, res) => {
 
   } catch (error: any) {
     console.error('Migration error:', error);
+    if (client) {
+      await client.end();
+    }
     res.status(500).json({ error: error.message });
   }
 });
