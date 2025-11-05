@@ -235,6 +235,12 @@ router.post('/setup-database', async (req: Request, res: Response) => {
         )
       `;
       
+      // Add stripeCustomerId column if it doesn't exist (for existing tables)
+      await sqlClient`
+        ALTER TABLE users 
+        ADD COLUMN IF NOT EXISTS "stripeCustomerId" VARCHAR(128)
+      `;
+      
       // Create licenses table
       await sqlClient`
         CREATE TABLE IF NOT EXISTS licenses (
