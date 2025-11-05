@@ -408,6 +408,27 @@ router.post('/setup-database', async (req: Request, res: Response) => {
         )
       `;
       
+      // Add missing columns if they don't exist (for existing tables)
+      await sqlClient`
+        ALTER TABLE reports 
+        ADD COLUMN IF NOT EXISTS "sourceType" source_type DEFAULT 'internal'
+      `;
+      
+      await sqlClient`
+        ALTER TABLE reports 
+        ADD COLUMN IF NOT EXISTS "detectedStandard" standard
+      `;
+      
+      await sqlClient`
+        ALTER TABLE reports 
+        ADD COLUMN IF NOT EXISTS "s3NormalizedUrl" TEXT
+      `;
+      
+      await sqlClient`
+        ALTER TABLE reports 
+        ADD COLUMN IF NOT EXISTS "s3OriginalUrl" TEXT
+      `;
+      
       // Get admin user ID
       const adminUsers = await sqlClient`
         SELECT id FROM users WHERE email = 'admin@qivo-mining.com' LIMIT 1
