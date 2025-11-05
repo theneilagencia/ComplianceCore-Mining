@@ -1,0 +1,1652 @@
+{
+  "entries": [
+    {
+      "textPayload": "Error: Not allowed by CORS\n    at origin (file:///app/dist/index.js:1273:32632)\n    at /app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:204:7)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at expressInit (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/init.js:40:5)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at query (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/query.js:45:5)",
+      "insertId": "690b49f20008c467307b589e",
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00029-l92",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:26.574567Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Fstderr",
+      "receiveTimestamp": "2025-11-05T12:58:26.807076327Z",
+      "errorGroups": [
+        {
+          "id": "CLzo3Mb-ub3z2QE"
+        }
+      ]
+    },
+    {
+      "textPayload": "Error: Not allowed by CORS\n    at origin (file:///app/dist/index.js:1273:32632)\n    at /app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:204:7)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at expressInit (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/init.js:40:5)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at query (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/query.js:45:5)",
+      "insertId": "690b49f10007cb8c82ceff35",
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00029-l92",
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.510860Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Fstderr",
+      "receiveTimestamp": "2025-11-05T12:58:25.808534141Z",
+      "errorGroups": [
+        {
+          "id": "CLzo3Mb-ub3z2QE"
+        }
+      ]
+    },
+    {
+      "insertId": "690b49f10007cc2a00695ac3",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/assets/index.PUDi2b2K.css",
+        "requestSize": "728",
+        "status": 500,
+        "responseSize": "373",
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "remoteIp": "98.91.185.154",
+        "referer": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/",
+        "serverIp": "34.143.76.2",
+        "latency": "0.002543020s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "location": "southamerica-east1",
+          "configuration_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00029-l92",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.506660Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/009f4fc293a9f5a7cfe6ff406919fe16",
+      "receiveTimestamp": "2025-11-05T12:58:25.650415585Z",
+      "spanId": "04a7e72f30ac2d35"
+    },
+    {
+      "textPayload": "Error: Not allowed by CORS\n    at origin (file:///app/dist/index.js:1273:32632)\n    at /app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:204:7)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at expressInit (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/init.js:40:5)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at query (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/query.js:45:5)",
+      "insertId": "690b49f100076ca312ade792",
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "service_name": "qivo-mining",
+          "revision_name": "qivo-mining-00029-l92",
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.486563Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Fstderr",
+      "receiveTimestamp": "2025-11-05T12:58:25.808534141Z",
+      "errorGroups": [
+        {
+          "id": "CLzo3Mb-ub3z2QE"
+        }
+      ]
+    },
+    {
+      "insertId": "690b49f100076d88222180ec",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/assets/icons.BMrMdK0R.js",
+        "requestSize": "712",
+        "status": 500,
+        "responseSize": "373",
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "remoteIp": "98.91.185.154",
+        "referer": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/",
+        "serverIp": "34.143.76.2",
+        "latency": "0.002393682s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining",
+          "revision_name": "qivo-mining-00029-l92",
+          "project_id": "qivo-mining-prod"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.483147Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/2c3745eb7dc6559bcfe6ff406919ff80",
+      "receiveTimestamp": "2025-11-05T12:58:25.650415585Z",
+      "spanId": "fd2d04a984e70e52"
+    },
+    {
+      "textPayload": "Error: Not allowed by CORS\n    at origin (file:///app/dist/index.js:1273:32632)\n    at /app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:204:7)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at expressInit (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/init.js:40:5)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at query (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/query.js:45:5)",
+      "insertId": "690b49f1000745affc76b113",
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00029-l92",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.476591Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Fstderr",
+      "receiveTimestamp": "2025-11-05T12:58:25.808534141Z",
+      "errorGroups": [
+        {
+          "id": "CLzo3Mb-ub3z2QE"
+        }
+      ]
+    },
+    {
+      "textPayload": "Error: Not allowed by CORS\n    at origin (file:///app/dist/index.js:1273:32632)\n    at /app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:204:7)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at expressInit (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/init.js:40:5)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at query (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/query.js:45:5)",
+      "insertId": "690b49f1000740de868d34f1",
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining",
+          "revision_name": "qivo-mining-00029-l92"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.475358Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Fstderr",
+      "receiveTimestamp": "2025-11-05T12:58:25.808534141Z",
+      "errorGroups": [
+        {
+          "id": "CLzo3Mb-ub3z2QE"
+        }
+      ]
+    },
+    {
+      "insertId": "690b49f1000746a9d9d8cf8f",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/assets/vendor.DqptLLSw.js",
+        "requestSize": "713",
+        "status": 500,
+        "responseSize": "373",
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "remoteIp": "98.91.185.154",
+        "referer": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/",
+        "serverIp": "34.143.76.2",
+        "latency": "0.002069691s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "configuration_name": "qivo-mining",
+          "revision_name": "qivo-mining-00029-l92",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.473173Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/4d7dcf96ba327ecdcfe6ff406919f7b9",
+      "receiveTimestamp": "2025-11-05T12:58:25.650415585Z",
+      "spanId": "9b019c72df2b8d8d"
+    },
+    {
+      "textPayload": "Error: Not allowed by CORS\n    at origin (file:///app/dist/index.js:1273:32632)\n    at /app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:219:13\n    at optionsCallback (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:199:9)\n    at corsMiddleware (/app/node_modules/.pnpm/cors@2.8.5/node_modules/cors/lib/index.js:204:7)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at expressInit (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/init.js:40:5)\n    at Layer.handle [as handle_request] (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/layer.js:95:5)\n    at trim_prefix (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:328:13)\n    at /app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:286:9\n    at Function.process_params (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:346:12)\n    at next (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/router/index.js:280:10)\n    at query (/app/node_modules/.pnpm/express@4.21.2/node_modules/express/lib/middleware/query.js:45:5)",
+      "insertId": "690b49f1000738135b95317e",
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00029-l92",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.473107Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Fstderr",
+      "receiveTimestamp": "2025-11-05T12:58:25.478836963Z",
+      "errorGroups": [
+        {
+          "id": "CLzo3Mb-ub3z2QE"
+        }
+      ]
+    },
+    {
+      "insertId": "690b49f10007417cdb833bfc",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/assets/trpc.CYyD9Hxy.js",
+        "requestSize": "712",
+        "status": 500,
+        "responseSize": "373",
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "remoteIp": "98.91.185.154",
+        "referer": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/",
+        "serverIp": "34.143.76.2",
+        "latency": "0.001899808s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "service_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "configuration_name": "qivo-mining",
+          "revision_name": "qivo-mining-00029-l92",
+          "project_id": "qivo-mining-prod"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.472381Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/b7ca7ade150124eecfe6ff406919fa8d",
+      "receiveTimestamp": "2025-11-05T12:58:25.650415585Z",
+      "spanId": "11282cc2f09268fe"
+    },
+    {
+      "insertId": "690b49f1000738e7965d4f64",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/assets/ui.Cbxy6WE7.js",
+        "requestSize": "710",
+        "status": 500,
+        "responseSize": "373",
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "remoteIp": "98.91.185.154",
+        "referer": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/",
+        "serverIp": "34.143.76.2",
+        "latency": "0.006218322s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00029-l92",
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining",
+          "project_id": "qivo-mining-prod"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.465285Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/3d89d7bb0a86b53ecfe6ff406919f923",
+      "receiveTimestamp": "2025-11-05T12:58:25.650415585Z",
+      "spanId": "79738dbe122676ac"
+    },
+    {
+      "insertId": "690b49f100073227dcc2f29b",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/assets/index.BGshUrTX.js",
+        "requestSize": "712",
+        "status": 500,
+        "responseSize": "373",
+        "userAgent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+        "remoteIp": "98.91.185.154",
+        "referer": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/",
+        "serverIp": "34.143.76.2",
+        "latency": "0.006492143s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining",
+          "revision_name": "qivo-mining-00029-l92",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1"
+        }
+      },
+      "timestamp": "2025-11-05T12:58:25.463817Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/44af152208d61ae2cfe6ff406919f64f",
+      "receiveTimestamp": "2025-11-05T12:58:25.650415585Z",
+      "spanId": "22a9b63d3eecb63c"
+    },
+    {
+      "textPayload": "ValidationError: The 'Forwarded' header (standardized X-Forwarded-For) is set but currently being ignored. Add a custom keyGenerator to use a value from this header. See https://express-rate-limit.github.io/ERR_ERL_FORWARDED_HEADER/ for more information.\n    at Object.forwardedHeader (file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:352:13)\n    at wrappedValidations.<computed> [as forwardedHeader] (file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:651:22)\n    at Object.keyGenerator (file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:755:20)\n    at file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:815:32\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:796:5 {",
+      "insertId": "690b42190009711d1dc00670",
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00029-l92",
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod"
+        }
+      },
+      "timestamp": "2025-11-05T12:24:57.618781Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Fstderr",
+      "receiveTimestamp": "2025-11-05T12:24:57.954977743Z",
+      "errorGroups": [
+        {
+          "id": "CIL3xuOZvJvk6wE"
+        }
+      ]
+    },
+    {
+      "textPayload": "ValidationError: The 'X-Forwarded-For' header is set but the Express 'trust proxy' setting is false (default). This could indicate a misconfiguration which would prevent express-rate-limit from accurately identifying users. See https://express-rate-limit.github.io/ERR_ERL_UNEXPECTED_X_FORWARDED_FOR/ for more information.\n    at Object.xForwardedForHeader (file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:337:13)\n    at wrappedValidations.<computed> [as xForwardedForHeader] (file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:651:22)\n    at Object.keyGenerator (file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:754:20)\n    at file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:815:32\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async file:///app/node_modules/.pnpm/express-rate-limit@8.2.1_express@4.21.2/node_modules/express-rate-limit/dist/index.mjs:796:5 {",
+      "insertId": "690b421900096fb168ddee23",
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "service_name": "qivo-mining",
+          "revision_name": "qivo-mining-00029-l92",
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod"
+        }
+      },
+      "timestamp": "2025-11-05T12:24:57.618417Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Fstderr",
+      "receiveTimestamp": "2025-11-05T12:24:57.625851662Z",
+      "errorGroups": [
+        {
+          "id": "CIL3xuOZvJvk6wE"
+        }
+      ]
+    },
+    {
+      "insertId": "690b421900098ddc3386c068",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://34.36.234.214/api/v2/.env",
+        "requestSize": "409",
+        "status": 404,
+        "responseSize": "545",
+        "userAgent": "Mozilla/5.0 (Macintosh; U; PPC Mac OS X 10_5_4; en-us) AppleWebKit/525.18 (KHTML, like Gecko) Version/3.1.2 Safari/525.20.1",
+        "remoteIp": "78.153.140.224",
+        "serverIp": "34.36.234.214",
+        "latency": "0.011191708s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00029-l92",
+          "service_name": "qivo-mining",
+          "location": "southamerica-east1"
+        }
+      },
+      "timestamp": "2025-11-05T12:24:57.613184Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "00147782969f3db564b3f30fb054bc9fd18a6c02ac825ee033a6657d73d20a94730a488031467c85643f2782c2d0d2dccac5d37538489e53b9da78a39bf11634303c39e2ea211bd727d7b12737"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/3d787ea44d8e44c5886cb9fb03a54bc6",
+      "receiveTimestamp": "2025-11-05T12:24:57.943847771Z",
+      "spanId": "5dddb38f86b36c8d",
+      "traceSampled": true
+    },
+    {
+      "insertId": "690b26bb000f1088a2371cc2",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://34.36.234.214/api/.env",
+        "requestSize": "416",
+        "status": 404,
+        "responseSize": "542",
+        "userAgent": "Mozilla/5.0 (iPhone; CPU iPhone OS 9_3_2 like Mac OS X) AppleWebKit/601.1.46 (KHTML, like Gecko) Version/9.0 Mobile/13F61 Safari/601.1",
+        "remoteIp": "78.153.140.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.002843191s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining",
+          "revision_name": "qivo-mining-00027-wv8"
+        }
+      },
+      "timestamp": "2025-11-05T10:28:11.982819Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/d5a00655574ea770d110a9b83e2eac0f",
+      "receiveTimestamp": "2025-11-05T10:28:12.271964881Z",
+      "spanId": "38ebdb6a7a36df90"
+    },
+    {
+      "insertId": "690ab9a50000ddbdd7bf7d7f",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/payment/checkout",
+        "requestSize": "369",
+        "status": 500,
+        "responseSize": "436",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.004197528s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:42:45.051283Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/2d092da0ba256bbaa0ce2ce700fafa8c",
+      "receiveTimestamp": "2025-11-05T02:42:45.058574219Z",
+      "spanId": "9dbd8871715b3272",
+      "traceSampled": true
+    },
+    {
+      "insertId": "690ab98b0005f32269b195ec",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/radar/operations",
+        "requestSize": "831",
+        "status": 503,
+        "responseSize": "1185",
+        "userAgent": "python-requests/2.32.5",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "2.709805340s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "location": "southamerica-east1",
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00027-wv8"
+        }
+      },
+      "timestamp": "2025-11-05T02:42:16.678942Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/73e4bfe010dfdc595ecbaab5bc44afd0",
+      "receiveTimestamp": "2025-11-05T02:42:19.668274401Z",
+      "spanId": "138e8c0b9ce034ff"
+    },
+    {
+      "insertId": "690ab98800063b077e119f36",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/storage/download",
+        "requestSize": "1122",
+        "status": 404,
+        "responseSize": "554",
+        "userAgent": "python-requests/2.32.5",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003856564s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:42:16.402943Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/18a85f1d086385915ecbaab5bc44a367",
+      "receiveTimestamp": "2025-11-05T02:42:16.672310697Z",
+      "spanId": "3d397768990a5ae9"
+    },
+    {
+      "insertId": "690ab9880004414738b2bd91",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/license/validate",
+        "requestSize": "1176",
+        "status": 404,
+        "responseSize": "555",
+        "userAgent": "python-requests/2.32.5",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.007458331s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "service_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8"
+        }
+      },
+      "timestamp": "2025-11-05T02:42:16.270182Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/ade0d4e7f6599d1c5ecbaab5bc44a72d",
+      "receiveTimestamp": "2025-11-05T02:42:16.336851991Z",
+      "spanId": "927abecfe8e6efc2"
+    },
+    {
+      "insertId": "690ab98800024209c3f62345",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/payment/create-checkout",
+        "requestSize": "1183",
+        "status": 404,
+        "responseSize": "562",
+        "userAgent": "python-requests/2.32.5",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003691169s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "service_name": "qivo-mining",
+          "revision_name": "qivo-mining-00027-wv8",
+          "configuration_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1"
+        }
+      },
+      "timestamp": "2025-11-05T02:42:16.143019Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/d6ffc326de42fa6a5ecbaab5bc44a85b",
+      "receiveTimestamp": "2025-11-05T02:42:16.336851991Z",
+      "spanId": "be154583912034b1"
+    },
+    {
+      "insertId": "690ab93500047baa644a8cd1",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/contact",
+        "requestSize": "858",
+        "status": 400,
+        "responseSize": "458",
+        "userAgent": "python-requests/2.32.5",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003564596s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:40:53.289084Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/7277e9867f3bebcfc7254d16f39fe9e2",
+      "receiveTimestamp": "2025-11-05T02:40:53.432485311Z",
+      "spanId": "c41d5b2f1a8bc6f5"
+    },
+    {
+      "insertId": "690ab931000ba768baa1739b",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/radar/operations",
+        "requestSize": "846",
+        "status": 503,
+        "responseSize": "1185",
+        "userAgent": "python-requests/2.32.5",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "1.703192548s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00027-wv8",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:40:48.059214Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/fdc134d8fedbbce6a68aedde5a135dcf",
+      "receiveTimestamp": "2025-11-05T02:40:49.768968828Z",
+      "spanId": "7c18d818b541266a"
+    },
+    {
+      "insertId": "690ab8ca0007f299f2c3fa0d",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/audits",
+        "requestSize": "306",
+        "status": 401,
+        "responseSize": "393",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003145046s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:39:06.516494Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/22b842ea8a4af8764816566d2c125c28",
+      "receiveTimestamp": "2025-11-05T02:39:06.526888691Z",
+      "spanId": "e49a3110a8a24e81"
+    },
+    {
+      "insertId": "690ab8c50002f5a7a5b2952a",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/reports",
+        "requestSize": "307",
+        "status": 401,
+        "responseSize": "393",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003965556s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00027-wv8"
+        }
+      },
+      "timestamp": "2025-11-05T02:39:01.182780Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/7e1f842c55c5428ed673133d131d473e",
+      "receiveTimestamp": "2025-11-05T02:39:01.196512473Z",
+      "spanId": "e2fbc87f69258f71",
+      "traceSampled": true
+    },
+    {
+      "insertId": "690ab889000ca6997972183d",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/storage/download",
+        "requestSize": "316",
+        "status": 404,
+        "responseSize": "554",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.004042582s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00027-wv8"
+        }
+      },
+      "timestamp": "2025-11-05T02:38:01.823534Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/d799bb96789d681e99eaf1483a90d71d",
+      "receiveTimestamp": "2025-11-05T02:38:02.078832898Z",
+      "spanId": "e078076426e8bb90"
+    },
+    {
+      "insertId": "690ab88900096997a30f97ca",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/trpc/storage.upload",
+        "requestSize": "338",
+        "status": 415,
+        "responseSize": "493",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.005228894s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00027-wv8",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:38:01.610422Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/58b67266f72d267391e913b1960359bd",
+      "receiveTimestamp": "2025-11-05T02:38:01.745372085Z",
+      "spanId": "09c67dd63e490a1b"
+    },
+    {
+      "insertId": "690ab88900065aabad41a854",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/dev/init",
+        "requestSize": "328",
+        "status": 403,
+        "responseSize": "422",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.002832293s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00027-wv8",
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod"
+        }
+      },
+      "timestamp": "2025-11-05T02:38:01.412218Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/48eb754b658a762db7cb02e73e20e93b",
+      "receiveTimestamp": "2025-11-05T02:38:01.745372085Z",
+      "spanId": "8c970f48155c1e20"
+    },
+    {
+      "insertId": "690ab88900035d0b03c8db6b",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/admin/dashboard",
+        "requestSize": "315",
+        "status": 404,
+        "responseSize": "553",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.004157096s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00027-wv8",
+          "location": "southamerica-east1"
+        }
+      },
+      "timestamp": "2025-11-05T02:38:01.215146Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/70c3aa9548ff6314384bff74960907f2",
+      "receiveTimestamp": "2025-11-05T02:38:01.411263664Z",
+      "spanId": "65e00dd671f305bc"
+    },
+    {
+      "insertId": "690ab88900005a126ffd7f9d",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/contact",
+        "requestSize": "327",
+        "status": 400,
+        "responseSize": "458",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.002956216s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00027-wv8",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:38:01.018500Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/bd3e8f737caaa36703d92de736a7b1e6",
+      "receiveTimestamp": "2025-11-05T02:38:01.079681571Z",
+      "spanId": "3bda18f9cb2d9605"
+    },
+    {
+      "insertId": "690ab888000c99a89a15f0f6",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/support/ticket",
+        "requestSize": "334",
+        "status": 404,
+        "responseSize": "553",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003200924s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "service_name": "qivo-mining",
+          "revision_name": "qivo-mining-00027-wv8",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:38:00.821135Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/e7da66e047d0b8eeb610a8d80e7d87a1",
+      "receiveTimestamp": "2025-11-05T02:38:01.079681571Z",
+      "spanId": "92292c7ec450964e"
+    },
+    {
+      "insertId": "690ab8880009a30c9b588cb9",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/trpc/integrations.status",
+        "requestSize": "324",
+        "status": 404,
+        "responseSize": "500",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003901766s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:38:00.626486Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/509c9423560cf9c495d23bfa822d31d2",
+      "receiveTimestamp": "2025-11-05T02:38:00.745452337Z",
+      "spanId": "7b1d908e7ea9d05e"
+    },
+    {
+      "insertId": "690ab888000379190745c91e",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/settings",
+        "requestSize": "308",
+        "status": 401,
+        "responseSize": "393",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003694734s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00027-wv8"
+        }
+      },
+      "timestamp": "2025-11-05T02:38:00.222324Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/32744dda074b10da2c5bd1cb88c88e1e",
+      "receiveTimestamp": "2025-11-05T02:38:00.412646593Z",
+      "spanId": "0f2f8547fb8c0203"
+    },
+    {
+      "insertId": "690ab888000068a481913cb4",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/trpc/technicalReports.upload",
+        "requestSize": "348",
+        "status": 415,
+        "responseSize": "493",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.004268691s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod"
+        }
+      },
+      "timestamp": "2025-11-05T02:38:00.020973Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/60c5662ff743fbf847cce51b1a5e5058",
+      "receiveTimestamp": "2025-11-05T02:38:00.080551658Z",
+      "spanId": "92411e09579edbbf"
+    },
+    {
+      "insertId": "690ab887000ca301bf67aa20",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/trpc/technicalReports.list",
+        "requestSize": "325",
+        "status": 404,
+        "responseSize": "504",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.004217446s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:59.822707Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/7b69fbfc4732bace073b5d1637101398",
+      "receiveTimestamp": "2025-11-05T02:38:00.080551658Z",
+      "spanId": "aa3a02b135e47550"
+    },
+    {
+      "insertId": "690ab88700099b8ba103520d",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/license/validate",
+        "requestSize": "335",
+        "status": 404,
+        "responseSize": "555",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.005941902s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:59.622402Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/ffce045b850167a19d54756196db5ded",
+      "receiveTimestamp": "2025-11-05T02:37:59.745700226Z",
+      "spanId": "50191b6b27317e63"
+    },
+    {
+      "insertId": "690ab8870006930713ae7333",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/payment/create-checkout",
+        "requestSize": "342",
+        "status": 404,
+        "responseSize": "562",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.002821785s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:59.426460Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/f84e350578ce48df186c073eeb831f20",
+      "receiveTimestamp": "2025-11-05T02:37:59.745700226Z",
+      "spanId": "30024bfeb636d2ab"
+    },
+    {
+      "insertId": "690ab887000398d50f706dbe",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/trpc/billing.getPlans",
+        "requestSize": "320",
+        "status": 404,
+        "responseSize": "494",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.006091903s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining",
+          "revision_name": "qivo-mining-00027-wv8"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:59.228538Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/143849c0bf36ba2820e321fcd8805414",
+      "receiveTimestamp": "2025-11-05T02:37:59.413408822Z",
+      "spanId": "4873669604eda8b2"
+    },
+    {
+      "insertId": "690ab88700008f0181b858fc",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/trpc/reports.generate",
+        "requestSize": "341",
+        "status": 415,
+        "responseSize": "493",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.004590021s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining",
+          "revision_name": "qivo-mining-00027-wv8",
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:59.030826Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/28e4d78fae00aa99e345bb714cf5db45",
+      "receiveTimestamp": "2025-11-05T02:37:59.079880331Z",
+      "spanId": "7e09a92d329a4d60"
+    },
+    {
+      "insertId": "690ab886000cc888a32ff8a0",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/trpc/reports.list",
+        "requestSize": "317",
+        "status": 404,
+        "responseSize": "486",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.005672169s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00027-wv8",
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining",
+          "location": "southamerica-east1"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:58.830873Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/5f6333ef3517102e6a544ec947f6ea29",
+      "receiveTimestamp": "2025-11-05T02:37:59.079880331Z",
+      "spanId": "1c58a69f2ee04697"
+    },
+    {
+      "insertId": "690ab8860009c0ebc9e95595",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/trpc/audits.create",
+        "requestSize": "337",
+        "status": 415,
+        "responseSize": "493",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.010091766s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "configuration_name": "qivo-mining",
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:58.627836Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/864a7d5df2a45470d395564ef8ae2491",
+      "receiveTimestamp": "2025-11-05T02:37:58.748655399Z",
+      "spanId": "fb4d32a5bbbc0eb7"
+    },
+    {
+      "insertId": "690ab8860006ada4af354108",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/trpc/audits.list",
+        "requestSize": "315",
+        "status": 404,
+        "responseSize": "484",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.007761691s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:58.428524Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/e0065bc067789031bfca99e9629c4fde",
+      "receiveTimestamp": "2025-11-05T02:37:58.748655399Z",
+      "spanId": "e0a5dfbf73d39631"
+    },
+    {
+      "insertId": "690ab886000399b04eeac863",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/trpc/projects.create",
+        "requestSize": "340",
+        "status": 415,
+        "responseSize": "493",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.006564165s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "location": "southamerica-east1",
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "revision_name": "qivo-mining-00027-wv8"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:58.228170Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/b5aedb49e78c864bc680776fcc0d95b3",
+      "receiveTimestamp": "2025-11-05T02:37:58.414150924Z",
+      "spanId": "5865fc659d86d467"
+    },
+    {
+      "insertId": "690ab886000084dd8c756872",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/trpc/projects.list",
+        "requestSize": "316",
+        "status": 404,
+        "responseSize": "488",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.009688141s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00027-wv8",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:58.023043Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/da0bcd1ad3f6568cb07bf9d148426b62",
+      "receiveTimestamp": "2025-11-05T02:37:58.081474036Z",
+      "spanId": "38ec63ae1c1091e0"
+    },
+    {
+      "insertId": "690ab8840006d89d51ffed56",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/radar/operations",
+        "requestSize": "316",
+        "status": 503,
+        "responseSize": "1185",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "1.717945874s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:54.729375Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/a07dab08ec1502e8df4226f61ec0e345",
+      "receiveTimestamp": "2025-11-05T02:37:56.749040256Z",
+      "spanId": "1c550eb160f9c99b"
+    },
+    {
+      "insertId": "690ab882000534d03f0f7f80",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/auth/register",
+        "requestSize": "332",
+        "status": 400,
+        "responseSize": "411",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003124051s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "service_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:54.336777Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/4ea5e7476660b99d2e4b80c742f0e1c5",
+      "receiveTimestamp": "2025-11-05T02:37:54.419275889Z",
+      "spanId": "bca66eab0ec093d6"
+    },
+    {
+      "insertId": "690ab88200023da877cea5c9",
+      "httpRequest": {
+        "requestMethod": "POST",
+        "requestUrl": "https://www.qivomining.com/api/auth/login",
+        "requestSize": "330",
+        "status": 400,
+        "responseSize": "411",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003634961s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining",
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining",
+          "location": "southamerica-east1"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:54.141864Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/a4dbbabf9a6a0ba83f432e5a460e1989",
+      "receiveTimestamp": "2025-11-05T02:37:54.419275889Z",
+      "spanId": "2389c07f1a2af158"
+    },
+    {
+      "insertId": "690ab8550003023eb8fb81d9",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/radar/operations",
+        "requestSize": "316",
+        "status": 503,
+        "responseSize": "1185",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "1.674732818s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "location": "southamerica-east1",
+          "revision_name": "qivo-mining-00027-wv8",
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining",
+          "service_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:07.520821Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/0b9324a30cf497948ca987f2e1212c39",
+      "receiveTimestamp": "2025-11-05T02:37:09.351788508Z",
+      "spanId": "0d9b1fdb5210f954"
+    },
+    {
+      "insertId": "690ab84e00004ee9f23a04e1",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/radar/operations",
+        "requestSize": "316",
+        "status": 503,
+        "responseSize": "1185",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "1.886232812s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00027-wv8",
+          "service_name": "qivo-mining",
+          "location": "southamerica-east1",
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:37:00.132610Z",
+      "severity": "ERROR",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/31c6f8c52e7baa2734180d1064a3dee7",
+      "receiveTimestamp": "2025-11-05T02:37:02.023803983Z",
+      "spanId": "6435cc14942d7226",
+      "traceSampled": true
+    },
+    {
+      "insertId": "690ab83b0008e560026a18a0",
+      "httpRequest": {
+        "requestMethod": "GET",
+        "requestUrl": "https://www.qivomining.com/api/radar/changes",
+        "requestSize": "313",
+        "status": 404,
+        "responseSize": "551",
+        "userAgent": "curl/7.81.0",
+        "remoteIp": "44.203.231.178",
+        "serverIp": "34.36.234.214",
+        "latency": "0.003674262s",
+        "protocol": "HTTP/1.1"
+      },
+      "resource": {
+        "type": "cloud_run_revision",
+        "labels": {
+          "revision_name": "qivo-mining-00027-wv8",
+          "location": "southamerica-east1",
+          "service_name": "qivo-mining",
+          "project_id": "qivo-mining-prod",
+          "configuration_name": "qivo-mining"
+        }
+      },
+      "timestamp": "2025-11-05T02:36:43.577944Z",
+      "severity": "WARNING",
+      "labels": {
+        "instanceId": "001477829628bcbab76a745a9ab314af081a01f7e8d6a0f9d52e68bca368891ae4c51a8c4f6f476aa1234d9a9f55cdb461338eac3753ae8e36d117ed229b0a25c89b83e52ab2c293c1271a4b7a21"
+      },
+      "logName": "projects/qivo-mining-prod/logs/run.googleapis.com%2Frequests",
+      "trace": "projects/qivo-mining-prod/traces/c9a51455b28ccc938fd3251e97b439b8",
+      "receiveTimestamp": "2025-11-05T02:36:43.800842079Z",
+      "spanId": "f81929b49b04aed3",
+      "traceSampled": true
+    }
+  ],
+  "nextPageToken": "eqgHCqMHAcpOjMw-b28c4OU2mDk7mm05zpaWaYtk10cPLLJ5fV6zRKLzbGwzm0lX1Y_IJunWi9W-cMwR1L4v8ELLM8dVUbR5MQvbOA_qfZoeqMd7v38WLt5nFVhR4uS5IVKIgihpvejRqBh3IpAGGRzmDL6q0pth8yRB6gu30q7qtBsbDg-KHUh4TTYQXZl-ktgwrThNkGntdb8aQ--1VMf7aZjH6ANinVaNKMQaxwr7ONEs1DQMo23DVkdqSboiiygFBmdcY913Le_pml5SiQviwwAtW15ppRGhMCcCvJn7jBHCOAhKA3ENqaw3H7wOghmPdnp5890LbSrKOLjzixX8Elrdhd0uGuNFIflehNsQica81XO6FucHupJLi-qfn0JiAVErbf1hrEQiF6sMXC7yA--k6OPBTOLbVPRZdM4jOAaPZjC4njWKYg1KCSRTpeQHVEdLz4QwjA8UHdNE5f2za3cLLAviClBZA5IQ2RQp_9SNxpk3LcUDXbTVNTlYsePXnBDubDd5D0JPZKyMuIGt1DAN_ay0cu7MM2HdkALFdzWGTh9--V1h_UxoLfpboW8j04yykIg3FC_YMd33o_sCbH2-m5rmHzR1QrArGJRU4Kd4yYsp51Ld9VgVoZf2AiIED5AWRSBPkoUnPP4cX5mJ_31HLU225a_li1jfapiqQsxnx-MHfFJoUVkC9Sbmi6EtlOEoAU2aw6Gdlc38fEdGjJtW_McV0jnZAtjCwpuejdrSnnkCUnp-0r8cqbZgTurPiDdkDChMiYyuSWpP_77TI3xpxfR7cYJtTfDmbe4bbToHRnbEQckcpg-PZvB_T-dvveDZBGHTbBdWr5yQGd8dWFDsgoOXV4Gny1A42pb-AjVOzXKrncDbTPF4ne10OyGKGQkcMLB2SFeVXjqUTmkeOyqmJnye8qPhLty4fOj1Fu_rw0vE9gd0hMx5A7VzB8JUzkhlFDhjDRxKirdjgwTBlsy_LeDpepa2-3Zvb7uBHiYOdnjjUVJcS0aeyiryltVE8Lc3l5zFOCfEOcR0hFb9LJDp_DhWCd7SlBzjYm97_dEYqwW0-miFiDm_FrnmhBDOUxtlWDq63MsvzTl1U2W5QrV4GAKefGGIvgyAvIQUX7zG7-gzQKjhf7iV42JRGgduNS4ME368SD0zsR6ObITQ6WrYjN8d7c9mIfnzMW0I1B5n-lQWvDkFZPKCb2V21nIYnD-_S2VrFUekgWexQDDU4Y3NnuNeChAB"
+}

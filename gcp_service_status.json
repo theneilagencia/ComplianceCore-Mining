@@ -1,0 +1,168 @@
+{
+  "name": "projects/qivo-mining-prod/locations/southamerica-east1/services/qivo-mining",
+  "uid": "9c897db8-3122-4f3d-9a7d-efa1d77966a9",
+  "generation": "29",
+  "createTime": "2025-11-04T17:47:48.977513Z",
+  "updateTime": "2025-11-05T12:10:34.400865Z",
+  "creator": "qivo-mining-prod@qivo-mining-prod.iam.gserviceaccount.com",
+  "lastModifier": "qivo-mining-prod@qivo-mining-prod.iam.gserviceaccount.com",
+  "client": "gcloud",
+  "clientVersion": "546.0.0",
+  "ingress": "INGRESS_TRAFFIC_ALL",
+  "launchStage": "GA",
+  "template": {
+    "scaling": {
+      "minInstanceCount": 1,
+      "maxInstanceCount": 10
+    },
+    "vpcAccess": {
+      "connector": "qivo-vpc-connector",
+      "egress": "PRIVATE_RANGES_ONLY"
+    },
+    "timeout": "300s",
+    "serviceAccount": "586444405059-compute@developer.gserviceaccount.com",
+    "containers": [
+      {
+        "image": "gcr.io/qivo-mining-prod/qivo-mining:latest",
+        "env": [
+          {
+            "name": "NODE_ENV",
+            "value": "production"
+          },
+          {
+            "name": "DATABASE_URL",
+            "valueSource": {
+              "secretKeyRef": {
+                "secret": "qivo-mining-db-url",
+                "version": "latest"
+              }
+            }
+          },
+          {
+            "name": "OPENAI_API_KEY",
+            "valueSource": {
+              "secretKeyRef": {
+                "secret": "openai-api-key",
+                "version": "latest"
+              }
+            }
+          },
+          {
+            "name": "SESSION_SECRET",
+            "valueSource": {
+              "secretKeyRef": {
+                "secret": "session-secret",
+                "version": "latest"
+              }
+            }
+          },
+          {
+            "name": "JWT_SECRET",
+            "valueSource": {
+              "secretKeyRef": {
+                "secret": "jwt-secret",
+                "version": "latest"
+              }
+            }
+          },
+          {
+            "name": "SIGMINE_API_KEY",
+            "valueSource": {
+              "secretKeyRef": {
+                "secret": "sigmine-api-key",
+                "version": "latest"
+              }
+            }
+          },
+          {
+            "name": "MAPBIOMAS_API_KEY",
+            "valueSource": {
+              "secretKeyRef": {
+                "secret": "mapbiomas-api-key",
+                "version": "latest"
+              }
+            }
+          }
+        ],
+        "resources": {
+          "limits": {
+            "cpu": "2",
+            "memory": "4Gi"
+          },
+          "cpuIdle": true,
+          "startupCpuBoost": true
+        },
+        "ports": [
+          {
+            "name": "http1",
+            "containerPort": 10000
+          }
+        ],
+        "volumeMounts": [
+          {
+            "name": "cloudsql",
+            "mountPath": "/cloudsql"
+          }
+        ],
+        "startupProbe": {
+          "timeoutSeconds": 240,
+          "periodSeconds": 240,
+          "failureThreshold": 1,
+          "tcpSocket": {
+            "port": 10000
+          }
+        }
+      }
+    ],
+    "volumes": [
+      {
+        "name": "cloudsql",
+        "cloudSqlInstance": {
+          "instances": [
+            "qivo-mining-prod:southamerica-east1:qivo-mining-db-prod"
+          ]
+        }
+      }
+    ],
+    "maxInstanceRequestConcurrency": 160
+  },
+  "traffic": [
+    {
+      "type": "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST",
+      "percent": 100
+    }
+  ],
+  "urls": [
+    "https://qivo-mining-586444405059.southamerica-east1.run.app",
+    "https://qivo-mining-kfw7vgq5xa-rj.a.run.app"
+  ],
+  "observedGeneration": "29",
+  "terminalCondition": {
+    "type": "Ready",
+    "state": "CONDITION_SUCCEEDED",
+    "lastTransitionTime": "2025-11-05T12:11:36.757468Z"
+  },
+  "conditions": [
+    {
+      "type": "RoutesReady",
+      "state": "CONDITION_SUCCEEDED",
+      "lastTransitionTime": "2025-11-05T12:11:36.714546Z"
+    },
+    {
+      "type": "ConfigurationsReady",
+      "state": "CONDITION_SUCCEEDED",
+      "lastTransitionTime": "2025-11-05T12:11:35.464749Z"
+    }
+  ],
+  "latestReadyRevision": "projects/qivo-mining-prod/locations/southamerica-east1/services/qivo-mining/revisions/qivo-mining-00029-l92",
+  "latestCreatedRevision": "projects/qivo-mining-prod/locations/southamerica-east1/services/qivo-mining/revisions/qivo-mining-00029-l92",
+  "trafficStatuses": [
+    {
+      "type": "TRAFFIC_TARGET_ALLOCATION_TYPE_LATEST",
+      "percent": 100
+    }
+  ],
+  "uri": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app",
+  "satisfiesPzs": true,
+  "etag": "\"CLr9rMgGEOjtkr8B/cHJvamVjdHMvcWl2by1taW5pbmctcHJvZC9sb2NhdGlvbnMvc291dGhhbWVyaWNhLWVhc3QxL3NlcnZpY2VzL3Fpdm8tbWluaW5n\""
+}

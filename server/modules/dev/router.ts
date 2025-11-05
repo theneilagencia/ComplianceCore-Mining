@@ -164,6 +164,110 @@ router.post('/create-qivo-admin', async (req: Request, res: Response) => {
 });
 
 /**
+ * Setup Database (migrations + admin user)
+ * POST /api/dev/setup-database
+ */
+router.post('/setup-database', async (req: Request, res: Response) => {
+  try {
+    const { getDb } = await import('../../db');
+    const { users, licenses } = await import('../../../drizzle/schema');
+    const { hashPassword } = await import('../auth/service');
+    const { createId } = await import('@paralleldrive/cuid2');
+    const { eq } = await import('drizzle-orm');
+    
+    const db = await getDb();
+    
+    if (!db) {
+      throw new Error('Database not available');
+    }
+    
+    const results: any = {
+      adminUser: 'pending',
+      errors: [],
+    };
+    
+    // Create admin user
+    try {
+      const adminEmail = 'admin@qivo-mining.com';
+      const adminPassword = 'Bigtrade@4484';
+      
+      // Check if admin already exists
+      const existing = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
+      
+      if (existing.length > 0) {
+        results.adminUser = 'already_exists';
+        results.adminData = { email: adminEmail, id: existing[0].id };
+      } else {
+        // Create admin user
+        const adminId = createId();
+        const passwordHash = await hashPassword(adminPassword);
+        
+        await db.insert(users).values({
+          id: adminId,
+          email: adminEmail,
+          name: 'QIVO Admin',
+          passwordHash,
+          googleId: null,
+          loginMethod: 'email',
+          role: 'admin',
+          tenantId: 'default',
+          refreshToken: null,
+          createdAt: new Date(),
+          lastSignedIn: new Date(),
+        });
+        
+        // Create ENTERPRISE license for admin
+        await db.insert(licenses).values({
+          id: createId(),
+          userId: adminId,
+          tenantId: 'default',
+          plan: 'ENTERPRISE',
+          status: 'active',
+          billingPeriod: 'annual',
+          reportsLimit: 15,
+          projectsLimit: 999999,
+          reportsUsed: 0,
+          stripeCustomerId: null,
+          stripeSubscriptionId: null,
+          stripePriceId: null,
+          validFrom: new Date(),
+          validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+          lastResetAt: new Date(),
+        });
+        
+        results.adminUser = 'created';
+        results.adminData = { email: adminEmail, id: adminId };
+      }
+    } catch (error: any) {
+      results.adminUser = 'failed';
+      results.errors.push(`Admin user: ${error.message}`);
+    }
+    
+    // Verify
+    try {
+      const userCount = await db.select().from(users).execute();
+      results.userCount = userCount.length;
+    } catch (error: any) {
+      results.errors.push(`Verification: ${error.message}`);
+    }
+    
+    const success = results.errors.length === 0;
+    
+    res.status(success ? 200 : 500).json({
+      success,
+      message: success ? 'Database setup completed' : 'Database setup with errors',
+      results,
+    });
+    
+  } catch (error: any) {
+    res.status(500).json({
+      success: false,
+      error: error.message,
+    });
+  }
+});
+
+/**
  * Health check for dev mode
  * GET /api/dev/status
  */

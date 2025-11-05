@@ -1,0 +1,208 @@
+{
+  "id": "c72b07a6-effd-4a3e-a525-49999b3f794e",
+  "status": "SUCCESS",
+  "source": {
+    "gitSource": {
+      "url": "https://github.com/theneilagencia/ComplianceCore-Mining.git",
+      "revision": "3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc"
+    }
+  },
+  "createTime": "2025-11-05T13:02:05.830396Z",
+  "startTime": "2025-11-05T13:02:51.902394139Z",
+  "finishTime": "2025-11-05T13:05:54.725546Z",
+  "results": {
+    "images": [
+      {
+        "name": "gcr.io/qivo-mining-prod/qivo-mining:3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc",
+        "digest": "sha256:ccc874655862b518918fcc993174505a61b6d184c847ae5be33c334bd2387299",
+        "pushTiming": {
+          "startTime": "2025-11-05T13:05:50.662964275Z",
+          "endTime": "2025-11-05T13:05:52.722701790Z"
+        }
+      },
+      {
+        "name": "gcr.io/qivo-mining-prod/qivo-mining",
+        "digest": "sha256:ccc874655862b518918fcc993174505a61b6d184c847ae5be33c334bd2387299",
+        "pushTiming": {
+          "startTime": "2025-11-05T13:05:50.662964275Z",
+          "endTime": "2025-11-05T13:05:52.722701790Z"
+        }
+      },
+      {
+        "name": "gcr.io/qivo-mining-prod/qivo-mining:latest",
+        "digest": "sha256:ccc874655862b518918fcc993174505a61b6d184c847ae5be33c334bd2387299",
+        "pushTiming": {
+          "startTime": "2025-11-05T13:05:50.662964275Z",
+          "endTime": "2025-11-05T13:05:52.722701790Z"
+        }
+      }
+    ],
+    "buildStepImages": [
+      "sha256:334ad5ebd38ade206217a03e97431e17c50a98d01ac056cd7244646cfc1e5ec6",
+      "sha256:334ad5ebd38ade206217a03e97431e17c50a98d01ac056cd7244646cfc1e5ec6",
+      "sha256:334ad5ebd38ade206217a03e97431e17c50a98d01ac056cd7244646cfc1e5ec6",
+      "sha256:4a3a42cc20cfd62fa14647a8092c7383c3f58bb0f2e15b9a3076edac9a0ed604"
+    ],
+    "buildStepOutputs": [
+      "",
+      "",
+      "",
+      ""
+    ]
+  },
+  "steps": [
+    {
+      "name": "gcr.io/cloud-builders/docker",
+      "args": [
+        "build",
+        "-t",
+        "gcr.io/qivo-mining-prod/qivo-mining:3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc",
+        "-t",
+        "gcr.io/qivo-mining-prod/qivo-mining:latest",
+        "-f",
+        "Dockerfile",
+        "."
+      ],
+      "id": "build-image",
+      "timing": {
+        "startTime": "2025-11-05T13:02:55.822261477Z",
+        "endTime": "2025-11-05T13:03:53.280001329Z"
+      },
+      "status": "SUCCESS",
+      "pullTiming": {
+        "startTime": "2025-11-05T13:02:55.822261477Z",
+        "endTime": "2025-11-05T13:02:55.828448876Z"
+      }
+    },
+    {
+      "name": "gcr.io/cloud-builders/docker",
+      "args": [
+        "push",
+        "gcr.io/qivo-mining-prod/qivo-mining:3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc"
+      ],
+      "id": "push-image",
+      "timing": {
+        "startTime": "2025-11-05T13:03:53.280080552Z",
+        "endTime": "2025-11-05T13:04:51.990916851Z"
+      },
+      "status": "SUCCESS",
+      "pullTiming": {
+        "startTime": "2025-11-05T13:03:53.280080552Z",
+        "endTime": "2025-11-05T13:03:53.281049646Z"
+      }
+    },
+    {
+      "name": "gcr.io/cloud-builders/docker",
+      "args": [
+        "push",
+        "gcr.io/qivo-mining-prod/qivo-mining:latest"
+      ],
+      "id": "push-latest",
+      "timing": {
+        "startTime": "2025-11-05T13:04:51.991000771Z",
+        "endTime": "2025-11-05T13:04:53.941314140Z"
+      },
+      "status": "SUCCESS",
+      "pullTiming": {
+        "startTime": "2025-11-05T13:04:51.991000771Z",
+        "endTime": "2025-11-05T13:04:51.992640414Z"
+      }
+    },
+    {
+      "name": "gcr.io/cloud-builders/gcloud",
+      "args": [
+        "run",
+        "deploy",
+        "qivo-mining",
+        "--image=gcr.io/qivo-mining-prod/qivo-mining:3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc",
+        "--region=southamerica-east1",
+        "--platform=managed",
+        "--allow-unauthenticated",
+        "--min-instances=1",
+        "--max-instances=10",
+        "--memory=4Gi",
+        "--cpu=2",
+        "--timeout=300",
+        "--port=10000",
+        "--vpc-connector=qivo-vpc-connector",
+        "--vpc-egress=private-ranges-only",
+        "--set-env-vars=NODE_ENV=production",
+        "--set-secrets=DATABASE_URL=compliancecore-db-url:latest,OPENAI_API_KEY=openai-api-key:latest,SESSION_SECRET=session-secret:latest,JWT_SECRET=jwt-secret:latest,SIGMINE_API_KEY=sigmine-api-key:latest,MAPBIOMAS_API_KEY=mapbiomas-api-key:latest"
+      ],
+      "id": "deploy-cloud-run",
+      "timing": {
+        "startTime": "2025-11-05T13:04:53.941393269Z",
+        "endTime": "2025-11-05T13:05:50.626216631Z"
+      },
+      "status": "SUCCESS",
+      "pullTiming": {
+        "startTime": "2025-11-05T13:04:53.941393269Z",
+        "endTime": "2025-11-05T13:04:53.948064452Z"
+      }
+    }
+  ],
+  "timeout": "1800s",
+  "images": [
+    "gcr.io/qivo-mining-prod/qivo-mining:3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc",
+    "gcr.io/qivo-mining-prod/qivo-mining:latest"
+  ],
+  "projectId": "qivo-mining-prod",
+  "sourceProvenance": {
+    "resolvedGitSource": {
+      "url": "https://github.com/theneilagencia/ComplianceCore-Mining.git",
+      "revision": "3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc"
+    }
+  },
+  "buildTriggerId": "4d23d3f4-a640-421a-8176-b464ec483817",
+  "options": {
+    "machineType": "E2_HIGHCPU_8",
+    "substitutionOption": "ALLOW_LOOSE",
+    "logging": "CLOUD_LOGGING_ONLY",
+    "dynamicSubstitutions": true,
+    "pool": {}
+  },
+  "logUrl": "https://console.cloud.google.com/cloud-build/builds/c72b07a6-effd-4a3e-a525-49999b3f794e?project=586444405059",
+  "substitutions": {
+    "TRIGGER_BUILD_CONFIG_PATH": "cloudbuild.yaml",
+    "_DEPLOY_REGION": "southamerica-east1",
+    "_SERVICE_NAME": "qivo-mining",
+    "REPO_FULL_NAME": "theneilagencia/ComplianceCore-Mining",
+    "REF_NAME": "main",
+    "COMMIT_SHA": "3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc",
+    "TRIGGER_NAME": "deploy-to-cloud-run",
+    "REVISION_ID": "3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc",
+    "BRANCH_NAME": "main",
+    "SHORT_SHA": "3d6c9f6",
+    "REPO_NAME": "ComplianceCore-Mining"
+  },
+  "tags": [
+    "trigger-4d23d3f4-a640-421a-8176-b464ec483817"
+  ],
+  "timing": {
+    "PUSH": {
+      "startTime": "2025-11-05T13:05:50.662963287Z",
+      "endTime": "2025-11-05T13:05:54.433482986Z"
+    },
+    "GIT_SOURCE": {
+      "startTime": "2025-11-05T13:02:54.028122122Z",
+      "endTime": "2025-11-05T13:02:55.320672056Z"
+    },
+    "FETCHSOURCE": {
+      "startTime": "2025-11-05T13:02:54.028122122Z",
+      "endTime": "2025-11-05T13:02:55.320672056Z"
+    },
+    "BUILD": {
+      "startTime": "2025-11-05T13:02:55.321652417Z",
+      "endTime": "2025-11-05T13:05:50.662892920Z"
+    }
+  },
+  "artifacts": {
+    "images": [
+      "gcr.io/qivo-mining-prod/qivo-mining:3d6c9f6b3d4239a8ad04517bc19deb2aceeea6fc",
+      "gcr.io/qivo-mining-prod/qivo-mining:latest"
+    ]
+  },
+  "queueTtl": "3600s",
+  "serviceAccount": "projects/qivo-mining-prod/serviceAccounts/qivo-mining-prod@qivo-mining-prod.iam.gserviceaccount.com",
+  "name": "projects/586444405059/locations/global/builds/c72b07a6-effd-4a3e-a525-49999b3f794e"
+}
