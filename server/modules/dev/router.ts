@@ -184,19 +184,52 @@ router.post('/setup-database', async (req: Request, res: Response) => {
         throw new Error('SQL client not available');
       }
       
+      // Create enums first
+      await sqlClient`
+        DO $$ BEGIN
+          CREATE TYPE role AS ENUM ('user', 'admin', 'parceiro', 'backoffice');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `;
+      
+      await sqlClient`
+        DO $$ BEGIN
+          CREATE TYPE plan AS ENUM ('START', 'PRO', 'ENTERPRISE');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `;
+      
+      await sqlClient`
+        DO $$ BEGIN
+          CREATE TYPE license_status AS ENUM ('active', 'expired', 'cancelled', 'suspended');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `;
+      
+      await sqlClient`
+        DO $$ BEGIN
+          CREATE TYPE billing_period AS ENUM ('monthly', 'annual');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `;
+      
       // Create users table
       await sqlClient`
         CREATE TABLE IF NOT EXISTS users (
           id VARCHAR(64) PRIMARY KEY,
           name TEXT,
-          email VARCHAR(320) UNIQUE,
+          email VARCHAR(320) UNIQUE NOT NULL,
           "passwordHash" TEXT,
-          "googleId" VARCHAR(255),
-          "loginMethod" VARCHAR(64) DEFAULT 'email',
-          role VARCHAR(20) DEFAULT 'user',
-          "tenantId" VARCHAR(64) DEFAULT 'default',
+          "googleId" VARCHAR(128),
+          "loginMethod" VARCHAR(64),
+          role role DEFAULT 'user' NOT NULL,
+          "tenantId" VARCHAR(64) NOT NULL,
           "refreshToken" TEXT,
-          "stripeCustomerId" VARCHAR(255),
+          "stripeCustomerId" VARCHAR(128),
           "createdAt" TIMESTAMP DEFAULT NOW(),
           "lastSignedIn" TIMESTAMP DEFAULT NOW()
         )
@@ -207,13 +240,13 @@ router.post('/setup-database', async (req: Request, res: Response) => {
         CREATE TABLE IF NOT EXISTS licenses (
           id VARCHAR(64) PRIMARY KEY,
           "userId" VARCHAR(64) REFERENCES users(id) ON DELETE CASCADE,
-          "tenantId" VARCHAR(64) DEFAULT 'default',
-          plan VARCHAR(20) DEFAULT 'START',
-          status VARCHAR(20) DEFAULT 'active',
-          "billingPeriod" VARCHAR(20) DEFAULT 'monthly',
-          "reportsLimit" INTEGER DEFAULT 5,
-          "projectsLimit" INTEGER DEFAULT 3,
-          "reportsUsed" INTEGER DEFAULT 0,
+          "tenantId" VARCHAR(64) NOT NULL,
+          plan plan DEFAULT 'START' NOT NULL,
+          status license_status DEFAULT 'active' NOT NULL,
+          "billingPeriod" billing_period DEFAULT 'monthly' NOT NULL,
+          "reportsLimit" INTEGER DEFAULT 5 NOT NULL,
+          "projectsLimit" INTEGER DEFAULT 3 NOT NULL,
+          "reportsUsed" INTEGER DEFAULT 0 NOT NULL,
           "stripeCustomerId" VARCHAR(255),
           "stripeSubscriptionId" VARCHAR(255),
           "stripePriceId" VARCHAR(255),
