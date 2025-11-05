@@ -78,6 +78,7 @@ export default function ExportStandards() {
   const [selectedReportId, setSelectedReportId] = useState('');
   const [toStandard, setToStandard] = useState<'JORC_2012' | 'NI_43_101' | 'PERC' | 'SAMREC' | 'CBRR'>('JORC_2012');
   const [format, setFormat] = useState<'PDF' | 'DOCX' | 'XLSX'>('PDF');
+  const [language, setLanguage] = useState<'pt-BR' | 'en-US' | 'es-ES' | 'fr-FR'>('pt-BR');
   
   const [reports, setReports] = useState<Report[]>([]);
   const [exports, setExports] = useState<Export[]>([]);
@@ -160,6 +161,7 @@ export default function ExportStandards() {
             reportId: selectedReportId,
             toStandard,
             format,
+            language,
           }),
         });
       }, 3, 2000);
@@ -312,7 +314,7 @@ export default function ExportStandards() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
             {/* Report Selection */}
             <div>
               <label className="block text-sm font-medium text-gray-300 mb-2">
@@ -375,6 +377,27 @@ export default function ExportStandards() {
                   </option>
                 ))}
               </select>
+            </div>
+
+            {/* Language Selection */}
+            <div>
+              <label className="block text-sm font-medium text-gray-300 mb-2">
+                Idioma do Relatório
+              </label>
+              <select
+                value={language}
+                onChange={(e) => setLanguage(e.target.value as any)}
+                className="w-full px-4 py-2 border border-white/20 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                disabled={exporting}
+              >
+                <option value="pt-BR">🇧🇷 Português (Brasil)</option>
+                <option value="en-US">🇺🇸 English (US)</option>
+                <option value="es-ES">🇪🇸 Español</option>
+                <option value="fr-FR">🇫🇷 Français</option>
+              </select>
+              <p className="text-xs text-gray-400 mt-1">
+                Define o idioma do relatório exportado
+              </p>
             </div>
           </div>
 

@@ -18,12 +18,13 @@ export const exportsRouter = router({
       reportId: z.string(),
       toStandard: z.enum(["JORC_2012", "NI_43_101", "PERC", "SAMREC", "CBRR"]),
       format: z.enum(["PDF", "DOCX", "XLSX"]),
+      language: z.enum(["pt-BR", "en-US", "es-ES", "fr-FR"]).optional().default("pt-BR"),
     }))
     .mutation(async ({ input, ctx }) => {
       const db = await getDb();
       if (!db) throw new Error('Database connection failed');
       
-      const { reportId, toStandard, format } = input;
+      const { reportId, toStandard, format, language } = input;
       const { user } = ctx;
 
       // 1) Get report
@@ -109,7 +110,8 @@ export const exportsRouter = router({
         reportId,
         normalizedData,
         toStandard,
-        format
+        format,
+        language
       );
 
       // 5) Save export record

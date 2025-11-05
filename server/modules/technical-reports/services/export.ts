@@ -47,7 +47,7 @@ function pickMapper(toStandard: Standard) {
   return mappers[toStandard];
 }
 
-async function renderPDF(payload: any, toStandard: Standard): Promise<Buffer> {
+async function renderPDF(payload: any, toStandard: Standard, language: string = 'pt-BR'): Promise<Buffer> {
   // Read HTML template based on standard
   const templateName = toStandard === 'CBRR' ? 'cbrr.html' : 'jorc_2012.html';
   const templatePath = path.join(__dirname, '../templates', templateName);
@@ -56,8 +56,8 @@ async function renderPDF(payload: any, toStandard: Standard): Promise<Buffer> {
   // Compile with Handlebars
   const template = Handlebars.compile(templateContent);
   
-  // Add generated_at timestamp
-  payload.generated_at = new Date().toLocaleString('pt-BR');
+  // Add generated_at timestamp with correct locale
+  payload.generated_at = new Date().toLocaleString(language);
   
   const html = template(payload);
 
@@ -80,7 +80,7 @@ async function renderPDF(payload: any, toStandard: Standard): Promise<Buffer> {
   return Buffer.from(pdfBuffer);
 }
 
-async function renderDOCX(payload: any, toStandard: Standard): Promise<Buffer> {
+async function renderDOCX(payload: any, toStandard: Standard, language: string = 'pt-BR'): Promise<Buffer> {
   // Import our professional DOCX renderer
   const { renderDOCX: professionalRender } = await import('./docx-renderer');
   
@@ -123,7 +123,7 @@ async function renderDOCX(payload: any, toStandard: Standard): Promise<Buffer> {
   return await professionalRender(reportPayload, toStandard);
 }
 
-async function renderXLSX(payload: any, toStandard: Standard): Promise<Buffer> {
+async function renderXLSX(payload: any, toStandard: Standard, language: string = 'pt-BR'): Promise<Buffer> {
   // Import our professional XLSX renderer
   const { renderXLSX: professionalRender } = await import('./xlsx-renderer');
   
@@ -171,7 +171,8 @@ export async function exportReport(
   reportId: string,
   normalized: NormalizedData,
   toStandard: Standard,
-  format: Format
+  format: Format,
+  language: 'pt-BR' | 'en-US' | 'es-ES' | 'fr-FR' = 'pt-BR'
 ): Promise<string> {
   if (!SUPPORTED_STANDARDS.includes(toStandard)) {
     throw new Error(`Unsupported standard: ${toStandard}`);
@@ -190,15 +191,15 @@ export async function exportReport(
   let extension: string;
 
   if (format === 'PDF') {
-    buffer = await renderPDF(payload, toStandard);
+    buffer = await renderPDF(payload, toStandard, language);
     contentType = 'application/pdf';
     extension = 'pdf';
   } else if (format === 'DOCX') {
-    buffer = await renderDOCX(payload, toStandard);
+    buffer = await renderDOCX(payload, toStandard, language);
     contentType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
     extension = 'docx';
   } else if (format === 'XLSX') {
-    buffer = await renderXLSX(payload, toStandard);
+    buffer = await renderXLSX(payload, toStandard, language);
     contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
     extension = 'xlsx';
   } else {
