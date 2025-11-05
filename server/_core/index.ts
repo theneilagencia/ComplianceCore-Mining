@@ -268,6 +268,10 @@ async function startServer() {
   // Populate database route (temporary, for setup)
   app.use("/api/dev", populateDbRouter);
   
+  // Migrations route (temporary, for setup)
+  const migrationsRouter = (await import("../modules/dev/migrations-router.js")).default;
+  app.use("/api/dev", migrationsRouter);
+  
   // Stripe webhook setup route (temporary, for setup)
   app.use("/api", stripeWebhookSetupRouter);
   
