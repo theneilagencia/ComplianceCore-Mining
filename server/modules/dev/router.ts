@@ -177,7 +177,12 @@ router.post('/setup-database', async (req: Request, res: Response) => {
     
     // Step 1: Push schema to database using raw SQL
     try {
-      const { sql: sqlClient } = await import('../../db');
+      const { getSqlClient } = await import('../../db');
+      const sqlClient = await getSqlClient();
+      
+      if (!sqlClient) {
+        throw new Error('SQL client not available');
+      }
       
       // Create users table
       await sqlClient`

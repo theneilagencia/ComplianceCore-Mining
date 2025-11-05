@@ -28,6 +28,21 @@ export async function getDb() {
   return _db;
 }
 
+// Get raw SQL client for direct queries
+export async function getSqlClient() {
+  const dbUrl = process.env.DATABASE_URL || process.env.DB_URL;
+  
+  if (!_client && dbUrl) {
+    _client = postgres(dbUrl, {
+      ssl: 'require',
+      max: 10,
+      idle_timeout: 20,
+      connect_timeout: 10,
+    });
+  }
+  return _client;
+}
+
 export async function upsertUser(user: InsertUser): Promise<void> {
   if (!user.id) {
     throw new Error("User ID is required for upsert");
