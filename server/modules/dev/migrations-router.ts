@@ -21,9 +21,11 @@ router.post('/run-migrations', async (req, res) => {
       return res.status(503).json({ error: 'DATABASE_URL not configured' });
     }
 
+    // Usar mesma configuração do db.ts principal
     client = postgres(dbUrl, {
-      ssl: { rejectUnauthorized: false },
+      ssl: 'require',
       max: 1,
+      idle_timeout: 20,
       connect_timeout: 10,
     });
 
@@ -71,7 +73,7 @@ router.post('/run-migrations', async (req, res) => {
       await client.unsafe(`
         CREATE TABLE IF NOT EXISTS "onDemandReports" (
           "id" SERIAL PRIMARY KEY,
-          "userId" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
+          "userId" VARCHAR(64) NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
           "reportType" VARCHAR(50) NOT NULL,
           "status" VARCHAR(20) NOT NULL DEFAULT 'pending',
           "stripeSessionId" VARCHAR(255),
