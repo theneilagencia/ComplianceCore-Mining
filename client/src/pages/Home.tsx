@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
+import PricingSection from "@/components/PricingSection";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
@@ -146,7 +147,7 @@ export default function Home() {
             </h1>
             
             <p className="text-lg text-gray-300 max-w-4xl mx-auto leading-snug">
-              O QIVO automatiza e padroniza relatórios técnicos conforme os principais códigos internacionais da família <strong className="text-white">CRIRSCO</strong> — JORC, NI 43-101, PERC, SAMREC e SEC S-K 1300 — e suas equivalências nacionais (ANM, ANP, CPRM, IBAMA).
+              A QIVO é a primeira plataforma a unificar e automatizar relatórios técnicos de mineração segundo os padrões da família <strong className="text-white">CRIRSCO</strong> — JORC, NI 43-101, PERC, SAMREC e SEC S-K 1300 — e suas equivalências nacionais, como ANM, ANP, CPRM e IBAMA. Combinando inteligência regulatória, machine learning e padronização multinormativa, a QIVO transforma o processo de reporting técnico em um fluxo automático, auditável e 100% compatível com os requisitos internacionais de compliance, governança e ESG.
             </p>
 
             <div className="flex flex-wrap gap-4 justify-center pt-6">
@@ -327,107 +328,19 @@ export default function Home() {
         </section>
 
         {/* Planos */}
-        <section id="pricing" className="bg-gradient-to-br from-[#171a4a] to-[#2f2c79] py-20 border-y border-white/10">
+        <PricingSection 
+          checkoutLoading={checkoutLoading}
+          handleSubscriptionCheckout={handleSubscriptionCheckout}
+        />
+
+        {/* Relatórios Avulsos */}
+        <section className="bg-gradient-to-br from-[#171a4a] to-[#2f2c79] py-20 border-y border-white/10">
           <div className="container mx-auto px-4">
             <div className="max-w-6xl mx-auto">
               <div className="text-center mb-12">
                 <h2 className="text-4xl font-bold text-white mb-4">
-                  Planos e Licenciamento
+                  Relatórios Avulsos — On-Demand
                 </h2>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                {/* Start */}
-                <Card className="p-6 bg-white/5 border-white/10">
-                  <h3 className="text-2xl font-bold text-white mb-2">Start</h3>
-                  <p className="text-gray-300 mb-4 text-sm">Consultores e pequenas mineradoras</p>
-                  <div className="text-4xl font-bold text-[#b96e48] mb-4">
-                    $ 2.500<span className="text-lg text-gray-400">/mês</span>
-                  </div>
-                  <ul className="space-y-2 mb-6">
-                    <li className="flex items-start gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                      <span>1 relatório/mês</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                      <span>Radar Local</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                      <span>Auditoria básica</span>
-                    </li>
-                  </ul>
-                  <Button 
-                    className="w-full bg-[#2f2c79] hover:bg-[#b96e48]"
-                    onClick={() => handleSubscriptionCheckout('START')}
-                    disabled={checkoutLoading}
-                  >
-                    {checkoutLoading ? 'Processando...' : 'Começar Agora'}
-                  </Button>
-                </Card>
-
-                {/* Pro */}
-                <Card className="p-6 bg-white/5/10 border-[#b96e48] border-2 relative">
-                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#b96e48] text-white px-4 py-1 rounded-full text-xs font-bold">
-                    POPULAR
-                  </div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Pro</h3>
-                  <p className="text-gray-300 mb-4 text-sm">Consultorias regionais</p>
-                  <div className="text-4xl font-bold text-[#b96e48] mb-4">
-                    $ 12.500<span className="text-lg text-gray-400">/mês</span>
-                  </div>
-                  <ul className="space-y-2 mb-6">
-                    <li className="flex items-start gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                      <span>5 relatórios/mês</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                      <span>Radar Global</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                      <span>Conversão multinormativa</span>
-                    </li>
-                  </ul>
-                  <Button 
-                    className="w-full bg-[#b96e48] hover:bg-[#8d4925]"
-                    onClick={() => handleSubscriptionCheckout('PRO')}
-                    disabled={checkoutLoading}
-                  >
-                    {checkoutLoading ? 'Processando...' : 'Começar Agora'}
-                  </Button>
-                </Card>
-
-                {/* Enterprise */}
-                <Card className="p-6 bg-white/5 border-white/10">
-                  <h3 className="text-2xl font-bold text-white mb-2">Enterprise</h3>
-                  <p className="text-gray-300 mb-4 text-sm">Mineradoras e órgãos reguladores</p>
-                  <div className="text-4xl font-bold text-[#b96e48] mb-4">
-                    $ 18.900<span className="text-lg text-gray-400">/mês</span>
-                  </div>
-                  <ul className="space-y-2 mb-6">
-                    <li className="flex items-start gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                      <span>Relatórios ilimitados</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                      <span>Auditoria profunda</span>
-                    </li>
-                    <li className="flex items-start gap-2 text-sm text-gray-300">
-                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                      <span>Integrações corporativas</span>
-                    </li>
-                  </ul>
-                  <Button 
-                    className="w-full bg-[#2f2c79] hover:bg-[#b96e48]"
-                    onClick={() => handleSubscriptionCheckout('ENTERPRISE')}
-                    disabled={checkoutLoading}
-                  >
-                    {checkoutLoading ? 'Processando...' : 'Começar Agora'}
-                  </Button>
-                </Card>
               </div>
 
               {/* Relatórios Avulsos */}
@@ -507,6 +420,178 @@ export default function Home() {
                   ))}
                 </div>
 
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Segurança e Conformidade */}
+        <section className="bg-gradient-to-br from-[#0f1135] to-[#171a4a] py-20 border-y border-white/10">
+          <div className="container mx-auto px-4">
+            <div className="max-w-6xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-white mb-4">
+                  Segurança, Rastreabilidade e Conformidade Técnica
+                </h2>
+                <p className="text-lg text-gray-300 max-w-4xl mx-auto leading-relaxed">
+                  A QIVO foi construída com os mais altos padrões de segurança, privacidade e auditabilidade, garantindo que cada dado, relatório e processo seja rastreado, verificado e protegido de ponta a ponta.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                {/* Segurança da Informação */}
+                <Card className="p-6 bg-white/5 border-white/10">
+                  <div className="flex items-start gap-4 mb-4">
+                    <Shield className="h-8 w-8 text-[#b96e48] flex-shrink-0" />
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2">Segurança da Informação</h3>
+                      <p className="text-sm text-gray-300 leading-relaxed">
+                        Toda comunicação entre cliente e servidor é criptografada via <strong className="text-white">TLS 1.3</strong>. Senhas são protegidas com <strong className="text-white">bcrypt</strong> e armazenadas de forma irreversível. Tokens de sessão são gerados com <strong className="text-white">JWT</strong> e expiram automaticamente após períodos de inatividade.
+                      </p>
+                    </div>
+                  </div>
+                  <ul className="space-y-2 ml-12">
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Criptografia TLS 1.3 end-to-end</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Autenticação JWT com refresh token automático</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Hashing bcrypt para senhas (salt rounds ≥ 10)</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Gestão segura de secrets via Google Secret Manager</span>
+                    </li>
+                  </ul>
+                </Card>
+
+                {/* Rastreabilidade e Auditoria */}
+                <Card className="p-6 bg-white/5 border-white/10">
+                  <div className="flex items-start gap-4 mb-4">
+                    <Database className="h-8 w-8 text-[#b96e48] flex-shrink-0" />
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2">Rastreabilidade e Auditoria</h3>
+                      <p className="text-sm text-gray-300 leading-relaxed">
+                        Cada relatório gerado pela QIVO possui <strong className="text-white">controle de versão automático</strong>, permitindo rastrear quem criou, quando foi criado e quais dados foram utilizados. Todas as operações críticas são registradas em logs imutáveis no <strong className="text-white">Google Cloud Logging</strong>.
+                      </p>
+                    </div>
+                  </div>
+                  <ul className="space-y-2 ml-12">
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Versionamento automático de relatórios (Git-like)</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Logs imutáveis no Google Cloud Logging</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Metadados de origem (fonte, data, autor, QP responsável)</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Assinatura digital verificada via hash SHA-256</span>
+                    </li>
+                  </ul>
+                </Card>
+
+                {/* Conformidade Técnica */}
+                <Card className="p-6 bg-white/5 border-white/10">
+                  <div className="flex items-start gap-4 mb-4">
+                    <CheckCircle2 className="h-8 w-8 text-[#b96e48] flex-shrink-0" />
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2">Conformidade Técnica</h3>
+                      <p className="text-sm text-gray-300 leading-relaxed">
+                        A QIVO verifica automaticamente a conformidade de cada relatório com mais de <strong className="text-white">130 regras técnicas</strong> baseadas nos padrões CRIRSCO, ANM, IBAMA e SEC. Cada verificação gera um <strong className="text-white">score KRCI</strong> (0-100) e um relatório de conformidade auditado.
+                      </p>
+                    </div>
+                  </div>
+                  <ul className="space-y-2 ml-12">
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Validação automática contra 130+ regras CRIRSCO</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Score KRCI (Key Risk and Critical Information)</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Relatório de conformidade com recomendações</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Compatibilidade com JORC, NI 43-101, SEC S-K 1300</span>
+                    </li>
+                  </ul>
+                </Card>
+
+                {/* Privacidade e LGPD */}
+                <Card className="p-6 bg-white/5 border-white/10">
+                  <div className="flex items-start gap-4 mb-4">
+                    <Shield className="h-8 w-8 text-[#b96e48] flex-shrink-0" />
+                    <div>
+                      <h3 className="text-xl font-bold text-white mb-2">Privacidade e LGPD</h3>
+                      <p className="text-sm text-gray-300 leading-relaxed">
+                        A QIVO está em conformidade com a <strong className="text-white">LGPD (Lei Geral de Proteção de Dados)</strong> e <strong className="text-white">GDPR</strong>. Dados pessoais são processados apenas com consentimento explícito, e usuários podem solicitar exclusão total de seus dados a qualquer momento.
+                      </p>
+                    </div>
+                  </div>
+                  <ul className="space-y-2 ml-12">
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Conformidade com LGPD e GDPR</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Consentimento explícito para processamento de dados</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Direito ao esquecimento (exclusão total de dados)</span>
+                    </li>
+                    <li className="flex items-start gap-2 text-sm text-gray-300">
+                      <Check className="h-4 w-4 text-[#b96e48] flex-shrink-0 mt-0.5" />
+                      <span>Política de privacidade transparente e acessível</span>
+                    </li>
+                  </ul>
+                </Card>
+              </div>
+
+              {/* Infraestrutura */}
+              <div className="bg-white/5 rounded-lg p-8 border border-white/10">
+                <div className="text-center mb-8">
+                  <h3 className="text-2xl font-bold text-white mb-4">
+                    Infraestrutura Cloud de Nível Enterprise
+                  </h3>
+                  <p className="text-gray-300 max-w-3xl mx-auto">
+                    A QIVO opera 100% na <strong className="text-white">Google Cloud Platform (GCP)</strong>, com arquitetura serverless, escalabilidade automática e disponibilidade de 99.9%. Todos os dados são armazenados em <strong className="text-white">Cloud SQL (PostgreSQL)</strong> com backups automáticos diários e replicação geográfica.
+                  </p>
+                </div>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                  <div className="p-4">
+                    <div className="text-3xl font-bold text-[#b96e48] mb-2">99.9%</div>
+                    <div className="text-sm text-gray-300">Disponibilidade</div>
+                  </div>
+                  <div className="p-4">
+                    <div className="text-3xl font-bold text-[#b96e48] mb-2">18+</div>
+                    <div className="text-sm text-gray-300">APIs Integradas</div>
+                  </div>
+                  <div className="p-4">
+                    <div className="text-3xl font-bold text-[#b96e48] mb-2">24/7</div>
+                    <div className="text-sm text-gray-300">Monitoramento</div>
+                  </div>
+                  <div className="p-4">
+                    <div className="text-3xl font-bold text-[#b96e48] mb-2">TLS 1.3</div>
+                    <div className="text-sm text-gray-300">Criptografia</div>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
