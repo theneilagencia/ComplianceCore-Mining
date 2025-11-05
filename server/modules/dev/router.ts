@@ -459,7 +459,7 @@ router.post('/setup-database', async (req: Request, res: Response) => {
             },
             {
               id: createId(),
-              standard: 'CBRR',
+              standard: 'JORC_2012',
               title: 'Relatório de Recursos - Mina Brucutu',
               status: 'ready_for_audit',
             },
