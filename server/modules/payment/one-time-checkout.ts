@@ -63,23 +63,29 @@ export interface OneTimeCheckoutParams {
   userId?: string;
   successUrl: string;
   cancelUrl: string;
+  hasActiveSubscription?: boolean; // Para aplicar desconto de 10%
 }
 
 /**
  * Create one-time payment checkout session for reports
+ * Applies 10% discount for users with active subscription
  */
 export async function createOneTimeCheckout(
   params: OneTimeCheckoutParams
 ): Promise<Stripe.Checkout.Session> {
   const stripe = getStripe();
-  const { reportType, userEmail, userId, successUrl, cancelUrl } = params;
+  const { reportType, userEmail, userId, successUrl, cancelUrl, hasActiveSubscription } = params;
 
-  const price = REPORT_PRICES[reportType];
+  const originalPrice = REPORT_PRICES[reportType];
   const name = REPORT_NAMES[reportType];
 
-  if (!price || !name) {
+  if (!originalPrice || !name) {
     throw new Error(`Invalid report type: ${reportType}`);
   }
+
+  // Aplicar desconto de 10% para assinantes
+  const discount = hasActiveSubscription ? 0.10 : 0;
+  const finalPrice = Math.round(originalPrice * (1 - discount));
 
   const session = await stripe.checkout.sessions.create({
     mode: 'payment', // One-time payment
@@ -89,10 +95,12 @@ export async function createOneTimeCheckout(
         price_data: {
           currency: 'usd',
           product_data: {
-            name,
-            description: `Relatório técnico on-demand - QIVO Mining`,
+            name: hasActiveSubscription ? `${name} (Desconto de Assinante - 10%)` : name,
+            description: hasActiveSubscription 
+              ? `Relatório técnico on-demand - QIVO Mining | Preço original: $${(originalPrice / 100).toFixed(2)} | Desconto: 10%`
+              : `Relatório técnico on-demand - QIVO Mining`,
           },
-          unit_amount: price,
+          unit_amount: finalPrice,
         },
         quantity: 1,
       },
@@ -103,6 +111,10 @@ export async function createOneTimeCheckout(
       reportType,
       userId: userId || '',
       type: 'one_time_report',
+      hasDiscount: hasActiveSubscription ? 'true' : 'false',
+      originalPrice: originalPrice.toString(),
+      finalPrice: finalPrice.toString(),
+      discountPercentage: hasActiveSubscription ? '10' : '0',
     },
     success_url: successUrl,
     cancel_url: cancelUrl,

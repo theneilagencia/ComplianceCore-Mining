@@ -243,11 +243,20 @@ router.post('/one-time', async (req: Request, res: Response) => {
       return;
     }
 
-    // Optional: get user if authenticated
+    // Optional: get user if authenticated and check for active subscription
     let userId: string | undefined;
+    let hasActiveSubscription = false;
+    
     try {
       const user = await authenticateFromCookie(req);
       userId = user.id;
+      
+      // Check if user has active subscription (START, PRO, or ENTERPRISE)
+      const license = await licenseService.getUserLicense(user.id);
+      if (license && license.status === 'active' && license.plan !== 'FREE') {
+        hasActiveSubscription = true;
+        console.log(`[Payment] User ${user.id} has active ${license.plan} subscription - applying 10% discount`);
+      }
     } catch {
       // Not authenticated, continue with email only
     }
@@ -262,6 +271,7 @@ router.post('/one-time', async (req: Request, res: Response) => {
       userId,
       successUrl,
       cancelUrl,
+      hasActiveSubscription,
     });
 
     res.json({

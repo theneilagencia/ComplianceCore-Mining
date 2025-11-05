@@ -348,9 +348,16 @@ export default function Home() {
                 <h3 className="text-2xl font-bold text-white mb-4">
                   Relatórios Avulsos — On-Demand
                 </h3>
-                <p className="text-gray-300 mb-6">
+                <p className="text-gray-300 mb-4">
                   Gere relatórios técnicos individuais sob demanda — sem assinatura e com a mesma precisão dos planos profissionais. Todos seguem os padrões da família CRIRSCO (JORC, NI 43-101, PERC, SAMREC e SEC S-K 1300) e suas equivalências nacionais (ANM, ANP, CPRM, IBAMA). Cada relatório é criado pelo motor de IA do QIVO, com dados integrados e verificação automática de conformidade técnica.
                 </p>
+                {user && user.license && user.license.plan !== 'FREE' && (
+                  <div className="bg-[#b96e48]/20 border border-[#b96e48] rounded-lg p-4 mb-6">
+                    <p className="text-white font-semibold text-center">
+                      🎉 Você tem <strong>10% de desconto</strong> em todos os relatórios avulsos como assinante {user.license.plan}!
+                    </p>
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   {[
                     { 
