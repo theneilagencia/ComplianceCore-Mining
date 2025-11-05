@@ -11,6 +11,7 @@ import {
 import { useEffect } from "react";
 import { useLocation } from "wouter";
 import PricingSection from "@/components/PricingSection";
+import ROICalculator from "@/components/ROICalculator";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
@@ -603,6 +604,9 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        {/* ROI Calculator */}
+        <ROICalculator />
 
         {/* Contato */}
         <section id="contact" className="bg-gradient-to-br from-[#171a4a] to-[#2f2c79] py-20 border-y border-white/10">
