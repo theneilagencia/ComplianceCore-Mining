@@ -4,6 +4,7 @@
  */
 import { Router } from 'express';
 import { getDb } from '../../db.js';
+import { sql } from 'drizzle-orm';
 
 const router = Router();
 
@@ -23,7 +24,7 @@ router.post('/run-migrations', async (req, res) => {
 
     // Migração 0004: regulatoryChanges
     try {
-      await db.execute(`
+      await db.execute(sql`
         CREATE TABLE IF NOT EXISTS "regulatoryChanges" (
           "id" SERIAL PRIMARY KEY,
           "title" VARCHAR(500) NOT NULL,
@@ -39,9 +40,9 @@ router.post('/run-migrations', async (req, res) => {
         )
       `);
       
-      await db.execute(`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_published" ON "regulatoryChanges" ("publishedAt" DESC)`);
-      await db.execute(`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_country" ON "regulatoryChanges" ("country")`);
-      await db.execute(`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_severity" ON "regulatoryChanges" ("severity")`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_published" ON "regulatoryChanges" ("publishedAt" DESC)`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_country" ON "regulatoryChanges" ("country")`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_regulatory_changes_severity" ON "regulatoryChanges" ("severity")`);
       
       results.push({ migration: '0004_add_regulatory_changes', status: 'success' });
     } catch (error: any) {
@@ -50,8 +51,8 @@ router.post('/run-migrations', async (req, res) => {
 
     // Migração 0005: stripeCustomerId
     try {
-      await db.execute(`ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "stripeCustomerId" VARCHAR(255)`);
-      await db.execute(`CREATE INDEX IF NOT EXISTS "idx_users_stripe_customer" ON "users" ("stripeCustomerId")`);
+      await db.execute(sql`ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "stripeCustomerId" VARCHAR(255)`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_users_stripe_customer" ON "users" ("stripeCustomerId")`);
       
       results.push({ migration: '0005_add_stripe_customer_id', status: 'success' });
     } catch (error: any) {
@@ -60,7 +61,7 @@ router.post('/run-migrations', async (req, res) => {
 
     // Migração 0006: onDemandReports
     try {
-      await db.execute(`
+      await db.execute(sql`
         CREATE TABLE IF NOT EXISTS "onDemandReports" (
           "id" SERIAL PRIMARY KEY,
           "userId" INTEGER NOT NULL REFERENCES "users"("id") ON DELETE CASCADE,
@@ -78,9 +79,9 @@ router.post('/run-migrations', async (req, res) => {
         )
       `);
       
-      await db.execute(`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_user" ON "onDemandReports" ("userId")`);
-      await db.execute(`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_status" ON "onDemandReports" ("status")`);
-      await db.execute(`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_stripe_session" ON "onDemandReports" ("stripeSessionId")`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_user" ON "onDemandReports" ("userId")`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_status" ON "onDemandReports" ("status")`);
+      await db.execute(sql`CREATE INDEX IF NOT EXISTS "idx_on_demand_reports_stripe_session" ON "onDemandReports" ("stripeSessionId")`);
       
       results.push({ migration: '0006_add_on_demand_reports', status: 'success' });
     } catch (error: any) {
