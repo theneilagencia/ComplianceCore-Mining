@@ -354,7 +354,7 @@ export default function Home() {
                 {user && user.license && user.license.plan !== 'FREE' && (
                   <div className="bg-[#b96e48]/20 border border-[#b96e48] rounded-lg p-4 mb-6">
                     <p className="text-white font-semibold text-center">
-                      🎉 Você tem <strong>10% de desconto</strong> em todos os relatórios avulsos como assinante {user.license.plan}!
+                      Você tem <strong>10% de desconto</strong> em todos os relatórios avulsos como assinante {user.license.plan}
                     </p>
                   </div>
                 )}

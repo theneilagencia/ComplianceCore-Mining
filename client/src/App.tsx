@@ -14,6 +14,7 @@ import PrivateRoute from "./components/PrivateRoute";
 // Páginas públicas (carregadas imediatamente)
 import Home from "./pages/Home";
 import Pricing from "./pages/Pricing";
+import PricingComparison from "./pages/PricingComparison";
 import NotFound from "@/pages/NotFound";
 
 // Auth Pages (lazy loading)
@@ -65,6 +66,8 @@ function Router() {
       <Route path={"/"} component={Home} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/plans"} component={Pricing} />
+      <Route path={"/compare"} component={PricingComparison} />
+      <Route path={"/pricing/compare"} component={PricingComparison} />
       <Route path={"/404"} component={NotFound} />
       
       {/* Páginas autenticadas (com lazy loading) */}

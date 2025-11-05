@@ -23,6 +23,14 @@ export default function PricingSection({ checkoutLoading, handleSubscriptionChec
             <p className="text-lg text-gray-300 max-w-4xl mx-auto mt-4">
               Escolha o plano que melhor acompanha o momento e a necessidade de sua operação.
             </p>
+            <div className="mt-6">
+              <a 
+                href="/compare" 
+                className="inline-block px-6 py-3 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-all border border-white/20 hover:border-white/40"
+              >
+                Ver Comparação Detalhada de Planos
+              </a>
+            </div>
           </div>
 
           {/* Cards dos Planos */}
