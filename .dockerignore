@@ -1,13 +1,108 @@
+# QIVO Mining - Docker Ignore File
+# Files and directories to exclude from Docker build context
+
+# Dependencies
 node_modules
-.git
-.env
-.env.local
+**/node_modules
+
+# Build outputs
 dist
-*.log
-.DS_Store
-coverage
+**/dist
+client/dist
+server/dist
+.next
+out
+
+# Environment files
+.env
+.env.*
+!.env.example
+!.env.production.example
+
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
 .vscode
 .idea
-screenshots
-upload
+*.swp
+*.swo
+*~
+.DS_Store
 
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Testing
+coverage
+.nyc_output
+tests
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+
+# Documentation
+docs
+*.md
+!README.md
+
+# CI/CD
+.github
+.gitlab-ci.yml
+.travis.yml
+.circleci
+
+# Misc
+tmp
+temp
+*.tmp
+*.bak
+*.swp
+.cache
+.parcel-cache
+upload
+screenshots
+
+# OS
+Thumbs.db
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Storybook
+.storybook
+storybook-static
+src/stories
+
+# Validation and reports
+VALIDACAO_*.md
+RELATORIO_*.md
+ANALISE_*.md
+PLANO_*.md
+CERTIFICACAO_*.md
+DESIGN_SYSTEM.md
+ACESSIBILIDADE_WCAG.md
+RESUMO_IMPLEMENTACOES.md
+
+# Scripts (not needed in production)
+scripts
+!scripts/db-migrate.sh
+
+# Test files
+tests
+test
+**/__tests__
+**/__mocks__
+
+# Backup files
+*.backup
+*.old
