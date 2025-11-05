@@ -70,6 +70,9 @@ async function startServer() {
   const app = express();
   const server = createServer(app);
   
+  // Trust proxy - REQUIRED for Cloud Run
+  app.set('trust proxy', true);
+  
   // Set server timeout to 5 minutes (300 seconds)
   server.timeout = 300000; // 5 minutes
   server.keepAliveTimeout = 305000; // Slightly longer than timeout
@@ -77,7 +80,8 @@ async function startServer() {
   
   // Configure CORS with credentials - GCP + localhost
   const allowedOrigins = [
-    // Production (GCP)
+    // Production (GCP) - Accept any Cloud Run URL
+    'https://qivo-mining-kfw7vgq5xa-rj.a.run.app',
     'https://qivo-mining-586444405059.southamerica-east1.run.app',
     'https://www.qivomining.com',
     'http://www.qivomining.com',
@@ -98,6 +102,13 @@ async function startServer() {
         return callback(null, true);
       }
       
+      // Allow any Cloud Run URL (*.run.app)
+      if (origin && origin.match(/^https:\/\/[a-z0-9-]+\.run\.app$/)) {
+        return callback(null, true);
+      }
+      
+      // Log blocked origin for debugging
+      console.warn(`[CORS] Blocked origin: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     },
     credentials: true,
@@ -133,6 +144,10 @@ async function startServer() {
     max: 300, // Máximo 300 requisições por IP por janela (20 req/min)
     standardHeaders: true,
     legacyHeaders: false,
+    // Skip failed requests (don't count them)
+    skipFailedRequests: true,
+    // Skip successful requests (only count errors)
+    skipSuccessfulRequests: false,
     // Handler customizado que retorna JSON em vez de texto
     handler: (req, res) => {
       res.status(429).json({
