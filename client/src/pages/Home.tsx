@@ -200,7 +200,7 @@ export default function Home() {
                       Radar Regulatório Global
                     </h3>
                     <p className="text-gray-300">
-                      Monitora e antecipa alterações normativas, geológicas e ambientais em tempo real.
+                      Monitora e antecipa alterações normativas, geológicas e ambientais com atualizações contínuas.
                     </p>
                   </div>
                 </div>
@@ -234,7 +234,7 @@ export default function Home() {
                       Auditoria e KRCI
                     </h3>
                     <p className="text-gray-300">
-                      Checagens automáticas de conformidade com plano de correção integrado.
+                      Checagens automáticas de conformidade com recomendações detalhadas.
                     </p>
                   </div>
                 </div>
@@ -584,8 +584,8 @@ export default function Home() {
                     <div className="text-sm text-gray-300">APIs Integradas</div>
                   </div>
                   <div className="p-4">
-                    <div className="text-3xl font-bold text-[#b96e48] mb-2">24/7</div>
-                    <div className="text-sm text-gray-300">Monitoramento</div>
+                    <div className="text-3xl font-bold text-[#b96e48] mb-2">100%</div>
+                    <div className="text-sm text-gray-300">Cloud GCP</div>
                   </div>
                   <div className="p-4">
                     <div className="text-3xl font-bold text-[#b96e48] mb-2">TLS 1.3</div>

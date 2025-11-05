@@ -18,7 +18,7 @@ export default function PricingSection({ checkoutLoading, handleSubscriptionChec
               Planos de Assinatura QIVO
             </h2>
             <p className="text-lg text-gray-300 max-w-4xl mx-auto leading-relaxed">
-              A QIVO é a plataforma mais completa de compliance regulatório, auditoria técnica e governança para mineração do mundo, com integração a 18 APIs, 11 padrões internacionais e brasileiros, e inteligência preditiva alimentada por dados satelitais, normativos e operacionais.
+              A QIVO é a plataforma mais completa de compliance regulatório, auditoria técnica e governança para mineração do mundo, com integração a 18 APIs, 11 padrões internacionais e brasileiros, alimentada por dados satelitais, normativos e operacionais.
             </p>
             <p className="text-lg text-gray-300 max-w-4xl mx-auto mt-4">
               Escolha o plano que melhor acompanha o momento e a necessidade de sua operação.
@@ -115,7 +115,7 @@ export default function PricingSection({ checkoutLoading, handleSubscriptionChec
                   </li>
                   <li className="flex items-start gap-3 text-sm text-gray-300">
                     <Check className="h-5 w-5 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                    <span><strong className="text-white">Radar Global</strong> (12 fontes) — monitoramento em tempo real de APIs nacionais e internacionais (USGS, Copernicus, World Bank, Global Forest Watch, Resource Watch).</span>
+                    <span><strong className="text-white">Radar Global</strong> (12 fontes) — monitoramento contínuo de APIs nacionais e internacionais (USGS, Copernicus, World Bank, Global Forest Watch, Resource Watch).</span>
                   </li>
                   <li className="flex items-start gap-3 text-sm text-gray-300">
                     <Check className="h-5 w-5 text-[#b96e48] flex-shrink-0 mt-0.5" />
@@ -154,10 +154,10 @@ export default function PricingSection({ checkoutLoading, handleSubscriptionChec
               <div className="mb-6">
                 <h3 className="text-3xl font-bold text-white mb-2">Enterprise</h3>
                 <p className="text-[#b96e48] font-semibold text-lg mb-4">
-                  "Compliance avançado com inteligência preditiva e domínio total da operação."
+                  "Compliance avançado com análises detalhadas e domínio total da operação."
                 </p>
                 <p className="text-gray-300 text-sm leading-relaxed">
-                  O Enterprise é o pacote mais completo da QIVO — desenhado para grandes mineradoras, fundos de investimento, auditores internacionais e órgãos reguladores. Integra dados técnicos, ambientais e satelitais em tempo real, permitindo governança completa e previsibilidade regulatória.
+                  O Enterprise é o pacote mais completo da QIVO — desenhado para grandes mineradoras, fundos de investimento, auditores internacionais e órgãos reguladores. Integra dados técnicos, ambientais e satelitais com atualizações contínuas, permitindo governança completa e previsibilidade regulatória.
                 </p>
               </div>
 
@@ -188,11 +188,11 @@ export default function PricingSection({ checkoutLoading, handleSubscriptionChec
                   </li>
                   <li className="flex items-start gap-3 text-sm text-gray-300">
                     <Check className="h-5 w-5 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                    <span><strong className="text-white">Análises Preditivas com IA</strong> — correlação entre eventos normativos e dados operacionais para prever riscos e revisões futuras.</span>
+                    <span><strong className="text-white">Análises Avançadas</strong> — correlação entre eventos normativos e dados operacionais com insights detalhados.</span>
                   </li>
                   <li className="flex items-start gap-3 text-sm text-gray-300">
                     <Check className="h-5 w-5 text-[#b96e48] flex-shrink-0 mt-0.5" />
-                    <span><strong className="text-white">Painel Financeiro Integrado (Stripe)</strong> — monitoramento de consumo e custos operacionais em tempo real por serviço e API.</span>
+                    <span><strong className="text-white">Painel Financeiro Integrado (Stripe)</strong> — monitoramento de consumo e custos operacionais por serviço e API.</span>
                   </li>
                 </ul>
               </div>
@@ -243,7 +243,7 @@ export default function PricingSection({ checkoutLoading, handleSubscriptionChec
                     <td className="py-4 px-4 font-semibold text-white">Auditoria KRCI</td>
                     <td className="py-4 px-4 text-center">Light (30 regras) — conformidade básica documental e regulatória.</td>
                     <td className="py-4 px-4 text-center bg-[#b96e48]/5">Full (70 regras) — auditoria técnica, ESG e documental com planos de correção automáticos.</td>
-                    <td className="py-4 px-4 text-center">Deep (130 regras) — verificação completa, análise de severidade e recomendações preditivas.</td>
+                    <td className="py-4 px-4 text-center">Deep (130 regras) — verificação completa, análise de severidade e recomendações detalhadas.</td>
                   </tr>
                   <tr className="border-b border-white/10">
                     <td className="py-4 px-4 font-semibold text-white">Radar Regulatório</td>
@@ -261,13 +261,13 @@ export default function PricingSection({ checkoutLoading, handleSubscriptionChec
                     <td className="py-4 px-4 font-semibold text-white">IA e Preditividade</td>
                     <td className="py-4 px-4 text-center">Não aplicável — geração manual com revisão humana.</td>
                     <td className="py-4 px-4 text-center bg-[#b96e48]/5">Parcial — IA semântica para conversão multinormativa e pré-preenchimento automático.</td>
-                    <td className="py-4 px-4 text-center">Completa — IA com análise preditiva, correlação entre eventos normativos e insights regulatórios automatizados.</td>
+                    <td className="py-4 px-4 text-center">Completa — IA com análise avançada, correlação entre eventos normativos e insights regulatórios automatizados.</td>
                   </tr>
                   <tr>
                     <td className="py-4 px-4 font-semibold text-white">Painel Financeiro (Stripe)</td>
                     <td className="py-4 px-4 text-center">Básico — acompanhamento de consumo e cobranças recorrentes.</td>
                     <td className="py-4 px-4 text-center bg-[#b96e48]/5">Avançado — visualização de gastos por API e alertas de uso.</td>
-                    <td className="py-4 px-4 text-center">Completo — monitoramento em tempo real de consumo, custo por serviço, e previsão de gastos operacionais.</td>
+                    <td className="py-4 px-4 text-center">Completo — monitoramento de consumo, custo por serviço, e acompanhamento de gastos operacionais.</td>
                   </tr>
                 </tbody>
               </table>
