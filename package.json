@@ -13,6 +13,7 @@
     "build": "NODE_ENV=production vite build && node esbuild.config.js",
     "build:full": "bash build.sh",
     "start": "NODE_ENV=production node dist/index.js",
+    "migrate": "tsx scripts/run-migrations.ts",
     "check": "tsc --noEmit",
     "format": "prettier --write .",
     "test": "vitest run",
