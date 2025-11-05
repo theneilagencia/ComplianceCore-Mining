@@ -19,13 +19,15 @@ export default defineConfig({
     include: [
       "tests/unit/**/*.test.ts", 
       "tests/unit/**/*.test.tsx",
-      "tests/unit/**/*.spec.ts", 
+      "tests/unit/**/*.spec.ts",
+      "tests/e2e/**/*.test.ts",
+      "tests/integration/**/*.test.ts",
       "server/**/*.test.ts", 
       "server/**/*.spec.ts",
       "client/**/*.test.tsx",
       "client/**/*.test.ts"
     ],
-    exclude: ["tests/e2e/**", "tests/fixtures/**", "**/node_modules/**", "**/dist/**"],
+    exclude: ["tests/fixtures/**", "**/node_modules/**", "**/dist/**"],
     coverage: {
       enabled: true,
       provider: "v8",
