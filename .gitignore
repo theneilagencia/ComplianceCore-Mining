@@ -110,3 +110,6 @@ temp/
 *.pyc
 __pycache__/
 .copilot/
+
+*storybook.log
+storybook-static

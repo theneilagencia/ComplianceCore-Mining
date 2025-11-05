@@ -1,0 +1,171 @@
+import { Meta } from '@storybook/blocks';
+
+<Meta title="Design System/Introdução" />
+
+# QIVO Mining Design System
+
+Bem-vindo à documentação completa do Design System da plataforma QIVO Mining.
+
+## Visão Geral
+
+Este Design System foi construído com **shadcn/ui** e **Tailwind CSS**, garantindo:
+
+- **Consistência visual** em toda a plataforma
+- **Acessibilidade WCAG 2.1 AA** em todos os componentes
+- **Responsividade** mobile-first
+- **Temas** claro e escuro
+- **TypeScript** para type safety
+
+---
+
+## Paleta de Cores
+
+### Cores Primárias
+
+- **Primary (Roxo):** `#2f2c79` - Usado para CTAs principais e elementos de destaque
+- **Secondary (Laranja):** `#b96e48` - Usado para acentos e elementos secundários
+
+### Gradientes
+
+- **Gradient Primary:** `linear-gradient(135deg, #2f2c79 0%, #b96e48 100%)`
+- Usado em headers, cards de destaque e elementos visuais principais
+
+### Cores Semânticas
+
+- **Success:** Verde para ações bem-sucedidas
+- **Warning:** Amarelo para avisos
+- **Error:** Vermelho para erros
+- **Info:** Azul para informações
+
+---
+
+## Tipografia
+
+### Hierarquia
+
+- **h1:** 36px (2.25rem) - Títulos principais
+- **h2:** 30px (1.875rem) - Títulos de seção
+- **h3:** 24px (1.5rem) - Subtítulos
+- **h4:** 20px (1.25rem) - Títulos de card
+- **Body:** 16px (1rem) - Texto padrão
+- **Small:** 14px (0.875rem) - Textos secundários
+
+### Fonte
+
+- **Font Family:** `-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif`
+- **Line Height:** 1.6 para legibilidade
+
+---
+
+## Espaçamento
+
+Seguimos a escala de espaçamento do Tailwind CSS:
+
+- **xs:** 4px (0.25rem)
+- **sm:** 8px (0.5rem)
+- **md:** 16px (1rem)
+- **lg:** 24px (1.5rem)
+- **xl:** 32px (2rem)
+- **2xl:** 48px (3rem)
+
+---
+
+## Componentes
+
+### 53 Componentes Disponíveis
+
+Organizados em categorias:
+
+1. **Formulários:** Input, Textarea, Select, Checkbox, Radio, Switch
+2. **Navegação:** Button, Link, Breadcrumb, Tabs, Pagination
+3. **Feedback:** Alert, Toast, Dialog, Sheet, Drawer
+4. **Layout:** Card, Separator, Skeleton, ScrollArea
+5. **Dados:** Table, Badge, Avatar, Progress
+6. **Overlays:** Popover, Tooltip, DropdownMenu, ContextMenu
+
+---
+
+## Acessibilidade
+
+Todos os componentes seguem as diretrizes **WCAG 2.1 AA**:
+
+- **Contraste de cores:** Mínimo 4.5:1 para texto normal
+- **Navegação por teclado:** Tab, Shift+Tab, Enter, Escape
+- **ARIA labels:** Todos os elementos interativos têm labels descritivos
+- **Focus visible:** Outline visível em todos os elementos focáveis
+- **Screen reader support:** Compatível com NVDA, JAWS, VoiceOver
+
+---
+
+## Responsividade
+
+Breakpoints Tailwind CSS:
+
+- **sm:** 640px
+- **md:** 768px
+- **lg:** 1024px
+- **xl:** 1280px
+- **2xl:** 1536px
+
+Todos os componentes são **mobile-first** e responsivos.
+
+---
+
+## Como Usar
+
+### Importar Componente
+
+```tsx
+import { Button } from '@/components/ui/button';
+
+function MyComponent() {
+  return <Button variant="default">Click me</Button>;
+}
+```
+
+### Variantes
+
+Cada componente tem múltiplas variantes:
+
+```tsx
+<Button variant="default">Default</Button>
+<Button variant="destructive">Destructive</Button>
+<Button variant="outline">Outline</Button>
+<Button variant="secondary">Secondary</Button>
+<Button variant="ghost">Ghost</Button>
+<Button variant="link">Link</Button>
+```
+
+### Tamanhos
+
+```tsx
+<Button size="default">Default</Button>
+<Button size="sm">Small</Button>
+<Button size="lg">Large</Button>
+<Button size="icon">Icon</Button>
+```
+
+---
+
+## Temas
+
+### Modo Escuro (Padrão)
+
+A plataforma inicia em **modo escuro** por padrão.
+
+### Toggle de Tema
+
+Usuários podem alternar entre claro e escuro usando o `ThemeToggle` component.
+
+---
+
+## Recursos
+
+- [shadcn/ui Documentation](https://ui.shadcn.com/)
+- [Tailwind CSS Documentation](https://tailwindcss.com/)
+- [WCAG 2.1 Guidelines](https://www.w3.org/WAI/WCAG21/quickref/)
+
+---
+
+**Versão:** 1.0  
+**Última Atualização:** 05/11/2025

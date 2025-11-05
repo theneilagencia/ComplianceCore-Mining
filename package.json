@@ -28,7 +28,9 @@
     "db:push": "drizzle-kit generate && drizzle-kit migrate",
     "generate:sprints": "tsx scripts/generate-sprints.ts",
     "import:manus": "tsx scripts/import-to-manus.ts",
-    "import:manus:dry": "DRY_RUN=true tsx scripts/import-to-manus.ts"
+    "import:manus:dry": "DRY_RUN=true tsx scripts/import-to-manus.ts",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.693.0",
@@ -185,7 +187,14 @@
     "typescript": "5.9.3",
     "vite": "^7.1.7",
     "vite-plugin-manus-runtime": "^0.0.42",
-    "vitest": "^4.0.6"
+    "vitest": "^4.0.6",
+    "storybook": "^10.0.5",
+    "@storybook/react-vite": "^10.0.5",
+    "@chromatic-com/storybook": "^4.1.2",
+    "@storybook/addon-docs": "^10.0.5",
+    "@storybook/addon-onboarding": "^10.0.5",
+    "@storybook/addon-a11y": "^10.0.5",
+    "@storybook/addon-vitest": "^10.0.5"
   },
   "packageManager": "pnpm@10.4.1+sha512.c753b6c3ad7afa13af388fa6d808035a008e30ea9993f58c6663e2bc5ff21679aa834db094987129aa4d488b86df57f7b634981b2f827cdcacc698cc0cfb88af",
   "pnpm": {
