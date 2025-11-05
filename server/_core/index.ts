@@ -29,6 +29,7 @@ import { startScheduler } from "../modules/radar/services/scheduler";
 import templatesRouter from "../modules/templates/router";
 import validateRouter from "../modules/validate/router";
 import contactRouter from "../modules/contact/router";
+import brandingRouter from "../modules/branding/router";
 import storageDownloadRouter from "../routes/storage-download";
 import fixS3UrlRouter from "../routes/fix-s3url";
 import { initStorage } from "../storage-hybrid";
@@ -329,6 +330,9 @@ async function startServer() {
   
   // Contact form routes
   app.use("/api/contact", contactRouter);
+  
+  // Branding routes
+  app.use("/api/branding", brandingRouter);
   
   // Storage download routes
   app.use("/api/storage", storageDownloadRouter);
