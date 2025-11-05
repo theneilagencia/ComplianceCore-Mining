@@ -386,6 +386,12 @@ export async function aggregateAllData(): Promise<{
     if (mapbiomasSource) mapbiomasSource.status = 'error';
   }
 
+  // Se nenhuma fonte retornou dados, adiciona dados de exemplo para demonstração
+  if (operations.length === 0) {
+    console.log('[DataAggregator] No data from external sources, using example data');
+    operations.push(...getExampleOperations());
+  }
+
   const duration = Date.now() - startTime;
   console.log(`[DataAggregator] Aggregation completed in ${duration}ms. Total operations: ${operations.length}`);
 
@@ -398,6 +404,179 @@ export async function aggregateAllData(): Promise<{
 export async function getDiagnostic(): Promise<DataSource[]> {
   const { sources } = await aggregateAllData();
   return sources;
+}
+
+/**
+ * Get example mining operations for demonstration
+ * Used when external APIs are not available or configured
+ */
+function getExampleOperations(): MiningOperation[] {
+  return [
+    // Brasil
+    {
+      id: 'example-br-1',
+      name: 'Mina Carajás',
+      country: 'Brazil',
+      continent: 'Americas',
+      mineral: 'Iron Ore',
+      status: 'active',
+      operator: 'Vale S.A.',
+      latitude: -6.0626,
+      longitude: -50.2108,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    {
+      id: 'example-br-2',
+      name: 'Mina de Sossego',
+      country: 'Brazil',
+      continent: 'Americas',
+      mineral: 'Copper',
+      status: 'active',
+      operator: 'Vale S.A.',
+      latitude: -6.4833,
+      longitude: -49.9833,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    {
+      id: 'example-br-3',
+      name: 'Mina de Brucutu',
+      country: 'Brazil',
+      continent: 'Americas',
+      mineral: 'Iron Ore',
+      status: 'active',
+      operator: 'Vale S.A.',
+      latitude: -19.8833,
+      longitude: -43.6167,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    // Chile
+    {
+      id: 'example-cl-1',
+      name: 'Chuquicamata',
+      country: 'Chile',
+      continent: 'Americas',
+      mineral: 'Copper',
+      status: 'active',
+      operator: 'Codelco',
+      latitude: -22.3167,
+      longitude: -68.9000,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    {
+      id: 'example-cl-2',
+      name: 'Escondida',
+      country: 'Chile',
+      continent: 'Americas',
+      mineral: 'Copper',
+      status: 'active',
+      operator: 'BHP',
+      latitude: -24.2333,
+      longitude: -69.0667,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    // Peru
+    {
+      id: 'example-pe-1',
+      name: 'Cerro Verde',
+      country: 'Peru',
+      continent: 'Americas',
+      mineral: 'Copper',
+      status: 'active',
+      operator: 'Freeport-McMoRan',
+      latitude: -16.5167,
+      longitude: -71.5833,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    // Austrália
+    {
+      id: 'example-au-1',
+      name: 'Mount Whaleback',
+      country: 'Australia',
+      continent: 'Oceania',
+      mineral: 'Iron Ore',
+      status: 'active',
+      operator: 'BHP',
+      latitude: -23.3667,
+      longitude: 119.6500,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    {
+      id: 'example-au-2',
+      name: 'Olympic Dam',
+      country: 'Australia',
+      continent: 'Oceania',
+      mineral: 'Copper, Uranium, Gold',
+      status: 'active',
+      operator: 'BHP',
+      latitude: -30.4333,
+      longitude: 136.8833,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    // África do Sul
+    {
+      id: 'example-za-1',
+      name: 'Venetia',
+      country: 'South Africa',
+      continent: 'Africa',
+      mineral: 'Diamonds',
+      status: 'active',
+      operator: 'De Beers',
+      latitude: -22.4167,
+      longitude: 29.3333,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    // Canadá
+    {
+      id: 'example-ca-1',
+      name: 'Highland Valley Copper',
+      country: 'Canada',
+      continent: 'Americas',
+      mineral: 'Copper, Molybdenum',
+      status: 'active',
+      operator: 'Teck Resources',
+      latitude: 50.4667,
+      longitude: -121.0167,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    // Indonésia
+    {
+      id: 'example-id-1',
+      name: 'Grasberg',
+      country: 'Indonesia',
+      continent: 'Asia',
+      mineral: 'Copper, Gold',
+      status: 'active',
+      operator: 'Freeport-McMoRan',
+      latitude: -4.0500,
+      longitude: 137.1167,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+    // China
+    {
+      id: 'example-cn-1',
+      name: 'Dexing Copper Mine',
+      country: 'China',
+      continent: 'Asia',
+      mineral: 'Copper',
+      status: 'active',
+      operator: 'Jiangxi Copper',
+      latitude: 28.9667,
+      longitude: 117.7000,
+      source: 'Example Data',
+      lastUpdate: new Date().toISOString().split('T')[0],
+    },
+  ];
 }
 
 export default {

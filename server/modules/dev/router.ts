@@ -354,6 +354,100 @@ router.post('/setup-database', async (req: Request, res: Response) => {
       results.errors.push(`Admin user: ${error.message}`);
     }
     
+    // Step 3: Create example reports
+    try {
+      const { getSqlClient } = await import('../../db');
+      const { createId } = await import('@paralleldrive/cuid2');
+      const sqlClient = await getSqlClient();
+      
+      if (!sqlClient) {
+        throw new Error('SQL client not available');
+      }
+      
+      // Create reports table if not exists
+      await sqlClient`
+        CREATE TABLE IF NOT EXISTS reports (
+          id VARCHAR(64) PRIMARY KEY,
+          "tenantId" VARCHAR(64) NOT NULL,
+          "userId" VARCHAR(64) REFERENCES users(id) ON DELETE CASCADE,
+          standard VARCHAR(64) NOT NULL,
+          title TEXT NOT NULL,
+          status VARCHAR(64) DEFAULT 'draft',
+          "sourceType" VARCHAR(64),
+          "parsingSummary" JSONB,
+          "createdAt" TIMESTAMP DEFAULT NOW(),
+          "updatedAt" TIMESTAMP DEFAULT NOW()
+        )
+      `;
+      
+      // Get admin user ID
+      const adminUsers = await sqlClient`
+        SELECT id FROM users WHERE email = 'admin@qivo-mining.com' LIMIT 1
+      `;
+      
+      if (adminUsers.length > 0) {
+        const adminId = adminUsers[0].id;
+        
+        // Check if reports already exist
+        const existingReports = await sqlClient`
+          SELECT COUNT(*) as count FROM reports WHERE "userId" = ${adminId}
+        `;
+        
+        if (parseInt(existingReports[0].count) === 0) {
+          // Create 3 example reports
+          const reports = [
+            {
+              id: createId(),
+              standard: 'NI_43_101',
+              title: 'Relatório Técnico - Projeto Carajás',
+              status: 'ready_for_audit',
+            },
+            {
+              id: createId(),
+              standard: 'JORC_2012',
+              title: 'Technical Report - Iron Ore Project',
+              status: 'draft',
+            },
+            {
+              id: createId(),
+              standard: 'CBRR',
+              title: 'Relatório de Recursos - Mina Brucutu',
+              status: 'ready_for_audit',
+            },
+          ];
+          
+          for (const report of reports) {
+            await sqlClient`
+              INSERT INTO reports (
+                id, "tenantId", "userId", standard, title, status,
+                "sourceType", "parsingSummary", "createdAt", "updatedAt"
+              ) VALUES (
+                ${report.id},
+                'default',
+                ${adminId},
+                ${report.standard},
+                ${report.title},
+                ${report.status},
+                'internal',
+                '{"language": "pt-BR"}'::jsonb,
+                NOW(),
+                NOW()
+              )
+            `;
+          }
+          
+          results.exampleReports = 'created';
+          results.reportsCount = reports.length;
+        } else {
+          results.exampleReports = 'already_exist';
+          results.reportsCount = parseInt(existingReports[0].count);
+        }
+      }
+    } catch (error: any) {
+      results.exampleReports = 'failed';
+      results.errors.push(`Example reports: ${error.message}`);
+    }
+    
     // Verify using raw SQL
     try {
       const { getSqlClient } = await import('../../db');
