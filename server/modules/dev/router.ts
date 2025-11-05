@@ -164,30 +164,80 @@ router.post('/create-qivo-admin', async (req: Request, res: Response) => {
 });
 
 /**
- * Setup Database (migrations + admin user)
+ * Setup Database (push schema + create admin)
  * POST /api/dev/setup-database
  */
 router.post('/setup-database', async (req: Request, res: Response) => {
   try {
-    const { getDb } = await import('../../db');
-    const { users, licenses } = await import('../../../drizzle/schema');
-    const { hashPassword } = await import('../auth/service');
-    const { createId } = await import('@paralleldrive/cuid2');
-    const { eq } = await import('drizzle-orm');
-    
-    const db = await getDb();
-    
-    if (!db) {
-      throw new Error('Database not available');
-    }
-    
     const results: any = {
+      schema: 'pending',
       adminUser: 'pending',
       errors: [],
     };
     
-    // Create admin user
+    // Step 1: Push schema to database using raw SQL
     try {
+      const { sql: sqlClient } = await import('../../db');
+      
+      // Create users table
+      await sqlClient`
+        CREATE TABLE IF NOT EXISTS users (
+          id VARCHAR(64) PRIMARY KEY,
+          name TEXT,
+          email VARCHAR(320) UNIQUE,
+          "passwordHash" TEXT,
+          "googleId" VARCHAR(255),
+          "loginMethod" VARCHAR(64) DEFAULT 'email',
+          role VARCHAR(20) DEFAULT 'user',
+          "tenantId" VARCHAR(64) DEFAULT 'default',
+          "refreshToken" TEXT,
+          "stripeCustomerId" VARCHAR(255),
+          "createdAt" TIMESTAMP DEFAULT NOW(),
+          "lastSignedIn" TIMESTAMP DEFAULT NOW()
+        )
+      `;
+      
+      // Create licenses table
+      await sqlClient`
+        CREATE TABLE IF NOT EXISTS licenses (
+          id VARCHAR(64) PRIMARY KEY,
+          "userId" VARCHAR(64) REFERENCES users(id) ON DELETE CASCADE,
+          "tenantId" VARCHAR(64) DEFAULT 'default',
+          plan VARCHAR(20) DEFAULT 'START',
+          status VARCHAR(20) DEFAULT 'active',
+          "billingPeriod" VARCHAR(20) DEFAULT 'monthly',
+          "reportsLimit" INTEGER DEFAULT 5,
+          "projectsLimit" INTEGER DEFAULT 3,
+          "reportsUsed" INTEGER DEFAULT 0,
+          "stripeCustomerId" VARCHAR(255),
+          "stripeSubscriptionId" VARCHAR(255),
+          "stripePriceId" VARCHAR(255),
+          "validFrom" TIMESTAMP DEFAULT NOW(),
+          "validUntil" TIMESTAMP,
+          "lastResetAt" TIMESTAMP DEFAULT NOW()
+        )
+      `;
+      
+      results.schema = 'success';
+    } catch (error: any) {
+      results.schema = 'failed';
+      results.errors.push(`Schema: ${error.message}`);
+    }
+    
+    // Step 2: Create admin user
+    try {
+      const { getDb } = await import('../../db');
+      const { users, licenses } = await import('../../../drizzle/schema');
+      const { hashPassword } = await import('../auth/service');
+      const { createId } = await import('@paralleldrive/cuid2');
+      const { eq } = await import('drizzle-orm');
+      
+      const db = await getDb();
+      
+      if (!db) {
+        throw new Error('Database not available');
+      }
+      
       const adminEmail = 'admin@qivo-mining.com';
       const adminPassword = 'Bigtrade@4484';
       
@@ -245,8 +295,14 @@ router.post('/setup-database', async (req: Request, res: Response) => {
     
     // Verify
     try {
-      const userCount = await db.select().from(users).execute();
-      results.userCount = userCount.length;
+      const { getDb } = await import('../../db');
+      const { users } = await import('../../../drizzle/schema');
+      const db = await getDb();
+      
+      if (db) {
+        const userCount = await db.select().from(users).execute();
+        results.userCount = userCount.length;
+      }
     } catch (error: any) {
       results.errors.push(`Verification: ${error.message}`);
     }
