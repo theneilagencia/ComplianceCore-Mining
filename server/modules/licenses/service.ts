@@ -11,9 +11,9 @@ import { createId } from '@paralleldrive/cuid2';
 export type Plan = 'START' | 'PRO' | 'ENTERPRISE';
 
 export const PLAN_LIMITS = {
-  START: { reportsLimit: 1, projectsLimit: 1, price: 0 },
-  PRO: { reportsLimit: 5, projectsLimit: 3, price: 899, priceAnnual: 9600 },
-  ENTERPRISE: { reportsLimit: 15, projectsLimit: -1, price: 1990, priceAnnual: 21000 },
+  START: { reportsLimit: 1, projectsLimit: 1, price: 2500, priceAnnual: 27000 },
+  PRO: { reportsLimit: 5, projectsLimit: 3, price: 12500, priceAnnual: 135000 },
+  ENTERPRISE: { reportsLimit: -1, projectsLimit: -1, price: 18900, priceAnnual: 204000 }, // -1 = unlimited
 };
 
 export async function createLicense(
@@ -87,7 +87,8 @@ export async function canCreateReport(userId: string) {
   const license = await getUserLicense(userId);
   if (!license) return { allowed: false, reason: 'No active license' };
   if (license.status !== 'active') return { allowed: false, reason: `License is ${license.status}`, license };
-  if (license.reportsUsed >= license.reportsLimit) {
+  // -1 means unlimited reports (Enterprise plan)
+  if (license.reportsLimit !== -1 && license.reportsUsed >= license.reportsLimit) {
     return { allowed: false, reason: `Monthly limit reached (${license.reportsLimit})`, license };
   }
   return { allowed: true, license };
@@ -165,7 +166,8 @@ export async function getLicenseStats(licenseId: string) {
   const [l] = await db.select().from(licenses).where(eq(licenses.id, licenseId)).limit(1);
   if (!l) return null;
 
-  const usagePercentage = (l.reportsUsed / l.reportsLimit) * 100;
+  const isUnlimited = l.reportsLimit === -1;
+  const usagePercentage = isUnlimited ? 0 : (l.reportsUsed / l.reportsLimit) * 100;
   const daysRemaining = l.validUntil ? Math.ceil((l.validUntil.getTime() - Date.now()) / (1000 * 60 * 60 * 24)) : null;
 
   return {
@@ -173,12 +175,13 @@ export async function getLicenseStats(licenseId: string) {
     status: l.status,
     reportsUsed: l.reportsUsed,
     reportsLimit: l.reportsLimit,
-    reportsRemaining: l.reportsLimit - l.reportsUsed,
+    reportsRemaining: isUnlimited ? -1 : l.reportsLimit - l.reportsUsed,
     usagePercentage: Math.round(usagePercentage),
     projectsLimit: l.projectsLimit,
     daysRemaining,
     validUntil: l.validUntil,
     billingPeriod: l.billingPeriod,
+    isUnlimited,
   };
 }
 
