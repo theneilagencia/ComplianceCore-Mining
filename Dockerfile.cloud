@@ -1,0 +1,88 @@
+# QIVO Mining - Cloud Build Optimized Dockerfile
+# Multi-stage build with frontend and backend
+
+# ============================================
+# Stage 1: Builder (Frontend + Backend)
+# ============================================
+FROM node:22-alpine AS builder
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apk add --no-cache bash python3 make g++
+
+# Install pnpm
+RUN npm install -g pnpm@10.4.1
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+COPY patches ./patches
+
+# Install ALL dependencies (including devDependencies for build)
+RUN pnpm install --frozen-lockfile
+
+# Copy all source code
+COPY . .
+
+# Generate Prisma Client
+RUN npx prisma generate
+
+# Build frontend (Vite) - outputs to dist/public
+RUN pnpm vite build
+
+# Build backend (esbuild) - outputs to dist/index.js
+RUN node esbuild.config.js
+
+# Verify build outputs
+RUN ls -la dist/ && \
+    ls -la dist/public/ && \
+    test -f dist/public/index.html && \
+    test -f dist/index.js && \
+    echo "✅ Build verification passed"
+
+# ============================================
+# Stage 2: Production Runtime
+# ============================================
+FROM node:22-alpine AS production
+
+WORKDIR /app
+
+# Install pnpm
+RUN npm install -g pnpm@10.4.1
+
+# Copy package files
+COPY package.json pnpm-lock.yaml ./
+COPY patches ./patches
+
+# Install ONLY production dependencies
+RUN pnpm install --prod --frozen-lockfile
+
+# Copy Prisma schema and generate client
+COPY prisma ./prisma
+RUN npx prisma generate
+
+# Copy built files from builder stage
+COPY --from=builder /app/dist ./dist
+
+# Copy migrations
+COPY server/migrations ./migrations
+
+# Create non-root user
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nodejs -u 1001
+
+# Change ownership
+RUN chown -R nodejs:nodejs /app
+
+# Switch to non-root user
+USER nodejs
+
+# Expose Cloud Run port
+EXPOSE 8080
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=40s --retries=3 \
+  CMD node -e "require('http').get('http://localhost:8080/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
+
+# Start application
+CMD ["node", "dist/index.js"]

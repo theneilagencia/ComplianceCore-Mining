@@ -1,8 +1,8 @@
-# Cloud Build Configuration for QIVO Mining - GCP Migration
-# This file automates the build and deployment process to Cloud Run
+# QIVO Mining - Cloud Build Configuration
+# Builds and deploys directly from GitHub to Cloud Run
 
 steps:
-  # Step 1: Build Docker image
+  # Step 1: Build Docker image with all source code
   - name: 'gcr.io/cloud-builders/docker'
     id: 'build-image'
     args:
@@ -12,57 +12,51 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/qivo-mining:latest'
       - '-f'
-      - 'Dockerfile'
+      - 'Dockerfile.cloud'
       - '.'
-    
+    timeout: 1200s
+
   # Step 2: Push image to Container Registry
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-image'
     args:
       - 'push'
       - 'gcr.io/$PROJECT_ID/qivo-mining:$COMMIT_SHA'
-    
+
   # Step 3: Push latest tag
   - name: 'gcr.io/cloud-builders/docker'
     id: 'push-latest'
     args:
       - 'push'
       - 'gcr.io/$PROJECT_ID/qivo-mining:latest'
-    
+
   # Step 4: Deploy to Cloud Run
-  - name: 'gcr.io/cloud-builders/gcloud'
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
     id: 'deploy-cloud-run'
+    entrypoint: gcloud
     args:
       - 'run'
       - 'deploy'
       - 'qivo-mining'
       - '--image=gcr.io/$PROJECT_ID/qivo-mining:$COMMIT_SHA'
-      - '--region=southamerica-east1'
+      - '--region=us-central1'
       - '--platform=managed'
       - '--allow-unauthenticated'
-      - '--min-instances=1'
-      - '--max-instances=10'
-      - '--memory=4Gi'
+      - '--port=8080'
+      - '--memory=2Gi'
       - '--cpu=2'
       - '--timeout=300'
-      - '--port=10000'
-      - '--vpc-connector=qivo-vpc-connector'
-      - '--vpc-egress=private-ranges-only'
-      - '--set-env-vars=NODE_ENV=production'
-      - '--set-secrets=DATABASE_URL=compliancecore-db-url:latest,OPENAI_API_KEY=openai-api-key:latest,SESSION_SECRET=session-secret:latest,JWT_SECRET=jwt-secret:latest,SIGMINE_API_KEY=sigmine-api-key:latest,MAPBIOMAS_API_KEY=mapbiomas-api-key:latest'
+      - '--max-instances=10'
+      - '--min-instances=0'
+      - '--set-env-vars=NODE_ENV=production,DISABLE_DIAGNOSTIC_CRON=true,DISABLE_ALL_CRONS=true'
+      - '--set-secrets=DATABASE_URL=DATABASE_URL:latest,JWT_SECRET=JWT_SECRET:latest,SESSION_SECRET=SESSION_SECRET:latest,GOOGLE_OAUTH_CLIENT_ID=GOOGLE_OAUTH_CLIENT_ID:latest,GOOGLE_OAUTH_CLIENT_SECRET=GOOGLE_OAUTH_CLIENT_SECRET:latest,STRIPE_PUBLISHABLE_KEY=STRIPE_PUBLISHABLE_KEY:latest,STRIPE_SECRET_KEY=STRIPE_SECRET_KEY:latest'
 
 # Build configuration
-timeout: 1800s  # 30 minutes
+timeout: 1800s
 options:
   machineType: 'E2_HIGHCPU_8'
   logging: CLOUD_LOGGING_ONLY
   
-# Images to be pushed to Container Registry
 images:
   - 'gcr.io/$PROJECT_ID/qivo-mining:$COMMIT_SHA'
   - 'gcr.io/$PROJECT_ID/qivo-mining:latest'
-
-# Substitutions
-substitutions:
-  _DEPLOY_REGION: 'southamerica-east1'
-  _SERVICE_NAME: 'qivo-mining'
