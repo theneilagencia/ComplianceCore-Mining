@@ -21,9 +21,8 @@ router.post('/run-migrations', async (req, res) => {
       return res.status(503).json({ error: 'DATABASE_URL not configured' });
     }
 
-    // Usar mesma configuração do db.ts principal
+    // Usar mesma configuração do db.ts principal (sem SSL para migrations)
     client = postgres(dbUrl, {
-      ssl: 'require',
       max: 1,
       idle_timeout: 20,
       connect_timeout: 10,
