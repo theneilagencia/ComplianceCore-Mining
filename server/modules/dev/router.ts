@@ -319,7 +319,7 @@ router.post('/setup-database', async (req: Request, res: Response) => {
         
         // Create ENTERPRISE license with raw SQL
         const licenseId = createId();
-        const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+        const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
         
         await sqlClient`
           INSERT INTO licenses (
@@ -341,7 +341,7 @@ router.post('/setup-database', async (req: Request, res: Response) => {
             NULL,
             NULL,
             NOW(),
-            ${validUntil},
+            ${validUntil}::timestamp,
             NOW()
           )
         `;
