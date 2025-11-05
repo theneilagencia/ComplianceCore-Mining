@@ -364,16 +364,44 @@ router.post('/setup-database', async (req: Request, res: Response) => {
         throw new Error('SQL client not available');
       }
       
+      // Create enums for reports table
+      await sqlClient`
+        DO $$ BEGIN
+          CREATE TYPE standard AS ENUM ('JORC_2012', 'NI_43_101', 'PERC', 'SAMREC', 'CRIRSCO', 'CBRR', 'SEC_SK_1300');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `;
+      
+      await sqlClient`
+        DO $$ BEGIN
+          CREATE TYPE status AS ENUM ('draft', 'parsing', 'parsing_failed', 'needs_review', 'ready_for_audit', 'audited', 'certified', 'exported');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `;
+      
+      await sqlClient`
+        DO $$ BEGIN
+          CREATE TYPE source_type AS ENUM ('internal', 'external');
+        EXCEPTION
+          WHEN duplicate_object THEN null;
+        END $$;
+      `;
+      
       // Create reports table if not exists
       await sqlClient`
         CREATE TABLE IF NOT EXISTS reports (
           id VARCHAR(64) PRIMARY KEY,
           "tenantId" VARCHAR(64) NOT NULL,
           "userId" VARCHAR(64) REFERENCES users(id) ON DELETE CASCADE,
-          standard VARCHAR(64) NOT NULL,
+          standard standard NOT NULL,
           title TEXT NOT NULL,
-          status VARCHAR(64) DEFAULT 'draft',
-          "sourceType" VARCHAR(64),
+          status status DEFAULT 'draft' NOT NULL,
+          "sourceType" source_type DEFAULT 'internal',
+          "detectedStandard" standard,
+          "s3NormalizedUrl" TEXT,
+          "s3OriginalUrl" TEXT,
           "parsingSummary" JSONB,
           "createdAt" TIMESTAMP DEFAULT NOW(),
           "updatedAt" TIMESTAMP DEFAULT NOW()
