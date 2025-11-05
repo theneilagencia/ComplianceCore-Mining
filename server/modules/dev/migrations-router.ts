@@ -22,8 +22,9 @@ router.post('/run-migrations', async (req, res) => {
     }
 
     client = postgres(dbUrl, {
-      ssl: 'require',
+      ssl: { rejectUnauthorized: false },
       max: 1,
+      connect_timeout: 10,
     });
 
     const results = [];
