@@ -262,66 +262,83 @@ router.post('/setup-database', async (req: Request, res: Response) => {
       results.errors.push(`Schema: ${error.message}`);
     }
     
-    // Step 2: Create admin user
+    // Step 2: Create admin user using raw SQL
     try {
-      const { getDb } = await import('../../db');
-      const { users, licenses } = await import('../../../drizzle/schema');
+      const { getSqlClient } = await import('../../db');
       const { hashPassword } = await import('../auth/service');
       const { createId } = await import('@paralleldrive/cuid2');
-      const { eq } = await import('drizzle-orm');
       
-      const db = await getDb();
+      const sqlClient = await getSqlClient();
       
-      if (!db) {
-        throw new Error('Database not available');
+      if (!sqlClient) {
+        throw new Error('SQL client not available');
       }
       
       const adminEmail = 'admin@qivo-mining.com';
       const adminPassword = 'Bigtrade@4484';
       
-      // Check if admin already exists
-      const existing = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
+      // Check if admin already exists using raw SQL
+      const existing = await sqlClient`
+        SELECT id, email FROM users WHERE email = ${adminEmail} LIMIT 1
+      `;
       
       if (existing.length > 0) {
         results.adminUser = 'already_exists';
         results.adminData = { email: adminEmail, id: existing[0].id };
       } else {
-        // Create admin user
+        // Create admin user with raw SQL
         const adminId = createId();
         const passwordHash = await hashPassword(adminPassword);
         
-        await db.insert(users).values({
-          id: adminId,
-          email: adminEmail,
-          name: 'QIVO Admin',
-          passwordHash,
-          googleId: null,
-          loginMethod: 'email',
-          role: 'admin',
-          tenantId: 'default',
-          refreshToken: null,
-          createdAt: new Date(),
-          lastSignedIn: new Date(),
-        });
+        await sqlClient`
+          INSERT INTO users (
+            id, email, name, "passwordHash", "googleId", "loginMethod",
+            role, "tenantId", "refreshToken", "stripeCustomerId",
+            "createdAt", "lastSignedIn"
+          ) VALUES (
+            ${adminId},
+            ${adminEmail},
+            'QIVO Admin',
+            ${passwordHash},
+            NULL,
+            'email',
+            'admin',
+            'default',
+            NULL,
+            NULL,
+            NOW(),
+            NOW()
+          )
+        `;
         
-        // Create ENTERPRISE license for admin
-        await db.insert(licenses).values({
-          id: createId(),
-          userId: adminId,
-          tenantId: 'default',
-          plan: 'ENTERPRISE',
-          status: 'active',
-          billingPeriod: 'annual',
-          reportsLimit: 15,
-          projectsLimit: 999999,
-          reportsUsed: 0,
-          stripeCustomerId: null,
-          stripeSubscriptionId: null,
-          stripePriceId: null,
-          validFrom: new Date(),
-          validUntil: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-          lastResetAt: new Date(),
-        });
+        // Create ENTERPRISE license with raw SQL
+        const licenseId = createId();
+        const validUntil = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000);
+        
+        await sqlClient`
+          INSERT INTO licenses (
+            id, "userId", "tenantId", plan, status, "billingPeriod",
+            "reportsLimit", "projectsLimit", "reportsUsed",
+            "stripeCustomerId", "stripeSubscriptionId", "stripePriceId",
+            "validFrom", "validUntil", "lastResetAt"
+          ) VALUES (
+            ${licenseId},
+            ${adminId},
+            'default',
+            'ENTERPRISE',
+            'active',
+            'annual',
+            15,
+            999999,
+            0,
+            NULL,
+            NULL,
+            NULL,
+            NOW(),
+            ${validUntil},
+            NOW()
+          )
+        `;
         
         results.adminUser = 'created';
         results.adminData = { email: adminEmail, id: adminId };
@@ -331,15 +348,14 @@ router.post('/setup-database', async (req: Request, res: Response) => {
       results.errors.push(`Admin user: ${error.message}`);
     }
     
-    // Verify
+    // Verify using raw SQL
     try {
-      const { getDb } = await import('../../db');
-      const { users } = await import('../../../drizzle/schema');
-      const db = await getDb();
+      const { getSqlClient } = await import('../../db');
+      const sqlClient = await getSqlClient();
       
-      if (db) {
-        const userCount = await db.select().from(users).execute();
-        results.userCount = userCount.length;
+      if (sqlClient) {
+        const userCount = await sqlClient`SELECT COUNT(*) as count FROM users`;
+        results.userCount = parseInt(userCount[0].count);
       }
     } catch (error: any) {
       results.errors.push(`Verification: ${error.message}`);
