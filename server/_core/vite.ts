@@ -54,9 +54,9 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  // FIX: Use process.cwd() instead of import.meta.dirname for production
-  // In production Docker container, files are at /app/dist/public
-  const distPath = path.join(process.cwd(), "dist", "public");
+  // FIX: In Docker container, working directory is /app
+  // Use absolute path /app/dist/public for production
+  const distPath = path.join("/app", "dist", "public");
   
   console.log(`[serveStatic] Attempting to serve static files from: ${distPath}`);
   console.log(`[serveStatic] Current working directory: ${process.cwd()}`);
