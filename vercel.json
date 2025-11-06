@@ -1,0 +1,15 @@
+{
+  "buildCommand": "cd client && pnpm install && pnpm build",
+  "outputDirectory": "dist/public",
+  "framework": "vite",
+  "rewrites": [
+    {
+      "source": "/api/:path*",
+      "destination": "https://qivo-mining-kfw7vgq5xa-rj.a.run.app/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
+    }
+  ]
+}
