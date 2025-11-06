@@ -353,12 +353,19 @@ async function startServer() {
   // IMPORTANT: Static files and catch-all MUST be registered LAST
   // to avoid intercepting API routes
   // development mode uses Vite, production mode uses static files
+  console.log("\n🔧 [STARTUP] Setting up static file serving...");
+  console.log("NODE_ENV:", process.env.NODE_ENV);
+  console.log("Is development?", process.env.NODE_ENV === "development");
+  
   if (process.env.NODE_ENV === "development") {
+    console.log("✅ [STARTUP] Using Vite dev server");
     // Use eval to hide import from esbuild bundler
     const viteModule = await eval('import("./vite")');
     await viteModule.setupVite(app, server);
   } else {
+    console.log("✅ [STARTUP] Calling serveStatic() for production...");
     serveStatic(app);
+    console.log("✅ [STARTUP] serveStatic() completed");
   }
 
   const preferredPort = parseInt(process.env.PORT || "3000");
