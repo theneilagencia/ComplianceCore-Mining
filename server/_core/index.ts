@@ -350,6 +350,29 @@ async function startServer() {
     })
   );
   
+  // DEBUG ENDPOINT - Verificar estrutura de arquivos
+  app.get("/api/debug/filesystem", (req, res) => {
+    const fs = require('fs');
+    const path = require('path');
+    
+    const info = {
+      cwd: process.cwd(),
+      __dirname: __dirname,
+      nodeEnv: process.env.NODE_ENV,
+      paths: {
+        "/app": fs.existsSync("/app") ? "EXISTS" : "NOT FOUND",
+        "/app/dist": fs.existsSync("/app/dist") ? "EXISTS" : "NOT FOUND",
+        "/app/dist/public": fs.existsSync("/app/dist/public") ? "EXISTS" : "NOT FOUND",
+        "/app/dist/public/index.html": fs.existsSync("/app/dist/public/index.html") ? "EXISTS" : "NOT FOUND",
+        "/app/dist/index.js": fs.existsSync("/app/dist/index.js") ? "EXISTS" : "NOT FOUND",
+      },
+      distContents: fs.existsSync("/app/dist") ? fs.readdirSync("/app/dist") : "N/A",
+      distPublicContents: fs.existsSync("/app/dist/public") ? fs.readdirSync("/app/dist/public").slice(0, 20) : "N/A",
+    };
+    
+    res.json(info);
+  });
+  
   // IMPORTANT: Static files and catch-all MUST be registered LAST
   // to avoid intercepting API routes
   // development mode uses Vite, production mode uses static files
