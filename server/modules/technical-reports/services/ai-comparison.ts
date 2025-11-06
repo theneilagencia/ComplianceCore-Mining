@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { getStandardPrompt, type MiningStandard, type Language } from './ai-prompts';
 
 let openai: OpenAI | null = null;
 
@@ -45,10 +46,16 @@ export async function generateAISection(
   sectionName: string,
   originalText: string,
   standard: string,
-  context: any
+  context: any,
+  language: Language = 'pt-BR'
 ): Promise<string> {
   try {
-    const prompt = `You are a CRIRSCO-compliant technical report writer specializing in ${standard} standard.
+    // Obter prompt especializado para o padrão e idioma
+    const standardPrompt = getStandardPrompt(standard as MiningStandard, language, sectionName);
+    
+    const prompt = `${standardPrompt}
+
+**Tarefa**: Reescrever a seguinte seção para conformidade total com ${standard}.
 
 **Section**: ${sectionName}
 **Standard**: ${standard}
@@ -80,7 +87,7 @@ Generate the improved section:`;
       messages: [
         {
           role: 'system',
-          content: `You are an expert CRIRSCO technical report writer with deep knowledge of ${standard} standards. Your writing is precise, compliant, and professional.`,
+          content: standardPrompt,
         },
         {
           role: 'user',

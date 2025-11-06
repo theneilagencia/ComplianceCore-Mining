@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import { getStandardPrompt, type MiningStandard, type Language } from './ai-prompts';
 
 let openai: OpenAI | null = null;
 
@@ -50,7 +51,8 @@ export async function generateExecutiveSummary(
   reportId: string,
   auditScore: number,
   krcis: any[],
-  reportData: any
+  reportData: any,
+  language: Language = 'pt-BR'
 ): Promise<ExecutiveSummary> {
   try {
     // Prepare KRCI data for analysis
@@ -70,8 +72,18 @@ export async function generateExecutiveSummary(
       return acc;
     }, {} as Record<string, any[]>);
 
+    // Obter prompt especializado
+    const standardPrompt = getStandardPrompt(
+      (reportData.standard || 'JORC_2012') as MiningStandard,
+      language
+    );
+    
     // Generate comprehensive analysis
-    const prompt = `You are a senior CRIRSCO compliance auditor analyzing a technical mining report audit.
+    const prompt = `${standardPrompt}
+
+**Análise de Auditoria KRCI**
+
+Você está analisando os resultados de uma auditoria KRCI de um relatório técnico de mineração.
 
 **Report Information**:
 - Report ID: ${reportId}
@@ -152,8 +164,7 @@ Return a JSON object with this structure:
       messages: [
         {
           role: 'system',
-          content:
-            'You are a senior CRIRSCO compliance auditor with 20+ years of experience. You provide clear, actionable insights that help mining companies improve their technical reports.',
+          content: standardPrompt,
         },
         {
           role: 'user',

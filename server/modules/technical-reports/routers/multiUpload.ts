@@ -36,6 +36,7 @@ export const multiUploadRouter = router({
         ).min(1).max(10), // Mínimo 1, máximo 10 arquivos
         reportTitle: z.string().optional(), // Título customizado do relatório
         standard: z.string().optional(), // Padrão do relatório (JORC, NI 43-101, etc)
+        language: z.enum(['pt-BR', 'en-US', 'es-ES', 'fr-FR']).optional().default('pt-BR'), // Idioma do relatório
       })
     )
     .mutation(async ({ ctx, input }) => {
