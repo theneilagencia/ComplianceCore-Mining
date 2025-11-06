@@ -56,7 +56,8 @@ export async function setupVite(app: Express, server: Server) {
 export function serveStatic(app: Express) {
   // FIX: In Docker container, working directory is /app
   // Use absolute path /app/dist/public for production
-  const distPath = path.join("/app", "dist", "public");
+  // IMPORTANT: Use string literal, NOT path.join() to avoid esbuild optimization
+  const distPath = "/app/dist/public";
   
   console.log(`[serveStatic] Attempting to serve static files from: ${distPath}`);
   console.log(`[serveStatic] Current working directory: ${process.cwd()}`);
@@ -136,7 +137,8 @@ export function serveStatic(app: Express) {
       return next();
     }
     
-    const indexPath = path.join("/app", "dist", "public", "index.html");
+    // IMPORTANT: Use string literal to avoid esbuild optimization issues
+    const indexPath = "/app/dist/public/index.html";
     console.log(`[serveStatic] Serving index.html for: ${req.originalUrl}`);
     console.log(`[serveStatic] Index path: ${indexPath}`);
     
