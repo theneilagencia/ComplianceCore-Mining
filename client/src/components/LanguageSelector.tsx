@@ -1,4 +1,4 @@
-import { useTranslation } from 'react-i18next';
+import { useTranslation } from '@/hooks/useTranslation';
 import { Globe } from 'lucide-react';
 import {
   DropdownMenu,
@@ -8,21 +8,17 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 
-const languages = [
-  { code: 'pt-BR', name: 'Português', flag: '🇧🇷' },
-  { code: 'en-US', name: 'English', flag: '🇺🇸' },
-  { code: 'es-ES', name: 'Español', flag: '🇪🇸' },
-  { code: 'fr-FR', name: 'Français', flag: '🇫🇷' },
-];
+const languages = {
+  pt: { name: 'Português', flag: '🇧🇷' },
+  en: { name: 'English', flag: '🇺🇸' },
+  es: { name: 'Español', flag: '🇪🇸' },
+  fr: { name: 'Français', flag: '🇫🇷' },
+};
 
 export function LanguageSelector() {
-  const { i18n } = useTranslation();
+  const { locale, setLocale, availableLocales } = useTranslation();
 
-  const currentLanguage = languages.find((lang) => lang.code === i18n.language) || languages[0];
-
-  const changeLanguage = (code: string) => {
-    i18n.changeLanguage(code);
-  };
+  const currentLanguage = languages[locale as keyof typeof languages];
 
   return (
     <DropdownMenu>
@@ -34,14 +30,15 @@ export function LanguageSelector() {
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
-        {languages.map((lang) => (
+        {availableLocales.map((lang) => (
           <DropdownMenuItem
-            key={lang.code}
-            onClick={() => changeLanguage(lang.code)}
-            className={i18n.language === lang.code ? 'bg-accent' : ''}
+            key={lang}
+            onClick={() => setLocale(lang as 'pt' | 'en' | 'es' | 'fr')}
+            className={locale === lang ? 'bg-accent' : ''}
           >
-            <span className="mr-2">{lang.flag}</span>
-            {lang.name}
+            <span className="mr-2">{languages[lang as keyof typeof languages].flag}</span>
+            {languages[lang as keyof typeof languages].name}
+            {locale === lang && <span className="ml-auto text-xs">✓</span>}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

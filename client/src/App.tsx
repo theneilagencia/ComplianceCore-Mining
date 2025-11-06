@@ -8,7 +8,7 @@ import { NotificationCenter } from "./components/NotificationCenter";
 import { setupWebhookListener } from "./hooks/useWebhooks";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AuthProvider } from "./contexts/AuthContext";
-// import { LocaleProvider } from "./contexts/LocaleContext"; // Temporarily disabled
+import { LocaleProvider } from "./contexts/LocaleContext";
 import PrivateRoute from "./components/PrivateRoute";
 
 // Páginas públicas (carregadas imediatamente)
@@ -175,14 +175,16 @@ function App() {
   return (
     <ErrorBoundary>
       <ThemeProvider defaultTheme="light" switchable={true}>
-        <AuthProvider>
-          <TooltipProvider>
-            <Toaster />
-            <PWAInstallPrompt />
-            <NotificationCenter />
-            <Router />
-          </TooltipProvider>
-        </AuthProvider>
+        <LocaleProvider>
+          <AuthProvider>
+            <TooltipProvider>
+              <Toaster />
+              <PWAInstallPrompt />
+              <NotificationCenter />
+              <Router />
+            </TooltipProvider>
+          </AuthProvider>
+        </LocaleProvider>
       </ThemeProvider>
     </ErrorBoundary>
   );
