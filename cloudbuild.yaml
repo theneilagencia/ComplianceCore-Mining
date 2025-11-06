@@ -40,7 +40,7 @@ steps:
       - 'deploy'
       - 'qivo-mining'
       - '--image=gcr.io/$PROJECT_ID/qivo-mining:$COMMIT_SHA'
-      - '--region=us-central1'
+      - '--region=southamerica-east1'
       - '--platform=managed'
       - '--allow-unauthenticated'
       - '--port=8080'
