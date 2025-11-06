@@ -23,6 +23,7 @@ import {
   cloudinaryGetUrl,
   getCloudinaryStatus,
 } from './storage-cloudinary';
+import { Storage } from '@google-cloud/storage';
 
 // ============================================================================
 // CONFIGURAÇÃO
@@ -32,6 +33,19 @@ const RENDER_DISK_PATH = process.env.RENDER_DISK_PATH || '/var/data/uploads';
 const USE_RENDER_DISK = process.env.USE_RENDER_DISK === 'true';
 const FORGE_API_URL = ENV.forgeApiUrl;
 const FORGE_API_KEY = ENV.forgeApiKey;
+const GCS_BUCKET = process.env.GCS_BUCKET || '';
+const USE_GCS = !!GCS_BUCKET;
+
+// Inicializar GCS se configurado
+let gcsStorage: Storage | null = null;
+if (USE_GCS) {
+  try {
+    gcsStorage = new Storage();
+    console.log('✅ Google Cloud Storage initialized');
+  } catch (error) {
+    console.error('❌ Failed to initialize GCS:', error);
+  }
+}
 
 // ============================================================================
 // TIPOS
@@ -41,7 +55,7 @@ export interface StorageResult {
   key: string;
   url: string;
   localPath?: string;
-  provider: 'render-disk' | 'cloudinary' | 'forge' | 'hybrid-cloudinary' | 'hybrid-forge';
+  provider: 'render-disk' | 'cloudinary' | 'forge' | 'hybrid-cloudinary' | 'hybrid-forge' | 'gcs' | 'hybrid-gcs';
 }
 
 // ============================================================================
@@ -143,6 +157,49 @@ async function readFromRenderDisk(relKey: string): Promise<Buffer> {
 }
 
 // ============================================================================
+// GCS OPERATIONS
+// ============================================================================
+
+async function uploadToGCS(
+  relKey: string,
+  data: Buffer | Uint8Array | string,
+  contentType: string
+): Promise<string> {
+  if (!gcsStorage || !GCS_BUCKET) {
+    throw new Error('GCS not configured: set GCS_BUCKET environment variable');
+  }
+
+  const key = normalizeKey(relKey);
+  const bucket = gcsStorage.bucket(GCS_BUCKET);
+  const file = bucket.file(key);
+
+  const buffer = typeof data === 'string' ? Buffer.from(data, 'utf8') : Buffer.from(data);
+
+  await file.save(buffer, {
+    contentType,
+    metadata: {
+      cacheControl: 'public, max-age=31536000',
+    },
+  });
+
+  // Tornar arquivo público
+  await file.makePublic();
+
+  const url = `https://storage.googleapis.com/${GCS_BUCKET}/${key}`;
+  console.log('✅ Uploaded to GCS:', url);
+  return url;
+}
+
+async function getGCSDownloadUrl(relKey: string): Promise<string> {
+  if (!gcsStorage || !GCS_BUCKET) {
+    throw new Error('GCS not configured');
+  }
+
+  const key = normalizeKey(relKey);
+  return `https://storage.googleapis.com/${GCS_BUCKET}/${key}`;
+}
+
+// ============================================================================
 // FORGE OPERATIONS (Fallback)
 // ============================================================================
 
@@ -229,10 +286,11 @@ export async function storagePut(
   const renderDiskAvailable = await isRenderDiskAvailable();
   const cloudinaryAvailable = isCloudinaryConfigured();
   const forgeAvailable = isForgeAvailable();
+  const gcsAvailable = USE_GCS && !!gcsStorage;
 
-  if (!renderDiskAvailable && !cloudinaryAvailable && !forgeAvailable) {
+  if (!renderDiskAvailable && !cloudinaryAvailable && !forgeAvailable && !gcsAvailable) {
     throw new Error(
-      'No storage backend available. Configure RENDER_DISK_PATH, CLOUDINARY, or BUILT_IN_FORGE credentials.'
+      'No storage backend available. Configure RENDER_DISK_PATH, CLOUDINARY, GCS_BUCKET, or BUILT_IN_FORGE credentials.'
     );
   }
 
@@ -240,8 +298,27 @@ export async function storagePut(
   let publicUrl: string;
   let provider: StorageResult['provider'];
 
-  // Estratégia 1: Híbrido (Render Disk + Cloudinary) - RECOMENDADO
-  if (renderDiskAvailable && cloudinaryAvailable) {
+  // Estratégia 1: GCS (Google Cloud Storage) - PRIORIDADE MÁXIMA
+  if (gcsAvailable) {
+    console.log('📦 Using GCS (Google Cloud Storage)');
+    
+    publicUrl = await uploadToGCS(relKey, data, contentType);
+    provider = 'gcs';
+  }
+  // Estratégia 2: Híbrido (Render Disk + GCS)
+  else if (renderDiskAvailable && gcsAvailable) {
+    console.log('📦 Using HYBRID storage (Render Disk + GCS)');
+    
+    // Salvar localmente
+    localPath = await saveToRenderDisk(relKey, data);
+    
+    // Upload para GCS para URL pública
+    publicUrl = await uploadToGCS(relKey, data, contentType);
+    
+    provider = 'hybrid-gcs';
+  }
+  // Estratégia 3: Híbrido (Render Disk + Cloudinary) - RECOMENDADO
+  else if (renderDiskAvailable && cloudinaryAvailable) {
     console.log('📦 Using HYBRID storage (Render Disk + Cloudinary)');
     
     // Salvar localmente
@@ -253,7 +330,7 @@ export async function storagePut(
     
     provider = 'hybrid-cloudinary';
   }
-  // Estratégia 2: Híbrido (Render Disk + FORGE)
+  // Estratégia 4: Híbrido (Render Disk + FORGE)
   else if (renderDiskAvailable && forgeAvailable) {
     console.log('📦 Using HYBRID storage (Render Disk + FORGE)');
     
@@ -265,7 +342,7 @@ export async function storagePut(
     
     provider = 'hybrid-forge';
   }
-  // Estratégia 3: Apenas Cloudinary
+  // Estratégia 5: Apenas Cloudinary
   else if (cloudinaryAvailable) {
     console.log('📦 Using CLOUDINARY only');
     
@@ -274,7 +351,7 @@ export async function storagePut(
     
     provider = 'cloudinary';
   }
-  // Estratégia 4: Apenas FORGE
+  // Estratégia 6: Apenas FORGE
   else if (forgeAvailable) {
     console.log('📦 Using FORGE only');
     
@@ -282,7 +359,7 @@ export async function storagePut(
     
     provider = 'forge';
   }
-  // Estratégia 5: Apenas Render Disk (sem URL pública)
+  // Estratégia 7: Apenas Render Disk (sem URL pública)
   else {
     console.log('📦 Using RENDER DISK only (no public URL)');
     
@@ -324,6 +401,16 @@ export async function storageGet(
       };
     } catch (error) {
       console.warn('⚠️ File not found in Render Disk, trying CDN...');
+    }
+  }
+
+  // Fallback para GCS
+  if (USE_GCS && gcsStorage) {
+    try {
+      const url = await getGCSDownloadUrl(key);
+      return { key, url };
+    } catch (error) {
+      console.warn('⚠️ File not found in GCS, trying Cloudinary...');
     }
   }
 
