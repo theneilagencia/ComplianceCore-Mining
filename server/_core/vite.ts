@@ -54,12 +54,44 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath = path.resolve(import.meta.dirname, "../..", "dist", "public");
+  // FIX: Use process.cwd() instead of import.meta.dirname for production
+  // In production Docker container, files are at /app/dist/public
+  const distPath = path.join(process.cwd(), "dist", "public");
+  
+  console.log(`[serveStatic] Attempting to serve static files from: ${distPath}`);
+  console.log(`[serveStatic] Current working directory: ${process.cwd()}`);
+  console.log(`[serveStatic] Directory exists: ${fs.existsSync(distPath)}`);
   
   if (!fs.existsSync(distPath)) {
     console.error(
-      `Could not find the build directory: ${distPath}, make sure to build the client first`
+      `❌ ERROR: Could not find the build directory: ${distPath}`
     );
+    console.error(`Please make sure to build the client first with: pnpm vite build`);
+    
+    // List what's actually in dist/
+    const distRoot = path.join(process.cwd(), "dist");
+    if (fs.existsSync(distRoot)) {
+      console.log(`Contents of ${distRoot}:`);
+      const contents = fs.readdirSync(distRoot);
+      contents.forEach(item => {
+        const itemPath = path.join(distRoot, item);
+        const stats = fs.statSync(itemPath);
+        console.log(`  ${stats.isDirectory() ? '📁' : '📄'} ${item}`);
+      });
+    } else {
+      console.error(`❌ ERROR: dist/ directory does not exist at all!`);
+    }
+  } else {
+    console.log(`✅ Static files directory found at: ${distPath}`);
+    // List contents for debugging
+    const contents = fs.readdirSync(distPath);
+    console.log(`Static files available (${contents.length} items):`);
+    contents.slice(0, 10).forEach(item => {
+      console.log(`  - ${item}`);
+    });
+    if (contents.length > 10) {
+      console.log(`  ... and ${contents.length - 10} more files`);
+    }
   }
 
   // ⚠️ FIX CRÍTICO: Serve static files com headers anti-cache para JS/CSS
@@ -103,6 +135,15 @@ export function serveStatic(app: Express) {
     if (req.originalUrl.startsWith('/api')) {
       return next();
     }
-    res.sendFile(path.resolve(distPath, "index.html"));
+    
+    const indexPath = path.join(distPath, "index.html");
+    console.log(`[serveStatic] Serving index.html for: ${req.originalUrl}`);
+    
+    if (!fs.existsSync(indexPath)) {
+      console.error(`❌ ERROR: index.html not found at: ${indexPath}`);
+      return res.status(500).send('Application not built correctly. Missing index.html');
+    }
+    
+    res.sendFile(indexPath);
   });
 }
