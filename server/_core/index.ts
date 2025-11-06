@@ -29,7 +29,6 @@ import { startScheduler } from "../modules/radar/services/scheduler";
 import templatesRouter from "../modules/templates/router";
 import validateRouter from "../modules/validate/router";
 import contactRouter from "../modules/contact/router";
-import brandingRouter from "../modules/branding/router";
 import storageDownloadRouter from "../routes/storage-download";
 import fixS3UrlRouter from "../routes/fix-s3url";
 import { initStorage } from "../storage-hybrid";
@@ -45,7 +44,7 @@ import stripeWebhookSetupRouter from "../modules/dev/setup-stripe-webhook";
 import { runDevSeeds } from "../modules/dev/seed";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
-import { serveStatic, setupVite } from "./vite";
+import { serveStatic } from "./vite";
 import { antiRedirectMiddleware } from "./anti-redirect-middleware";
 
 function isPortAvailable(port: number): Promise<boolean> {
@@ -331,9 +330,6 @@ async function startServer() {
   // Contact form routes
   app.use("/api/contact", contactRouter);
   
-  // Branding routes
-  app.use("/api/branding", brandingRouter);
-  
   // Storage download routes
   app.use("/api/storage", storageDownloadRouter);
   
@@ -358,6 +354,7 @@ async function startServer() {
   // to avoid intercepting API routes
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
+    const { setupVite } = await import("./vite");
     await setupVite(app, server);
   } else {
     serveStatic(app);
