@@ -440,8 +440,14 @@ export async function storageGet(
  */
 export function getStorageStatus() {
   const cloudinaryStatus = getCloudinaryStatus();
+  const gcsAvailable = USE_GCS && !!gcsStorage;
   
   return {
+    gcs: {
+      enabled: USE_GCS,
+      bucket: GCS_BUCKET,
+      available: gcsAvailable,
+    },
     renderDisk: {
       enabled: USE_RENDER_DISK,
       path: RENDER_DISK_PATH,
@@ -462,14 +468,18 @@ export async function initStorage() {
   const renderDiskAvailable = await isRenderDiskAvailable();
   const cloudinaryAvailable = initCloudinary();
   const forgeAvailable = isForgeAvailable();
+  const gcsAvailable = USE_GCS && !!gcsStorage;
 
   console.log('\n🗄️  Storage Configuration:');
+  console.log('  GCS (Google Cloud Storage):', gcsAvailable ? '✅ Available' : '❌ Not configured');
   console.log('  Render Disk:', renderDiskAvailable ? '✅ Available' : '❌ Not available');
   console.log('  Cloudinary:', cloudinaryAvailable ? '✅ Available' : '❌ Not configured');
   console.log('  FORGE:', forgeAvailable ? '✅ Available' : '❌ Not configured');
   
-  if (renderDiskAvailable && cloudinaryAvailable) {
-    console.log('  Mode: 🔄 HYBRID (Render Disk + Cloudinary) ⭐ RECOMMENDED\n');
+  if (gcsAvailable) {
+    console.log('  Mode: ☁️  GCS (Google Cloud Storage) ⭐ RECOMMENDED\n');
+  } else if (renderDiskAvailable && cloudinaryAvailable) {
+    console.log('  Mode: 🔄 HYBRID (Render Disk + Cloudinary)\n');
   } else if (renderDiskAvailable && forgeAvailable) {
     console.log('  Mode: 🔄 HYBRID (Render Disk + FORGE)\n');
   } else if (cloudinaryAvailable) {
