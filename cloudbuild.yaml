@@ -13,7 +13,7 @@ steps:
       - '-t'
       - 'gcr.io/$PROJECT_ID/qivo-mining:latest'
       - '-f'
-      - 'Dockerfile.cloud'
+      - 'Dockerfile.simple'
       - '.'
     timeout: 1200s
 
