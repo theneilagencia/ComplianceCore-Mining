@@ -54,6 +54,12 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
+  console.log("\n========== serveStatic() CALLED ==========");
+  console.log("Time:", new Date().toISOString());
+  console.log("__dirname:", __dirname);
+  console.log("process.cwd():", process.cwd());
+  console.log("==========================================\n");
+  
   // FIX: In Docker container, working directory is /app
   // Use absolute path /app/dist/public for production
   // IMPORTANT: Use string literal, NOT path.join() to avoid esbuild optimization
