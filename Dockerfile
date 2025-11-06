@@ -35,9 +35,6 @@ COPY --from=deps /app/node_modules ./node_modules
 # Copy source code
 COPY . .
 
-# Generate Prisma Client
-RUN npx prisma generate
-
 # Build application
 RUN bash build.sh
 
@@ -55,10 +52,6 @@ RUN npm install -g pnpm@10.4.1
 COPY package.json pnpm-lock.yaml ./
 COPY patches ./patches
 RUN pnpm install --prod --frozen-lockfile
-
-# Copy Prisma schema and generate client
-COPY prisma ./prisma
-RUN npx prisma generate
 
 # Copy built files from builder
 COPY --from=builder /app/dist ./dist
