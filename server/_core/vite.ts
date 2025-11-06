@@ -136,14 +136,16 @@ export function serveStatic(app: Express) {
       return next();
     }
     
-    const indexPath = path.join(distPath, "index.html");
+    const indexPath = path.join("/app", "dist", "public", "index.html");
     console.log(`[serveStatic] Serving index.html for: ${req.originalUrl}`);
+    console.log(`[serveStatic] Index path: ${indexPath}`);
     
     if (!fs.existsSync(indexPath)) {
       console.error(`❌ ERROR: index.html not found at: ${indexPath}`);
       return res.status(500).send('Application not built correctly. Missing index.html');
     }
     
-    res.sendFile(indexPath);
+    // Use absolute path with sendFile
+    res.sendFile(indexPath, { root: "/" });
   });
 }
