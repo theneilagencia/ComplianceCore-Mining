@@ -24,9 +24,6 @@ RUN pnpm install --frozen-lockfile
 # Copy all source code
 COPY . .
 
-# Generate Prisma Client
-RUN npx prisma generate
-
 # Build frontend (Vite) - outputs to dist/public
 RUN pnpm vite build
 
@@ -56,10 +53,6 @@ COPY patches ./patches
 
 # Install ONLY production dependencies
 RUN pnpm install --prod --frozen-lockfile
-
-# Copy Prisma schema and generate client
-COPY prisma ./prisma
-RUN npx prisma generate
 
 # Copy built files from builder stage
 COPY --from=builder /app/dist ./dist
