@@ -354,8 +354,9 @@ async function startServer() {
   // to avoid intercepting API routes
   // development mode uses Vite, production mode uses static files
   if (process.env.NODE_ENV === "development") {
-    const { setupVite } = await import("./vite");
-    await setupVite(app, server);
+    // Use eval to hide import from esbuild bundler
+    const viteModule = await eval('import("./vite")');
+    await viteModule.setupVite(app, server);
   } else {
     serveStatic(app);
   }
