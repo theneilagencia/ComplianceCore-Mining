@@ -23,6 +23,10 @@ RUN bash build.sh
 # Expose port (Render uses PORT env var, default to 10000)
 EXPOSE 10000
 
-# Start application
-CMD ["pnpm", "run", "start"]
+# Copy startup script
+COPY start-with-migrations.sh ./
+RUN chmod +x start-with-migrations.sh
+
+# Start application with migrations
+CMD ["./start-with-migrations.sh"]
 

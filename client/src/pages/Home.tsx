@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { useEffect } from "react";
 import { useLocation } from "wouter";
+import ROICalculator from "@/components/ROICalculator";
 
 const API_BASE_URL = import.meta.env.VITE_API_URL || "";
 
@@ -176,8 +177,11 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Como Funciona */}
-        <section id="modules" className="container mx-auto px-4 py-20">
+        {/* Calculadora ROI */}
+        <ROICalculator />
+
+        {/* Contato */}
+        <section id="contact" className="container mx-auto px-4 py-20">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-16">
               <h2 className="text-4xl font-bold text-white mb-4">

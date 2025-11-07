@@ -22,17 +22,19 @@ if (!DATABASE_URL) {
 
 console.log('✅ DATABASE_URL configurado');
 
+// Remove sslmode from URL - Cloud Run connects via private VPC without SSL
+const cleanUrl = DATABASE_URL.replace(/[?&]sslmode=[^&]+/, '');
+
+console.log('🔌 Connecting to database via private VPC (no SSL)');
+
 const pool = new Pool({
-  connectionString: DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
+  connectionString: cleanUrl,
+  // No SSL needed for Cloud Run -> Cloud SQL via private VPC
+  ssl: false
 });
 
 const migrations = [
-  '0004_add_regulatory_changes.sql',
-  '0005_add_stripe_customer_id.sql',
-  '0006_add_on_demand_reports.sql',
+  '0000_postgresql_fix.sql',
 ];
 
 async function runMigrations() {

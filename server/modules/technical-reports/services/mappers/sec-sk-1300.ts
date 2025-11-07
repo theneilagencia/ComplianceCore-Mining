@@ -1,21 +1,69 @@
 /**
- * NI 43-101 Mapper - COMPLETE VERSION
- * Maps normalized.json to NI 43-101 (Canadian) standard structure
+ * SEC S-K 1300 Mapper
+ * Maps normalized.json to SEC S-K 1300 standard structure
  */
 
 interface NormalizedData {
-  metadata?: any;
-  sections?: any[];
-  resource_estimates?: any[];
-  reserve_estimates?: any[];
-  competent_persons?: any[];
-  drilling?: any;
-  sampling?: any;
+  metadata?: {
+    project_name?: string;
+    company?: string;
+    effective_date?: string;
+    report_date?: string;
+    location?: string;
+    country?: string;
+  };
+  sections?: Array<{
+    title?: string;
+    content_text?: string;
+  }>;
+  resource_estimates?: Array<{
+    category?: string;
+    tonnage?: number;
+    grade?: Record<string, number>;
+    cutoff_grade?: Record<string, number>;
+    contained_metal?: Record<string, number>;
+  }>;
+  reserve_estimates?: Array<{
+    category?: string;
+    tonnage?: number;
+    grade?: Record<string, number>;
+    contained_metal?: Record<string, number>;
+  }>;
+  competent_persons?: Array<{
+    name?: string;
+    qualification?: string;
+    organization?: string;
+    affiliation?: string;
+    role?: string;
+  }>;
+  drilling?: {
+    total_holes?: number;
+    total_meters?: number;
+    drill_type?: string;
+  };
+  sampling?: {
+    method?: string;
+    laboratory?: string;
+  };
   geology?: any;
-  property?: any;
-  economic_assumptions?: any;
+  property?: {
+    license_number?: string;
+    license_type?: string;
+    license_area?: number;
+    license_holder?: string;
+  };
+  economic_assumptions?: {
+    recovery_rate?: number;
+    mining_cost?: number;
+    processing_cost?: number;
+    mining_method?: string;
+    processing_method?: string;
+  };
   qa_qc?: string;
-  brand?: any;
+  brand?: {
+    logo_s3?: string;
+    company_display?: string;
+  };
 }
 
 export function toStandard(n: NormalizedData) {
@@ -34,7 +82,7 @@ export function toStandard(n: NormalizedData) {
   const resources = n.resource_estimates || [];
   const reserves = n.reserve_estimates || [];
   
-  const resourcesTable = resources.map((r: any) => ({
+  const resourcesTable = resources.map(r => ({
     category: r.category || "-",
     tonnage: r.tonnage || 0,
     grades: r.grade || {},
@@ -42,7 +90,7 @@ export function toStandard(n: NormalizedData) {
     contained_metal: r.contained_metal || {},
   }));
 
-  const reservesTable = reserves.map((r: any) => ({
+  const reservesTable = reserves.map(r => ({
     category: r.category || "-",
     tonnage: r.tonnage || 0,
     grades: r.grade || {},
@@ -52,67 +100,79 @@ export function toStandard(n: NormalizedData) {
   const geologyData = typeof n.geology === 'string' ? { regional: n.geology } : (n.geology || {});
 
   return {
-    standard: "NI 43-101",
+    standard: "SEC S-K 1300",
+    
+    // Basic Information
     project_name: n.metadata?.project_name || "-",
     company: n.metadata?.company || "-",
     location: n.metadata?.location || "-",
-    country: n.metadata?.country || "Canada",
+    country: n.metadata?.country || "-",
     report_date: n.metadata?.report_date || new Date().toISOString().split('T')[0],
     effective_date: n.metadata?.effective_date || new Date().toISOString().split('T')[0],
     
-    qualified_persons: (n.competent_persons || []).map((p: any) => ({
+    // Competent/Qualified Persons
+    competent_persons: (n.competent_persons || []).map(p => ({
       name: p.name || "-",
       qualification: p.qualification || "-",
       organization: p.organization || "-",
       affiliation: p.affiliation || "Independent",
-      role: p.role || "Qualified Person (NI 43-101)",
+      role: p.role || "Competent Person (SEC S-K 1300)",
     })),
     
+    // Property
     property: {
-      location: n.metadata?.location || "-",
-      mineral_tenure: n.property?.license_number || "-",
-      tenure_type: n.property?.license_type || "-",
-      area: n.property?.license_area || 0,
-      holder: n.property?.license_holder || n.metadata?.company || "-",
+      license_number: n.property?.license_number || "-",
+      license_type: n.property?.license_type || "-",
+      license_area: n.property?.license_area || 0,
+      license_holder: n.property?.license_holder || n.metadata?.company || "-",
     },
     
+    // Geology
     geology: {
       regional: geologyData.regional || "-",
       local: geologyData.local || "-",
       deposit_type: geologyData.deposit_type || "-",
     },
     
+    // Drilling
     drilling: {
       total_holes: n.drilling?.total_holes || 0,
       total_meters: n.drilling?.total_meters || 0,
       drill_type: n.drilling?.drill_type || "-",
     },
     
+    // Sampling
     sampling: {
       method: n.sampling?.method || "-",
       laboratory: n.sampling?.laboratory || "-",
       qaqc: n.qa_qc || "-",
     },
     
+    // Resources
     mineral_resources: {
       table: resourcesTable,
       estimation_method: "Kriging",
     },
     
+    // Reserves (if applicable)
     mineral_reserves: reserves.length > 0 ? {
       table: reservesTable,
     } : null,
     
+    // Economic
     economic_assumptions: n.economic_assumptions || {},
     
-    items: {
-      item2: findSection("item 2"),
-      item14: findSection("item 14"),
-      item27: findSection("item 27"),
+    // Sections
+    sections: {
+      section1: findSection("section 1"),
+      section2: findSection("section 2"),
+      section3: findSection("section 3"),
     },
     
+    // Legacy compatibility
     resources_table: resourcesTable,
     
+    // Brand
     _brand: {
       logo_s3: n.brand?.logo_s3,
       company_display: n.brand?.company_display || n.metadata?.company || "-",
@@ -120,9 +180,12 @@ export function toStandard(n: NormalizedData) {
   };
 }
 
+/**
+ * Get dynamic fields for SEC S-K 1300 manual entry
+ */
 export function getDynamicFields() {
   return {
-    standard: "NI_43_101",
+    standard: "SEC_SK_1300",
     sections: [
       {
         id: "basic",
@@ -130,18 +193,18 @@ export function getDynamicFields() {
         fields: [
           { name: "project_name", label: "Project Name", type: "text", required: true },
           { name: "location", label: "Location", type: "text", required: true },
-          { name: "company", label: "Issuer", type: "text", required: true },
+          { name: "company", label: "Company", type: "text", required: true },
           { name: "report_date", label: "Report Date", type: "date", required: true },
           { name: "effective_date", label: "Effective Date", type: "date", required: true },
         ],
       },
       {
-        id: "qualified_person",
-        title: "Qualified Person",
+        id: "competent_person",
+        title: "Competent Person",
         repeatable: true,
         fields: [
           { name: "name", label: "Name", type: "text", required: true },
-          { name: "qualification", label: "Professional Designation", type: "text", required: true },
+          { name: "qualification", label: "Qualification", type: "text", required: true },
           { name: "organization", label: "Organization", type: "text", required: true },
         ],
       },
@@ -149,8 +212,8 @@ export function getDynamicFields() {
         id: "property",
         title: "Property",
         fields: [
-          { name: "mineral_tenure", label: "Mineral Tenure", type: "text", required: true },
-          { name: "area", label: "Area (hectares)", type: "number", required: true },
+          { name: "license_number", label: "License Number", type: "text", required: true },
+          { name: "license_area", label: "Area (hectares)", type: "number", required: true },
         ],
       },
       {

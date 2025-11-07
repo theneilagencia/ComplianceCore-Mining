@@ -110,3 +110,9 @@ temp/
 *.pyc
 __pycache__/
 .copilot/
+
+# Backup files
+*.backup
+
+# Validation and test results
+validation-results.json

@@ -6,6 +6,7 @@ import { uploadsV2Router } from "./routers/uploadsV2";
 import { auditRouter } from "./routers/audit";
 import { exportsRouter } from "./routers/exports";
 import { precertificationRouter } from "./routers/precertification";
+// import { dynamicFieldsRouter } from "./dynamic-fields-router"; // Temporariamente desabilitado
 import { TRPCError } from "@trpc/server";
 
 /**
@@ -35,7 +36,7 @@ export const technicalReportsRouter = router({
     create: protectedProcedure
       .input(
         z.object({
-          standard: z.enum(["JORC_2012", "NI_43_101", "PERC", "SAMREC", "CRIRSCO", "SEC_SK_1300"]),
+          standard: z.enum(["JORC_2012", "NI_43_101", "PERC", "SAMREC", "CRIRSCO", "SEC_SK_1300", "CBRR", "ANM", "ANP", "CPRM", "IBAMA"]),
           title: z.string().min(5, "Título deve ter no mínimo 5 caracteres"),
           projectName: z.string().optional(),
           location: z.string().optional(),
@@ -381,8 +382,8 @@ export const technicalReportsRouter = router({
       .input(
         z.object({
           reportId: z.string(),
-          fromStandard: z.enum(["JORC_2012", "NI_43_101", "PERC", "SAMREC", "CRIRSCO"]),
-          toStandard: z.enum(["JORC_2012", "NI_43_101", "PERC", "SAMREC", "CRIRSCO"]),
+          fromStandard: z.enum(["JORC_2012", "NI_43_101", "PERC", "SAMREC", "CRIRSCO", "SEC_SK_1300", "CBRR", "ANM", "ANP", "CPRM", "IBAMA"]),
+          toStandard: z.enum(["JORC_2012", "NI_43_101", "PERC", "SAMREC", "CRIRSCO", "SEC_SK_1300", "CBRR", "ANM", "ANP", "CPRM", "IBAMA"]),
           format: z.enum(["PDF", "DOCX", "XLSX"]).default("PDF"),
         })
       )
@@ -480,6 +481,9 @@ export const technicalReportsRouter = router({
 
   // ==================== PRE-CERTIFICATION (ETAPA 4) ====================
   precertification: precertificationRouter,
+
+  // ==================== DYNAMIC FIELDS ====================
+  // dynamicFields: dynamicFieldsRouter, // Temporariamente desabilitado
 });
 
 // Module load detection

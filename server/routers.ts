@@ -8,6 +8,7 @@ import { technicalReportsRouter } from "./modules/technical-reports/router";
 import { billingRouter } from "./modules/billing/router";
 import { integrationsRouter } from "./modules/integrations/router";
 import { storageRouter } from "./modules/storage/router";
+// import { radarAdminRouter } from "./modules/radar/admin-router"; // Temporariamente desabilitado
 
 export const appRouter = router({
   system: systemRouter,
@@ -29,6 +30,7 @@ export const appRouter = router({
   billing: billingRouter,
   integrations: integrationsRouter,
   storage: storageRouter,
+  // radarAdmin: radarAdminRouter, // Temporariamente desabilitado
 
 
 });

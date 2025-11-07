@@ -26,6 +26,7 @@ import radarRouter from "../modules/radar/router";
 import diagnosticRouter from "../modules/radar/diagnosticRouter";
 import { startDiagnosticCron } from "../modules/radar/services/diagnosticCron";
 import { startScheduler } from "../modules/radar/services/scheduler";
+// import { startScheduler as startRadarAdminScheduler } from "../modules/radar/jobs/scheduler"; // Temporariamente desabilitado
 import templatesRouter from "../modules/templates/router";
 import validateRouter from "../modules/validate/router";
 import contactRouter from "../modules/contact/router";
@@ -76,9 +77,11 @@ async function startServer() {
   server.headersTimeout = 310000; // Slightly longer than keepAliveTimeout
   
   // Configure CORS with credentials - GCP + localhost
+  // CORS is applied ONLY to /api routes to avoid blocking static files
   const allowedOrigins = [
     // Production (GCP)
     'https://qivo-mining-586444405059.southamerica-east1.run.app',
+    'https://qivo-mining-kfw7vgq5xa-rj.a.run.app',
     'https://www.qivomining.com',
     'http://www.qivomining.com',
     'https://qivomining.com',
@@ -88,8 +91,8 @@ async function startServer() {
     'http://localhost:4173'
   ];
   
-  app.use(cors({
-    origin: (origin, callback) => {
+  const corsOptions = {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (mobile apps, Postman, etc.)
       if (!origin) return callback(null, true);
       
@@ -103,7 +106,7 @@ async function startServer() {
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
-  }));
+  };
   
   // Gzip compression for all responses (should be early in middleware chain)
   app.use(compression({
@@ -179,7 +182,8 @@ async function startServer() {
     },
   });
   
-  // Aplicar rate limiting geral a todas as rotas /api
+  // Aplicar CORS e rate limiting apenas para rotas /api
+  app.use('/api/', cors(corsOptions));
   app.use('/api/', generalLimiter);
   
   // Health check endpoint (enhanced v2.0)
@@ -376,6 +380,16 @@ async function startServer() {
         console.error('❌ [Radar Scheduler] Failed to initialize:', error);
         // Non-blocking - continue server startup even if scheduler fails
       }
+      
+      // Initialize Radar Admin Scheduler (API monitoring, health checks, cleanup)
+      // Temporariamente desabilitado
+      // try {
+      //   startRadarAdminScheduler();
+      //   console.log('✅ [Radar Admin Scheduler] Initialized successfully - Jobs scheduled for API monitoring and maintenance');
+      // } catch (error) {
+      //   console.error('❌ [Radar Admin Scheduler] Failed to initialize:', error);
+      //   // Non-blocking - continue server startup even if scheduler fails
+      // }
     }
     
     // Auto-seed disabled - use POST /api/dev/init to create test users

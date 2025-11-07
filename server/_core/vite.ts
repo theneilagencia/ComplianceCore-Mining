@@ -3,6 +3,8 @@ import fs from "fs";
 import { type Server } from "http";
 import { nanoid } from "nanoid";
 import path from "path";
+import { fileURLToPath } from "url";
+import { dirname } from "path";
 import { createServer as createViteServer } from "vite";
 import viteConfig from "../../vite.config";
 
@@ -31,8 +33,10 @@ export async function setupVite(app: Express, server: Server) {
     }
 
     try {
+      const __filename = fileURLToPath(import.meta.url);
+      const __dirname = dirname(__filename);
       const clientTemplate = path.resolve(
-        import.meta.dirname,
+        __dirname,
         "../..",
         "client",
         "index.html"
@@ -54,10 +58,16 @@ export async function setupVite(app: Express, server: Server) {
 }
 
 export function serveStatic(app: Express) {
-  const distPath =
-    process.env.NODE_ENV === "development"
-      ? path.resolve(import.meta.dirname, "../..", "dist", "public")
-      : path.resolve(import.meta.dirname, "public");
+  // ⚠️ FIX CRÍTICO: Detectar produção corretamente
+  // Em produção, o código compilado está em dist/ e os assets em dist/public/
+  // Verificamos se estamos rodando do código compilado (dist/index.js)
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+  const isProduction = __dirname.includes('/dist');
+  
+  const distPath = isProduction
+    ? path.resolve(__dirname, "public") // dist/public (relativo a dist/)
+    : path.resolve(__dirname, "../..", "dist", "public"); // Desenvolvimento
   if (!fs.existsSync(distPath)) {
     console.error(
       `Could not find the build directory: ${distPath}, make sure to build the client first`
@@ -82,6 +92,12 @@ export function serveStatic(app: Express) {
         res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate, proxy-revalidate, max-age=0');
         res.setHeader('Pragma', 'no-cache');
         res.setHeader('Expires', '0');
+        // ⚠️ FIX CRÍTICO: Setar Content-Type explicitamente
+        if (filePath.endsWith('.js') || filePath.endsWith('.mjs')) {
+          res.setHeader('Content-Type', 'application/javascript; charset=utf-8');
+        } else if (filePath.endsWith('.css')) {
+          res.setHeader('Content-Type', 'text/css; charset=utf-8');
+        }
         // Security headers (bonus)
         res.setHeader('X-Content-Type-Options', 'nosniff');
       }
@@ -101,8 +117,8 @@ export function serveStatic(app: Express) {
   // fall through to index.html if the file doesn't exist (but not for API routes)
   // IMPORTANT: Use middleware without path (not "*") to only catch unhandled routes
   app.use((req, res, next) => {
-    // Don't serve index.html for API routes - let them 404 naturally
-    if (req.originalUrl.startsWith('/api')) {
+    // Don't serve index.html for API routes or assets - let them 404 naturally
+    if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/assets')) {
       return next();
     }
     res.sendFile(path.resolve(distPath, "index.html"));
