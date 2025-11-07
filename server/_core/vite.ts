@@ -128,6 +128,19 @@ export function serveStatic(app: Express) {
     res.setHeader('Expires', '0');
     res.setHeader('Surrogate-Control', 'no-store');
     
-    res.sendFile(path.resolve(distPath, "index.html"));
+    // ⚠️ FIX CRÍTICO: Injetar timestamp no HTML para forçar Cloudflare a reconhecer mudança
+    const indexPath = path.resolve(distPath, "index.html");
+    fs.readFile(indexPath, 'utf-8', (err, html) => {
+      if (err) {
+        return res.status(500).send('Error loading page');
+      }
+      // Injeta meta tag com timestamp único
+      const timestamp = Date.now();
+      const modifiedHtml = html.replace(
+        '</head>',
+        `<meta name="cache-bust" content="${timestamp}"></head>`
+      );
+      res.send(modifiedHtml);
+    });
   });
 }
