@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { TrendingUp, Clock, DollarSign, Calculator } from "lucide-react";
 
+// Updated: 2025-11-07 13:26 UTC - Currency changed to USD
 export default function ROICalculator() {
   const [reportsPerYear, setReportsPerYear] = useState<number>(12);
   const [costPerReport, setCostPerReport] = useState<number>(5000);
