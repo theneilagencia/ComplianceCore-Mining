@@ -15,6 +15,7 @@ import {
 import { trpc } from "@/lib/trpc";
 import { FileText, Upload as UploadIcon, Download, AlertCircle, CheckCircle } from "lucide-react";
 import UploadModalAtomic from "../components/UploadModalAtomic";
+import BatchUploadModal from "../components/BatchUploadModal";
 import { Badge } from "@/components/ui/badge";
 import { ReportListSkeleton } from "@/components/ui/skeleton";
 import { EmptyState } from "@/components/EmptyState";
@@ -34,6 +35,7 @@ export default function GenerateReport() {
  const [grade, setGrade] = useState<string>("");
  const [description, setDescription] = useState<string>("");
  const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
+ const [showBatchUploadModal, setShowBatchUploadModal] = useState<boolean>(false);
  const [, navigate] = useLocation();
 
  const utils = trpc.useUtils();
@@ -450,10 +452,16 @@ export default function GenerateReport() {
 					<p className="text-sm text-gray-400 mb-4">
 						Faça upload de relatórios em PDF, DOCX, XLSX, CSV ou ZIP
 					</p>
-					<Button onClick={() => setShowUploadModal(true)}>
-						<UploadIcon className="h-4 w-4 mr-2" />
-						Selecionar Arquivo
-					</Button>
+						<div className="flex gap-3 justify-center">
+							<Button onClick={() => setShowUploadModal(true)}>
+								<UploadIcon className="h-4 w-4 mr-2" />
+								Upload Único
+							</Button>
+							<Button onClick={() => setShowBatchUploadModal(true)} variant="outline">
+								<UploadIcon className="h-4 w-4 mr-2" />
+								Upload em Lote
+							</Button>
+						</div>
 					<p className="text-xs text-gray-500 mt-3">
 						Formatos aceitos: PDF, DOCX, XLSX, CSV, ZIP (máx. 50MB)
 					</p>
@@ -535,9 +543,15 @@ export default function GenerateReport() {
 			}
 			navigate(`/reports/${result.reportId}/review`);
 		}}
-	/>
- </div>
- </DashboardLayout>
- );
+		/>
+		
+		{/* Batch Upload Modal */}
+		<BatchUploadModal
+			open={showBatchUploadModal}
+			onClose={() => setShowBatchUploadModal(false)}
+		/>
+	 </div>
+	 </DashboardLayout>
+	 );
 }
 
