@@ -17,8 +17,9 @@ RUN pnpm install --frozen-lockfile
 # Copy source code
 COPY . .
 
-# Build application
-RUN bash build.sh
+# Build application (with timestamp to bust cache)
+ARG CACHE_BUST=unknown
+RUN echo "Building at: $CACHE_BUST" && bash build.sh
 
 # Expose port (Render uses PORT env var, default to 10000)
 EXPOSE 10000
