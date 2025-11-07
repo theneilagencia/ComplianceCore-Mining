@@ -30,10 +30,13 @@ else
   pnpm install
 fi
 
-# Clean old build artifacts
+# Clean old build artifacts (aggressive)
 echo "🧹 Cleaning old build..."
 rm -rf dist/
 rm -rf .vite-cache/ 2>/dev/null || true
+rm -rf client/dist/ 2>/dev/null || true
+rm -rf node_modules/.vite/ 2>/dev/null || true
+echo "✅ Build cache cleared"
 
 # Build client (Vite)
 echo "🎨 Building client..."
