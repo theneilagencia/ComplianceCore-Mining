@@ -58,7 +58,7 @@ export default function ROICalculator() {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="cost">Custo atual por relatório (R$)</Label>
+                <Label htmlFor="cost">Custo atual por relatório (USD)</Label>
                 <Input
                   id="cost"
                   type="number"
@@ -100,7 +100,7 @@ export default function ROICalculator() {
                   Economia Anual
                 </div>
                 <div className="text-3xl font-bold text-green-600">
-                  R$ {annualSavings.toLocaleString('pt-BR')}
+                  $ {annualSavings.toLocaleString('en-US')}
                 </div>
               </div>
 
