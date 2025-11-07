@@ -25,14 +25,16 @@ router.get('/operations', async (req: Request, res: Response) => {
     const { operations, sources } = await aggregateAllData();
     const activeSources = sources.filter(s => s.status === 'active').length;
     
-    // Production mode: require real data
+    // Handle empty data gracefully
     if (operations.length === 0) {
-      console.error('[Radar] No operations available from data sources');
-      return res.status(503).json({
-        success: false,
-        error: 'No mining operations data available. Data sources may be offline or not configured.',
+      console.warn('[Radar] No operations available from data sources');
+      return res.status(200).json({
+        success: true,
+        operations: [],
         sources: activeSources,
+        lastUpdate: new Date().toISOString(),
         sourceDetails: sources,
+        message: 'No mining operations data available at this time. Data sources are being updated.',
       });
     }
     

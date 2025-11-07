@@ -120,12 +120,18 @@ export default function RadarPage() {
         credentials: 'include',
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch operations');
+      const data = await response.json();
+      
+      if (!response.ok || !data.success) {
+        throw new Error(data.error || 'Failed to fetch operations');
       }
 
-      const data = await response.json();
       setOperations(data.operations || []);
+      
+      // Show friendly message if no data available
+      if (data.operations.length === 0 && data.message) {
+        console.info('[Radar]', data.message);
+      }
     } catch (err: any) {
       setError(err.message);
     } finally {
