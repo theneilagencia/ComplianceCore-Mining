@@ -121,6 +121,13 @@ export function serveStatic(app: Express) {
     if (req.originalUrl.startsWith('/api') || req.originalUrl.startsWith('/assets')) {
       return next();
     }
+    
+    // ⚠️ FIX CRÍTICO: Headers anti-cache AGRESSIVOS para index.html
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader('Surrogate-Control', 'no-store');
+    
     res.sendFile(path.resolve(distPath, "index.html"));
   });
 }
