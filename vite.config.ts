@@ -31,9 +31,9 @@ export default defineConfig({
       output: {
         // ⚠️ FIX CRÍTICO: Hash em TODOS os assets para cache busting
         // Cada deploy gera novos hashes, forçando navegador a baixar versão nova
-        entryFileNames: `assets/[name].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[ext]`,
+        entryFileNames: `assets/[name]-[hash].js`,
+        chunkFileNames: `assets/[name]-[hash].js`,
+        assetFileNames: `assets/[name]-[hash].[ext]`,
         manualChunks: {
           // React ecosystem
           vendor: ["react", "react-dom", "wouter"],
