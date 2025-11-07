@@ -85,6 +85,8 @@ async function startServer() {
     'https://www.qivomining.com',
     'http://www.qivomining.com',
     'https://qivomining.com',
+    // Staging
+    'https://qivo-mining-staging-586444405059.southamerica-east1.run.app',
     // Development
     'http://localhost:5173',
     'http://localhost:3000',
