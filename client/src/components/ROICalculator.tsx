@@ -8,6 +8,7 @@ import { TrendingUp, Clock, DollarSign, Calculator } from "lucide-react";
 // Updated: 2025-11-08 05:40 UTC - Currency changed to USD
 // Force rebuild: 1762598400 - Google Cloud CDN cache bust
 export default function ROICalculator() {
+  const CACHE_VERSION = '2025-11-08-v2'; // Force new hash
   const [reportsPerYear, setReportsPerYear] = useState<number>(12);
   const [costPerReport, setCostPerReport] = useState<number>(5000);
   const [hoursPerReport, setHoursPerReport] = useState<number>(40);
