@@ -97,7 +97,7 @@ export function verifyToken(token: string): { userId: string; email?: string; ty
 export async function registerUser(data: RegisterData): Promise<AuthTokens> {
   const db = await getDb();
   if (!db) throw new Error('Database not available');
-
+  throw new Error('User with this email already exists')
   // Check if user already exists
   const [existingUser] = await db
     .select()
