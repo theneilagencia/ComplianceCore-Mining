@@ -90,7 +90,9 @@ async function startServer() {
     // Development
     'http://localhost:5173',
     'http://localhost:3000',
-    'http://localhost:4173'
+    'http://localhost:4173',
+    'https://dev-qivo-mining.vercel.app'
+
   ];
   
   const corsOptions = {
