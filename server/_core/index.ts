@@ -32,6 +32,7 @@ import validateRouter from "../modules/validate/router";
 import contactRouter from "../modules/contact/router";
 import storageDownloadRouter from "../routes/storage-download";
 import fixS3UrlRouter from "../routes/fix-s3url";
+import runMigrationsRouter from "../routes/run-migrations";
 import { initStorage } from "../storage-hybrid";
 import { installS3UrlTrigger } from "../install-s3url-trigger";
 import { passport } from "../modules/auth/google-oauth";
@@ -326,6 +327,9 @@ async function startServer() {
   
   // Fix s3Url migration route
   app.use("/api", fixS3UrlRouter);
+  
+  // Run migrations route
+  app.use("/api", runMigrationsRouter);
   
   // Server-Sent Events (SSE) for real-time upload pipeline updates
   const { eventsRouter } = await import("../modules/technical-reports/routers/events");
