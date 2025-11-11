@@ -8,6 +8,8 @@ import { TrendingUp, Clock, DollarSign, Calculator, Building2, Users } from "luc
 
 type ProfileType = "mining" | "consulting" | null;
 
+// Build timestamp: 2025-11-11T15:50:00Z
+
 export default function ROICalculator() {
   const [profile, setProfile] = useState<ProfileType>(null);
   
