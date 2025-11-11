@@ -39,7 +39,7 @@ router.post('/', async (req, res) => {
       throw new Error('Database not available');
     }
     
-    const adminEmail = 'admin@qivo-mining.com';
+    const adminEmail = 'admin@qivomining.com';
     const adminPassword = 'Bigtrade@4484';
     
     // Check if admin already exists
@@ -99,7 +99,7 @@ router.post('/', async (req, res) => {
     });
     
     console.log('[Create Admin] ✅ Admin user created successfully');
-    console.log('[Create Admin] Email: admin@qivo-mining.com');
+    console.log('[Create Admin] Email: admin@qivomining.com');
     console.log('[Create Admin] Password: Bigtrade@4484');
     console.log('[Create Admin] Role: admin');
     console.log('[Create Admin] License: ENTERPRISE (unlimited)');
