@@ -8,7 +8,7 @@ import { TrendingUp, Clock, DollarSign, Calculator, Building2, Users } from "luc
 
 type ProfileType = "mining" | "consulting" | null;
 
-// Build timestamp: 2025-11-11T15:50:00Z
+// Build timestamp: 2025-11-11T16:00:00Z - Fixed click interaction
 
 export default function ROICalculator() {
   const [profile, setProfile] = useState<ProfileType>(null);
@@ -61,34 +61,48 @@ export default function ROICalculator() {
                 A seleção define quais campos serão exibidos e qual lógica de cálculo será usada
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <RadioGroup onValueChange={(value) => setProfile(value as ProfileType)} className="space-y-4">
-                <div className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-slate-50 cursor-pointer">
-                  <RadioGroupItem value="mining" id="mining" />
-                  <div className="flex-1">
-                    <Label htmlFor="mining" className="flex items-center gap-2 font-semibold cursor-pointer">
-                      <Building2 className="h-5 w-5 text-blue-600" />
-                      Mineradora
-                    </Label>
-                    <p className="text-sm text-slate-600 mt-1">
-                      Empresa de mineração que gera relatórios técnicos/regulatórios internamente
-                    </p>
+            <CardContent className="space-y-4">
+              {/* Opção Mineradora - Usando Button ao invés de RadioGroup */}
+              <button
+                onClick={() => setProfile("mining")}
+                className="w-full flex items-start space-x-3 p-4 border rounded-lg hover:bg-slate-50 hover:border-blue-500 transition-all cursor-pointer text-left"
+              >
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-transparent"></div>
                   </div>
                 </div>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 font-semibold mb-1">
+                    <Building2 className="h-5 w-5 text-blue-600" />
+                    Mineradora
+                  </div>
+                  <p className="text-sm text-slate-600">
+                    Empresa de mineração que gera relatórios técnicos/regulatórios internamente
+                  </p>
+                </div>
+              </button>
 
-                <div className="flex items-start space-x-3 p-4 border rounded-lg hover:bg-slate-50 cursor-pointer">
-                  <RadioGroupItem value="consulting" id="consulting" />
-                  <div className="flex-1">
-                    <Label htmlFor="consulting" className="flex items-center gap-2 font-semibold cursor-pointer">
-                      <Users className="h-5 w-5 text-indigo-600" />
-                      Consultoria especializada
-                    </Label>
-                    <p className="text-sm text-slate-600 mt-1">
-                      Consultoria que entrega relatórios técnicos para múltiplos clientes
-                    </p>
+              {/* Opção Consultoria - Usando Button ao invés de RadioGroup */}
+              <button
+                onClick={() => setProfile("consulting")}
+                className="w-full flex items-start space-x-3 p-4 border rounded-lg hover:bg-slate-50 hover:border-indigo-500 transition-all cursor-pointer text-left"
+              >
+                <div className="flex-shrink-0 mt-1">
+                  <div className="w-5 h-5 rounded-full border-2 border-slate-300 flex items-center justify-center">
+                    <div className="w-2 h-2 rounded-full bg-transparent"></div>
                   </div>
                 </div>
-              </RadioGroup>
+                <div className="flex-1">
+                  <div className="flex items-center gap-2 font-semibold mb-1">
+                    <Users className="h-5 w-5 text-indigo-600" />
+                    Consultoria especializada
+                  </div>
+                  <p className="text-sm text-slate-600">
+                    Consultoria que entrega relatórios técnicos para múltiplos clientes
+                  </p>
+                </div>
+              </button>
             </CardContent>
           </Card>
         </div>
