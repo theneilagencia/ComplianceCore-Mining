@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0"
+    />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+    <link rel="icon" type="image/png" sizes="192x192" href="/favicon-192.png" />
+    <link rel="icon" type="image/png" sizes="512x512" href="/favicon-512.png" />
+    <link rel="apple-touch-icon" href="/favicon-192.png" />
+    <title>QIVO Mining</title>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- 
+      ⚠️ FIX: Umami Analytics desabilitado temporariamente
+      Problema: URL /umami.js retornava index.html, causando erro "Unexpected token '<'"
+      Solução: Remover até configurar URL válida do Umami
+      
+      Para reativar:
+      1. Configurar variável VITE_UMAMI_URL no .env
+      2. Descomentar linha abaixo
+      3. Trocar src="/umami.js" por src="${VITE_UMAMI_URL}"
+    -->
+    <!-- 
+    <script
+      defer
+      src="/umami.js"
+      data-website-id=""
+    ></script>
+    -->
+  </body>
+</html>

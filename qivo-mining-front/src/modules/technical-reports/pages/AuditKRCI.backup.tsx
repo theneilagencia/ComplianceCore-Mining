@@ -1,0 +1,690 @@
+import { useEffect } from "react";
+import DashboardLayout from "@/components/DashboardLayout";
+import { Button } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { AuditListSkeleton } from "@/components/ui/skeleton";
+import { trpc } from "@/lib/trpc";
+import { Shield, CheckCircle, AlertTriangle, FileSearch, Download, ExternalLink } from "lucide-react";
+import { CorrectionPlan } from "../components/CorrectionPlan";
+import { AuditTrendsDashboard } from "@/components/AuditTrendsDashboard";
+import { HistoricalComparison } from "@/components/HistoricalComparison";
+import { OfficialSourcesValidation } from "@/components/OfficialSourcesValidation";
+import { useState, useEffect, useRef } from "react";
+import { toast } from "sonner";
+import { useLocation } from "wouter";
+import UploadModalAtomic from '../components/UploadModalAtomic';
+import { exportCorrectionPlan } from '@/services/export-correction-plan';
+
+// Tipos para estados (BUG-005 fix)
+interface KRCI {
+  code: string;
+  section: string;
+  message: string;
+  severity: "critical" | "high" | "medium" | "low";
+  weight: number;
+}
+
+interface AuditResult {
+  auditId: string;
+  reportId: string;
+  score: number;
+  totalRules: number;
+  passedRules: number;
+  failedRules: number;
+  krcis: KRCI[];
+  recommendations: string[];
+  pdfUrl: string | null;
+  timestamp: string;
+}
+
+interface CorrectionItem {
+  ruleCode: string;
+  category: string;
+  section: string;
+  issue: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  weight: number;
+  priority: number;
+  estimatedTime: number;
+  suggestedFix: string;
+  autoFixAvailable: boolean;
+  steps: string[];
+}
+
+interface CorrectionPlanData {
+  reportId: string;
+  auditScore: number;
+  totalIssues: number;
+  criticalIssues: number;
+  highIssues: number;
+  mediumIssues: number;
+  lowIssues: number;
+  estimatedTotalTime: number;
+  priority: 'critical' | 'high' | 'medium' | 'low';
+  corrections: CorrectionItem[];
+  quickWins: CorrectionItem[];
+  mustFix: CorrectionItem[];
+  canDefer: CorrectionItem[];
+  summary: string;
+  createdAt: Date;
+}
+
+export default function AuditKRCI() {
+  const [location, navigate] = useLocation();
+  const [selectedReport, setSelectedReport] = useState<string>("");
+  const [auditResult, setAuditResult] = useState<AuditResult | null>(null);
+  const [correctionPlan, setCorrectionPlan] = useState<CorrectionPlanData | null>(null);
+  const [shouldGeneratePlan, setShouldGeneratePlan] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'select' | 'upload'>('select');
+  const [advancedTab, setAdvancedTab] = useState<'trends' | 'comparison' | 'official'>('trends');
+  const [showUploadModal, setShowUploadModal] = useState<boolean>(false);
+  const blockNavigationRef = useRef<boolean>(false);
+  
+  // GUARD: Bloquear redirecionamento para /review quando estamos processando upload
+  useEffect(() => {
+    console.log('[AuditKRCI] Location changed:', location, 'Block active:', blockNavigationRef.current);
+    if (location.includes('/review') && blockNavigationRef.current) {
+      console.warn('[AuditKRCI] ⛔ BLOCKED navigation to /review, staying in audit module');
+      navigate('/reports/audit', { replace: true });
+      // Manter bloqueio ativo por mais tempo
+      setTimeout(() => {
+        blockNavigationRef.current = false;
+        console.log('[AuditKRCI] Block deactivated');
+      }, 3000);
+    }
+  }, [location, navigate]);
+
+  // Query para listar relatórios (sem polling - atualiza apenas quando necessário)
+  const { data: reports, refetch: refetchReports } = trpc.technicalReports.generate.list.useQuery(
+    { limit: 20 },
+    {
+      refetchOnWindowFocus: false,
+      staleTime: Infinity, // Cache permanente até refetch manual
+    }
+  );
+
+  // Query para listar auditorias (sem polling - atualiza apenas quando necessário)
+  const { data: audits, isLoading: auditsLoading, refetch: refetchAudits } = trpc.technicalReports.audit.list.useQuery(
+    { limit: 10 },
+    {
+      refetchOnWindowFocus: false,
+      staleTime: Infinity, // Cache permanente até refetch manual
+    }
+  );
+
+  // Query para gerar plano de correção (BUG-004 fix: retry logic)
+  const { data: planData, error: planError } = trpc.technicalReports.audit.correctionPlan.useQuery(
+    { auditId: auditResult?.auditId || '' },
+    {
+      enabled: shouldGeneratePlan && !!auditResult?.auditId,
+      retry: 3, // Tenta 3 vezes
+      retryDelay: attemptIndex => Math.min(1000 * 2 ** attemptIndex, 5000), // 1s, 2s, 4s
+    }
+  );
+
+  // Handle plan data success/error
+  useEffect(() => {
+    if (planData && shouldGeneratePlan) {
+      setCorrectionPlan(planData);
+      setShouldGeneratePlan(false);
+      toast.success('Plano de correção gerado!');
+    }
+  }, [planData, shouldGeneratePlan]);
+
+  useEffect(() => {
+    if (planError && shouldGeneratePlan) {
+      setShouldGeneratePlan(false);
+      toast.error('Erro ao gerar plano', {
+        description: planError.message,
+      });
+    }
+  }, [planError, shouldGeneratePlan]);
+
+  // Mutation para executar auditoria
+  const runAudit = trpc.technicalReports.audit.run.useMutation({
+    onSuccess: async (data) => {
+      console.log("[AuditKRCI] Audit completed successfully:", data);
+      toast.success("Auditoria concluída!", {
+        description: `Score: ${data.score}% - ${data.totalRules} regras verificadas`,
+        duration: 5000,
+      });
+      setAuditResult(data);
+      setSelectedReport("");
+      
+      // Refetch IMEDIATO após sucesso
+      console.log("[AuditKRCI] Triggering immediate refetch...");
+      await Promise.all([refetchReports(), refetchAudits()]);
+      
+      // Scroll automático para os resultados após 500ms
+      setTimeout(() => {
+        const resultsElement = document.getElementById('audit-results');
+        if (resultsElement) {
+          resultsElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      }, 500);
+    },
+    onError: (error) => {
+      console.error("[AuditKRCI] Audit failed:", error);
+      toast.error("Erro ao executar auditoria", {
+        description: error.message,
+        duration: 10000,
+      });
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!selectedReport) {
+      toast.error("Selecione um relatório");
+      return;
+    }
+
+    // Módulo de auditoria não requer validação humana prévia
+    // Permite auditoria direta em relatórios com status 'needs_review' ou 'ready_for_audit'
+    const report = reports?.items?.find((r) => r.id === selectedReport);
+    
+    console.log("[AuditKRCI] Starting audit for report:", {
+      reportId: selectedReport,
+      reportTitle: report?.title,
+      reportStatus: report?.status,
+    });
+    
+    // Apenas bloqueia se o relatório ainda estiver em parsing
+    if (report?.status === "parsing") {
+      toast.error("Relatório ainda está sendo processado", {
+        description: "Aguarde o parsing completar antes de auditar",
+      });
+      return;
+    }
+
+    toast.info("Iniciando auditoria...", {
+      description: "Processando relatório...",
+      duration: 3000,
+    });
+
+    // Auditoria pode ser executada diretamente em qualquer relatório processado
+    // (não precisa de revisão humana - isso é apenas para geração de relatórios)
+    runAudit.mutate({
+      reportId: selectedReport,
+      auditType: "full",
+    });
+  };
+
+  // Função para determinar cor do score
+  const getScoreColor = (score: number) => {
+    if (score >= 85) return "text-green-600";
+    if (score >= 70) return "text-yellow-600";
+    if (score >= 50) return "text-orange-600";
+    return "text-red-600";
+  };
+
+  // Função para determinar cor do badge de severidade
+  const getSeverityColor = (severity: string) => {
+    switch (severity) {
+      case "critical":
+        return "bg-red-600";
+      case "high":
+        return "bg-orange-600";
+      case "medium":
+        return "bg-yellow-600";
+      case "low":
+        return "bg-[#2f2c79]";
+      default:
+        return "bg-gray-600";
+    }
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Auditoria & KRCI</h1>
+          <p className="text-gray-400 mt-2">
+            Verifique a conformidade dos relatórios com 22 regras de auditoria KRCI
+          </p>
+        </div>
+
+        {/* Estatísticas */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-green-100 flex items-center justify-center">
+                <CheckCircle className="h-5 w-5 text-green-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-400">Auditorias Completas</p>
+                <p className="text-2xl font-bold">{audits?.length || 0}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-yellow-100 flex items-center justify-center">
+                <AlertTriangle className="h-5 w-5 text-yellow-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-400">Score Médio</p>
+                <p className="text-2xl font-bold">
+                  {audits && audits.length > 0
+                    ? Math.round(audits.reduce((sum, a) => sum + a.score, 0) / audits.length)
+                    : 0}
+                  %
+                </p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-blue-100 flex items-center justify-center">
+                <FileSearch className="h-5 w-5 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-400">Relatórios Prontos</p>
+                <p className="text-2xl font-bold">
+                  {reports?.items?.filter((r) => r.status === "ready_for_audit").length || 0}
+                </p>
+              </div>
+            </div>
+          </Card>
+        </div>
+
+        {/* Formulário de Nova Auditoria */}
+        <Card className="p-6">
+          <div className="flex items-center gap-4 mb-6">
+            <div className="h-12 w-12 rounded-lg bg-purple-100 flex items-center justify-center">
+              <Shield className="h-6 w-6 text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-xl font-semibold">Nova Auditoria</h2>
+              <p className="text-sm text-gray-400">
+                Selecione um relatório existente ou faça upload de um documento para validação
+              </p>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-2 mb-6 border-b">
+            <button
+              onClick={() => setActiveTab('select')}
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === 'select'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Selecionar Relatório
+            </button>
+            <button
+              onClick={() => setActiveTab('upload')}
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === 'upload'
+                  ? 'text-blue-600 border-b-2 border-blue-600'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Upload de Documento
+            </button>
+          </div>
+
+          {activeTab === 'select' ? (
+            <div>
+              <p className="text-sm text-gray-400 mb-4">
+                Selecione um relatório para executar auditoria KRCI completa (22 regras)
+              </p>
+
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div>
+                  <Label htmlFor="report">Relatório</Label>
+                  <Select value={selectedReport} onValueChange={setSelectedReport}>
+                    <SelectTrigger id="report">
+                      <SelectValue placeholder="Selecione um relatório..." />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {reports?.items?.map((report) => (
+                        <SelectItem key={report.id} value={report.id}>
+                          {report.title} ({report.standard}) - {report.status}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className="pt-4">
+                  <Button 
+                    type="submit" 
+                    className="w-full" 
+                    disabled={runAudit.isPending}
+                    aria-label="Executar auditoria KRCI no relatório selecionado"
+                    aria-busy={runAudit.isPending}
+                  >
+                    {runAudit.isPending ? "Executando auditoria..." : "Executar Auditoria"}
+                  </Button>
+                </div>
+              </form>
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-400 mb-4">Faça upload de um relatório para auditar</p>
+              <Button onClick={() => setShowUploadModal(true)}>
+                Fazer Upload
+              </Button>
+            </div>
+          )}
+        </Card>
+
+        {/* Indicador de Processamento */}
+        {runAudit.isPending && (
+          <Card className="p-6 bg-blue-900/20 border-blue-600">
+            <div className="flex items-center gap-4">
+              <div className="animate-spin text-4xl">⏳</div>
+              <div className="flex-1">
+                <h3 className="text-lg font-semibold text-blue-400 mb-1">
+                  Processamento em andamento...
+                </h3>
+                <p className="text-sm text-gray-300">
+                  O relatório está sendo analisado. Aguarde enquanto validamos as 22 regras KRCI.
+                </p>
+                <div className="mt-3 h-2 bg-gray-700 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-blue-500 to-purple-500 animate-pulse" style={{width: '70%'}} />
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
+
+        {/* Resultado da Auditoria */}
+        {auditResult && (
+          <Card id="audit-results" className="p-6">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-xl font-semibold">Resultado da Auditoria</h2>
+              <Badge variant="secondary" className="text-xs">
+                ID: {auditResult.auditId}
+              </Badge>
+            </div>
+
+            {/* Score */}
+            <div className="bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg p-8 text-center text-white mb-6">
+              <div className={`text-6xl font-bold ${getScoreColor(auditResult.score)}`} style={{ color: 'white' }}>
+                {auditResult.score}%
+              </div>
+              <p className="text-lg mt-2 opacity-90">Pontuação de Conformidade</p>
+              <div className="flex justify-center gap-8 mt-6">
+                <div>
+                  <div className="text-3xl font-bold">{auditResult.totalRules}</div>
+                  <div className="text-sm opacity-75">Regras Verificadas</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold">{auditResult.passedRules}</div>
+                  <div className="text-sm opacity-75">Aprovadas</div>
+                </div>
+                <div>
+                  <div className="text-3xl font-bold">{auditResult.failedRules}</div>
+                  <div className="text-sm opacity-75">Reprovadas</div>
+                </div>
+              </div>
+            </div>
+
+            {/* Botão para Gerar Plano de Correção */}
+            {auditResult.failedRules > 0 && !correctionPlan && (
+              <div className="mb-6">
+                <Button
+                  onClick={() => setShouldGeneratePlan(true)}
+                  className="w-full"
+                  variant="default"
+                  aria-label={`Gerar plano de correção para ${auditResult.failedRules} regras falhadas`}
+                >
+                  <FileSearch className="h-4 w-4 mr-2" aria-hidden="true" />
+                  Gerar Plano de Correção Automático
+                </Button>
+              </div>
+            )}
+
+            {/* KRCI Identificados */}
+            <div className="mb-6">
+              <h3 className="text-lg font-semibold mb-4">KRCI Identificados</h3>
+              {auditResult.krcis.length > 0 ? (
+                <div className="space-y-3">
+                  {auditResult.krcis.map((krci: any, idx: number) => (
+                    <div
+                      key={idx}
+                      className="flex items-start justify-between p-4 border rounded-lg hover:bg-[#000020]"
+                    >
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-mono text-sm font-bold">{krci.code}</span>
+                          <Badge className={getSeverityColor(krci.severity)}>
+                            {krci.severity}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-gray-400 mb-1">
+                          <strong>Seção:</strong> {krci.section}
+                        </p>
+                        <p className="text-sm">{krci.message}</p>
+                      </div>
+                      <div className="text-sm text-gray-500 ml-4">
+                        Peso: {krci.weight}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-green-50 border-2 border-green-200 rounded-lg p-6 text-center">
+                  <CheckCircle className="h-12 w-12 text-green-600 mx-auto mb-2" />
+                  <p className="text-green-900 font-semibold">
+                    Nenhum KRCI identificado!
+                  </p>
+                  <p className="text-green-700 text-sm mt-1">
+                    Relatório em conformidade total com os padrões internacionais.
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Recomendações */}
+            {auditResult.recommendations.length > 0 && (
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-4">Recomendações</h3>
+                <div className="bg-blue-50 border-l-4 border-blue-500 p-4 rounded">
+                  <ul className="space-y-2">
+                    {auditResult.recommendations.map((rec: string, idx: number) => (
+                      <li key={idx} className="text-sm text-blue-900">
+                        • {rec}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            )}
+
+            {/* Download PDF */}
+            {auditResult.pdfUrl && (
+              <div className="flex gap-3">
+                <Button asChild className="flex-1" aria-label="Baixar relatório de auditoria em PDF">
+                  <a href={auditResult.pdfUrl} target="_blank" rel="noopener noreferrer">
+                    <Download className="h-4 w-4 mr-2" aria-hidden="true" />
+                    Baixar Relatório PDF
+                  </a>
+                </Button>
+                <Button variant="outline" asChild aria-label="Visualizar relatório de auditoria em nova aba">
+                  <a href={auditResult.pdfUrl} target="_blank" rel="noopener noreferrer">
+                    <ExternalLink className="h-4 w-4 mr-2" aria-hidden="true" />
+                    Visualizar
+                  </a>
+                </Button>
+              </div>
+            )}
+            {!auditResult.pdfUrl && (
+              <div className="text-center py-4 text-sm text-yellow-600">
+                ⚠️ PDF não disponível. A auditoria foi salva mas o relatório não pôde ser gerado.
+              </div>
+            )}
+          </Card>
+        )}
+
+        {/* Plano de Correção */}
+        {correctionPlan && (
+          <Card className="p-6">
+            <CorrectionPlan
+              plan={correctionPlan}
+              onExport={(format) => {
+                // BUG-006 fix: Usa service de export
+                exportCorrectionPlan(correctionPlan, format);
+                toast.success(`Plano exportado em ${format.toUpperCase()}`);
+              }}
+            />
+          </Card>
+        )}
+
+        {/* Análises Avançadas */}
+        {selectedReport && (
+          <Card className="p-6">
+            <h2 className="text-xl font-semibold mb-6">Análises Avançadas</h2>
+            
+            {/* Advanced Tabs */}
+            <div className="flex gap-2 mb-6 border-b">
+              <button
+                onClick={() => setAdvancedTab('trends')}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  advancedTab === 'trends'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Dashboard de Tendências
+              </button>
+              <button
+                onClick={() => setAdvancedTab('comparison')}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  advancedTab === 'comparison'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Comparativo Histórico
+              </button>
+              <button
+                onClick={() => setAdvancedTab('official')}
+                className={`px-4 py-2 font-medium transition-colors ${
+                  advancedTab === 'official'
+                    ? 'text-blue-600 border-b-2 border-blue-600'
+                    : 'text-gray-400 hover:text-white'
+                }`}
+              >
+                Fontes Oficiais
+              </button>
+            </div>
+
+            {/* Advanced Content */}
+            <div>
+              {advancedTab === 'trends' && (
+                <AuditTrendsDashboard reportId={selectedReport} />
+              )}
+              {advancedTab === 'comparison' && (
+                <HistoricalComparison reportId={selectedReport} />
+              )}
+              {advancedTab === 'official' && (
+                <OfficialSourcesValidation reportId={selectedReport} />
+              )}
+            </div>
+          </Card>
+        )}
+
+        {/* Auditorias Recentes */}
+        <Card className="p-6">
+          <h3 className="text-lg font-semibold mb-4">Auditorias Recentes</h3>
+          {auditsLoading ? (
+            <AuditListSkeleton />
+          ) : audits && audits.length > 0 ? (
+            <div className="space-y-3">
+              {audits.map((audit) => (
+                <div
+                  key={audit.id}
+                  className="flex items-center justify-between p-4 border rounded-lg hover:bg-[#000020]"
+                >
+                  <div className="flex-1">
+                    <p className="font-medium">Relatório ID: {audit.reportId}</p>
+                    <p className="text-sm text-gray-400">
+                      {audit.id} • {new Date(audit.createdAt || "").toLocaleDateString("pt-BR")}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="text-right">
+                      <p className={`text-2xl font-bold ${getScoreColor(audit.score)}`}>
+                        {audit.score}%
+                      </p>
+                      <p className="text-xs text-gray-400">
+                        {audit.passedRules}/{audit.totalRules} aprovadas
+                      </p>
+                    </div>
+                    {audit.pdfUrl && (
+                      <Button 
+                        size="sm" 
+                        variant="outline" 
+                        asChild
+                        aria-label={`Baixar relatório de auditoria ${audit.id}`}
+                      >
+                        <a href={audit.pdfUrl} target="_blank" rel="noopener noreferrer">
+                          <Download className="h-4 w-4" />
+                        </a>
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-gray-500 text-center py-8">
+              Nenhuma auditoria realizada ainda
+            </p>
+          )}
+        </Card>
+
+        {/* Upload Modal */}
+        <UploadModalAtomic
+          isOpen={showUploadModal}
+          onClose={() => setShowUploadModal(false)}
+          onSuccess={(result) => {
+            setShowUploadModal(false);
+            
+            // ATIVAR bloqueio de navegação para /review
+            blockNavigationRef.current = true;
+            console.log('[AuditKRCI] 🛡️ Navigation block ACTIVATED');
+            
+            // Módulo de auditoria: executar auditoria diretamente após upload
+            // (não redireciona para revisão humana)
+            toast.info("Upload concluído! Iniciando auditoria...", {
+              description: "Processando relatório...",
+              duration: 3000,
+            });
+            
+            // Aguarda 500ms para garantir que o modal fechou antes de iniciar auditoria
+            setTimeout(() => {
+              runAudit.mutate({
+                reportId: result.reportId,
+                auditType: "full",
+              });
+              // Desativar bloqueio após 5 segundos (tempo suficiente para auditoria iniciar)
+              setTimeout(() => {
+                blockNavigationRef.current = false;
+                console.log('[AuditKRCI] Block deactivated after timeout');
+              }, 5000);
+            }, 500);
+          }}
+        />
+      </div>
+    </DashboardLayout>
+  );
+}
+
