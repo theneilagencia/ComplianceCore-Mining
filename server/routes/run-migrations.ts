@@ -4,6 +4,8 @@ import { db } from '../db';
 
 const router = Router();
 
+// Force rebuild - 2025-11-11
+
 router.post('/run-migrations', async (req, res) => {
   try {
     console.log('[Migrations] Starting database migrations...');
