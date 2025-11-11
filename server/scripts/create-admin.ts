@@ -18,7 +18,7 @@ async function createAdminUser() {
     throw new Error('Database not available');
   }
   
-  const adminEmail = 'admin@qivo.ai';
+  const adminEmail = 'admin@qivomining.com';
   const adminPassword = 'Bigtrade@4484';
   
   // Check if admin already exists
