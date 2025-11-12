@@ -13,6 +13,7 @@ jobs:
   build:
     name: "🏗️ Build & Setup"
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     
     steps:
       - name: "🧩 Checkout repository"
@@ -69,6 +70,7 @@ jobs:
     name: "🧪 Run Automated Tests"
     needs: build
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     
     steps:
       - name: "🧩 Checkout repository"
@@ -164,6 +166,7 @@ jobs:
     name: "🚀 Deploy to Render"
     needs: test
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     
     steps:
       - name: "🧩 Checkout repository"

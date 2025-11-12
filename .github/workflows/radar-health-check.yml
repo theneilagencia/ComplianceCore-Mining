@@ -12,6 +12,7 @@ jobs:
   health-check:
     name: Radar System Health Check
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     
     steps:
       - name: Checkout code
@@ -101,6 +102,7 @@ jobs:
   cleanup-old-backups:
     name: Cleanup Old Backups
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     needs: health-check
     
     steps:

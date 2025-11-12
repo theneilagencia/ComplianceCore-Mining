@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Relatório CBRR - Código Brasileiro de Recursos e Reservas Minerais</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #1f2937;
+      line-height: 1.6;
+      padding: 40px;
+      background: #ffffff;
+    }
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      margin-bottom: 30px;
+      padding-bottom: 20px;
+      border-bottom: 3px solid #059669;
+    }
+    .logo { height: 50px; object-fit: contain; }
+    .header-text h1 {
+      font-size: 28px;
+      color: #047857;
+      margin-bottom: 5px;
+    }
+    .header-text .meta {
+      font-size: 14px;
+      color: #6b7280;
+    }
+    .standard-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .anm-badge {
+      display: inline-block;
+      background: #fbbf24;
+      color: #78350f;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 12px;
+      margin-left: 10px;
+    }
+    h2 {
+      font-size: 20px;
+      color: #047857;
+      margin-top: 30px;
+      margin-bottom: 15px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #d1fae5;
+    }
+    h3 {
+      font-size: 16px;
+      color: #374151;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    p { margin-bottom: 12px; color: #4b5563; }
+    ul { margin-left: 25px; margin-bottom: 15px; }
+    li { margin-bottom: 8px; color: #4b5563; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    th {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      color: white;
+      padding: 12px;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 10px 12px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    tr:hover { background: #f0fdf4; }
+    .footer {
+      margin-top: 50px;
+      padding-top: 20px;
+      border-top: 2px solid #d1fae5;
+      text-align: center;
+      color: #9ca3af;
+      font-size: 12px;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin: 20px 0;
+    }
+    .info-item {
+      padding: 12px;
+      background: #f0fdf4;
+      border-radius: 6px;
+      border-left: 4px solid #059669;
+    }
+    .info-label {
+      font-weight: 600;
+      color: #047857;
+      font-size: 13px;
+      margin-bottom: 4px;
+    }
+    .info-value {
+      color: #6b7280;
+      font-size: 14px;
+    }
+    .compliance-box {
+      background: #fef3c7;
+      border: 2px solid #fbbf24;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 20px 0;
+    }
+    .compliance-box h3 {
+      color: #92400e;
+      margin-top: 0;
+    }
+    .compliance-box p {
+      color: #78350f;
+      margin-bottom: 8px;
+    }
+    .environmental-box {
+      background: #dbeafe;
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 20px 0;
+    }
+    .environmental-box h3 {
+      color: #1e40af;
+      margin-top: 0;
+    }
+    .environmental-box p {
+      color: #1e3a8a;
+      margin-bottom: 8px;
+    }
+    .category-badge {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-right: 8px;
+    }
+    .category-medido {
+      background: #d1fae5;
+      color: #065f46;
+    }
+    .category-indicado {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .category-inferido {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .category-provada {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .category-provavel {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header com Logo -->
+  <div class="header">
+    {{#if _brand.logo_s3}}
+    <img src="{{_brand.logo_s3}}" alt="Logo" class="logo">
+    {{/if}}
+    <div class="header-text">
+      <h1>{{project_name}}</h1>
+      <div class="meta">
+        {{_brand.company_display}} · Gerado em {{generated_at}}
+      </div>
+    </div>
+  </div>
+
+  <!-- Badge do Padrão -->
+  <div class="standard-badge">
+    CBRR - Código Brasileiro de Recursos e Reservas Minerais
+    <span class="anm-badge">ANM</span>
+  </div>
+
+  <!-- Informações do Projeto -->
+  <h2>📋 Informações do Projeto</h2>
+  <div class="info-grid">
+    <div class="info-item">
+      <div class="info-label">Projeto</div>
+      <div class="info-value">{{project_name}}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Empresa</div>
+      <div class="info-value">{{company}}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Data Efetiva</div>
+      <div class="info-value">{{effective_date}}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Padrão</div>
+      <div class="info-value">{{standard_full_name}}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Processo ANM</div>
+      <div class="info-value">{{anm_process}}</div>
+    </div>
+    {{#if dnpm_code}}
+    <div class="info-item">
+      <div class="info-label">Código DNPM</div>
+      <div class="info-value">{{dnpm_code}}</div>
+    </div>
+    {{/if}}
+  </div>
+
+  <!-- Conformidade ANM -->
+  <div class="compliance-box">
+    <h3>⚖️ Conformidade Regulatória - ANM</h3>
+    <p><strong>Órgão Regulador:</strong> {{regulatory_body}}</p>
+    <p><strong>Norma Aplicável:</strong> {{anm_compliance.norm}}</p>
+    <p><strong>Sistema de Classificação:</strong> {{anm_compliance.classification_system}}</p>
+    <p><strong>Registro Obrigatório:</strong> {{#if anm_compliance.requires_registration}}Sim - {{anm_compliance.registration_body}}{{else}}Não{{/if}}</p>
+  </div>
+
+  <!-- Pessoa Qualificada (PQ) -->
+  <h2>👤 Pessoa Qualificada (PQ)</h2>
+  <p>Conforme exigido pelo CBRR e pela ANM, o relatório foi elaborado e assinado por Pessoa Qualificada registrada no CREA/CONFEA:</p>
+  
+  {{#each qualified_persons}}
+  <div class="info-grid">
+    <div class="info-item">
+      <div class="info-label">Nome</div>
+      <div class="info-value">{{name}}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Qualificação</div>
+      <div class="info-value">{{qualification}}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Organização</div>
+      <div class="info-value">{{organization}}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Função</div>
+      <div class="info-value">{{role}}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">Registro CREA</div>
+      <div class="info-value">{{crea_number}}</div>
+    </div>
+    <div class="info-item">
+      <div class="info-label">CPF</div>
+      <div class="info-value">{{cpf}}</div>
+    </div>
+  </div>
+  {{/each}}
+
+  <!-- Recursos e Reservas Minerais -->
+  <h2>💎 Recursos e Reservas Minerais (Classificação CBRR)</h2>
+  <p>Classificação conforme CBRR, alinhada com padrões CRIRSCO:</p>
+  
+  <table>
+    <thead>
+      <tr>
+        <th>Categoria</th>
+        <th>Tonelagem (t)</th>
+        <th>Teor Médio</th>
+        <th>Teor de Corte</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#each resources_table}}
+      <tr>
+        <td>
+          {{#if (eq category "Medido")}}
+          <span class="category-badge category-medido">{{category}}</span>
+          {{else if (eq category "Indicado")}}
+          <span class="category-badge category-indicado">{{category}}</span>
+          {{else if (eq category "Inferido")}}
+          <span class="category-badge category-inferido">{{category}}</span>
+          {{else if (eq category "Reserva Provada")}}
+          <span class="category-badge category-provada">{{category}}</span>
+          {{else if (eq category "Reserva Provável")}}
+          <span class="category-badge category-provavel">{{category}}</span>
+          {{else}}
+          {{category}}
+          {{/if}}
+        </td>
+        <td>{{tonnage}}</td>
+        <td>
+          {{#each grades}}
+          {{@key}}: {{this}}%<br>
+          {{/each}}
+        </td>
+        <td>
+          {{#each cutoff}}
+          {{@key}}: {{this}}%<br>
+          {{/each}}
+        </td>
+      </tr>
+      {{/each}}
+    </tbody>
+  </table>
+
+  <!-- Premissas Econômicas -->
+  <h2>💰 Premissas Econômicas</h2>
+  <div class="info-grid">
+    {{#if economic_assumptions.recovery_rate}}
+    <div class="info-item">
+      <div class="info-label">Taxa de Recuperação</div>
+      <div class="info-value">{{economic_assumptions.recovery_rate}}%</div>
+    </div>
+    {{/if}}
+    {{#if economic_assumptions.mining_cost}}
+    <div class="info-item">
+      <div class="info-label">Custo de Mineração</div>
+      <div class="info-value">R$ {{economic_assumptions.mining_cost}}/t</div>
+    </div>
+    {{/if}}
+    {{#if economic_assumptions.processing_cost}}
+    <div class="info-item">
+      <div class="info-label">Custo de Processamento</div>
+      <div class="info-value">R$ {{economic_assumptions.processing_cost}}/t</div>
+    </div>
+    {{/if}}
+    {{#if economic_assumptions.cfem_rate}}
+    <div class="info-item">
+      <div class="info-label">CFEM (Compensação Financeira)</div>
+      <div class="info-value">{{economic_assumptions.cfem_rate}}%</div>
+    </div>
+    {{/if}}
+  </div>
+
+  <!-- Licenciamento Ambiental -->
+  <div class="environmental-box">
+    <h3>🌿 Licenciamento Ambiental</h3>
+    <p><strong>Tipo de Licença:</strong> {{environmental_licensing.license_type}}</p>
+    <p><strong>Número da Licença:</strong> {{environmental_licensing.license_number}}</p>
+    <p><strong>Órgão Emissor:</strong> {{environmental_licensing.issuing_agency}}</p>
+  </div>
+
+  <!-- Geologia -->
+  <h2>🗺️ Geologia</h2>
+  <p>{{geology}}</p>
+
+  <!-- QA/QC -->
+  <h2>✅ Controle de Qualidade (QA/QC)</h2>
+  <p>{{qa_qc}}</p>
+
+  <!-- Seções do Relatório -->
+  {{#if sections.introducao.content_text}}
+  <h2>📖 Introdução</h2>
+  <p>{{sections.introducao.content_text}}</p>
+  {{/if}}
+
+  {{#if sections.localizacao.content_text}}
+  <h2>📍 Localização</h2>
+  <p>{{sections.localizacao.content_text}}</p>
+  {{/if}}
+
+  {{#if sections.metodologia.content_text}}
+  <h2>🔬 Metodologia</h2>
+  <p>{{sections.metodologia.content_text}}</p>
+  {{/if}}
+
+  {{#if sections.conclusoes.content_text}}
+  <h2>📊 Conclusões</h2>
+  <p>{{sections.conclusoes.content_text}}</p>
+  {{/if}}
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>Relatório gerado conforme CBRR (Código Brasileiro de Recursos e Reservas Minerais)</p>
+    <p>Regulamentado pela ANM (Agência Nacional de Mineração) - NRM-01</p>
+    <p>Sistema de classificação alinhado com CRIRSCO (Committee for Mineral Reserves International Reporting Standards)</p>
+    <p>Gerado em {{generated_at}}</p>
+  </div>
+</body>
+</html>
+

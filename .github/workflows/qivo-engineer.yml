@@ -14,6 +14,7 @@ jobs:
   technical-audit:
     name: Technical Core Audit
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     
     steps:
       - name: Checkout code

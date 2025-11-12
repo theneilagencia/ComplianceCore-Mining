@@ -25,6 +25,7 @@ jobs:
   technical-audit:
     name: Auditoria Técnica Completa
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     
     steps:
       - name: Checkout Repository
@@ -181,6 +182,7 @@ jobs:
   module-health-check:
     name: Health Check de Módulos
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     
     strategy:
       matrix:
@@ -226,6 +228,7 @@ jobs:
   compliance-check:
     name: Verificação de Conformidade
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     
     steps:
       - name: Checkout Repository

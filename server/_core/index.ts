@@ -94,7 +94,7 @@ async function startServer() {
     'http://localhost:3000',
     'http://localhost:4173'
   ];
-  
+
   const corsOptions = {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (mobile apps, Postman, etc.)

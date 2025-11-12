@@ -1,0 +1,68 @@
+# Cloud Build Configuration for QIVO Mining Backend
+# This file automates the build and deployment process to Cloud Run
+# Supports multiple environments: dev, staging, prd
+# Service name pattern: qivo-mining-${_ENV}
+
+steps:
+  # Step 1: Build Docker image
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'build-image'
+    args:
+      - 'build'
+      - '--no-cache'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:${_IMAGE_TAG}'
+      - '-t'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest'
+      - '-f'
+      - 'Dockerfile.backend'
+      - '.'
+    
+  # Step 2: Push image to Container Registry
+  - name: 'gcr.io/cloud-builders/docker'
+    id: 'push-image'
+    args:
+      - 'push'
+      - '--all-tags'
+      - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}'
+    
+  # Step 3: Deploy to Cloud Run
+  - name: 'gcr.io/cloud-builders/gcloud'
+    id: 'deploy-cloud-run'
+    args:
+      - 'run'
+      - 'deploy'
+      - '${_SERVICE_NAME}'
+      - '--image=gcr.io/$PROJECT_ID/${_SERVICE_NAME}:${_IMAGE_TAG}'
+      - '--region=southamerica-east1'
+      - '--platform=managed'
+      - '--allow-unauthenticated'
+      - '--min-instances=1'
+      - '--max-instances=10'
+      - '--memory=4Gi'
+      - '--cpu=2'
+      - '--timeout=300'
+      - '--port=10000'
+      - '--vpc-connector=qivo-vpc-connector'
+      - '--vpc-egress=private-ranges-only'
+      - '--set-env-vars=NODE_ENV=${_NODE_ENV}'
+      - '--set-secrets=DATABASE_URL=compliancecore-db-url:latest,OPENAI_API_KEY=openai-api-key:latest,SESSION_SECRET=session-secret:latest,JWT_SECRET=jwt-secret:latest,SIGMINE_API_KEY=sigmine-api-key:latest,MAPBIOMAS_API_KEY=mapbiomas-api-key:latest'
+
+# Build configuration
+timeout: 1800s  # 30 minutes
+options:
+  machineType: 'E2_HIGHCPU_8'
+  logging: CLOUD_LOGGING_ONLY
+  
+# Images to be pushed to Container Registry
+images:
+  - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:${_IMAGE_TAG}'
+  - 'gcr.io/$PROJECT_ID/${_SERVICE_NAME}:latest'
+
+# Substitutions
+substitutions:
+  _IMAGE_TAG: 'latest'  # Default, será sobrescrito pelo script
+  _ENV: 'prd'  # Default environment
+  _SERVICE_NAME: 'qivo-mining-prd'  # Default service name
+  _NODE_ENV: 'production'  # Default node environment
+
