@@ -9,7 +9,7 @@ import puppeteer from 'puppeteer';
 import { Document, Packer, Paragraph, TextRun, Table, TableCell, TableRow } from 'docx';
 import * as XLSX from 'xlsx';
 import Handlebars from 'handlebars';
-import { storagePut } from '../../../storage';
+import { storagePut } from '../../../storage-gcs';
 import * as jorcMapper from './mappers/jorc';
 import * as ni43Mapper from './mappers/ni43';
 import * as percMapper from './mappers/perc';

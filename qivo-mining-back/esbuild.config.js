@@ -4,6 +4,7 @@
 import { build } from 'esbuild';
 import { fileURLToPath } from 'url';
 import { dirname, resolve } from 'path';
+import { existsSync } from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -16,7 +17,16 @@ const aliasPlugin = {
   setup(build) {
     build.onResolve({ filter: /^@shared/ }, (args) => {
       const pathWithoutAlias = args.path.replace(/^@shared\//, '');
-      const resolvedPath = resolve(__dirname, 'src/shared', pathWithoutAlias);
+      let resolvedPath = resolve(__dirname, 'src/shared', pathWithoutAlias);
+      
+      // If no extension, try to find .ts file
+      if (!resolvedPath.match(/\.(ts|tsx|js|jsx)$/)) {
+        const withTs = `${resolvedPath}.ts`;
+        if (existsSync(withTs)) {
+          resolvedPath = withTs;
+        }
+      }
+      
       return { path: resolvedPath };
     });
   },

@@ -33,3 +33,6 @@ uploads
 *.zip
 *.tar.gz
 
+# Explicitly include pnpm-lock.yaml (required for Docker build)
+!pnpm-lock.yaml
+

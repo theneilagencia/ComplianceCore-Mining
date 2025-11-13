@@ -1,32 +1,23 @@
 #!/bin/bash
 set -e
 
-# Adicionar gcloud ao PATH se não estiver
-if ! command -v gcloud &> /dev/null; then
-  if [ -f "$HOME/google-cloud-sdk/bin/gcloud" ]; then
-    export PATH="$HOME/google-cloud-sdk/bin:$PATH"
-  fi
-fi
-
-# Verificar se gcloud está disponível
-if ! command -v gcloud &> /dev/null; then
-  echo "❌ ERRO: gcloud não encontrado!"
-  echo "   Instale o Google Cloud SDK ou adicione ao PATH"
-  exit 1
-fi
+# Script de deploy SEM Cloud Build
+# Faz build local da imagem Docker e push direto para Container Registry
+# Uso: ./deploy-local.sh <env>
+# Ambientes: dev, staging, prd
 
 # Verificar se o ambiente foi fornecido
 if [ -z "$1" ]; then
   echo "❌ ERRO: Ambiente não especificado!"
   echo ""
-  echo "Uso: ./deploy.sh <env>"
+  echo "Uso: ./deploy-local.sh <env>"
   echo ""
   echo "Ambientes disponíveis:"
   echo "  dev      - Ambiente de desenvolvimento"
   echo "  staging  - Ambiente de staging"
   echo "  prd      - Ambiente de produção"
   echo ""
-  echo "Exemplo: ./deploy.sh dev"
+  echo "Exemplo: ./deploy-local.sh dev"
   exit 1
 fi
 
@@ -39,6 +30,26 @@ if [[ ! "$ENV" =~ ^(dev|staging|prd)$ ]]; then
   exit 1
 fi
 
+# Verificar se Docker está instalado
+if ! command -v docker &> /dev/null; then
+  echo "❌ ERRO: Docker não encontrado!"
+  echo "   Instale o Docker: https://docs.docker.com/get-docker/"
+  exit 1
+fi
+
+# Verificar se gcloud está disponível
+if ! command -v gcloud &> /dev/null; then
+  if [ -f "$HOME/google-cloud-sdk/bin/gcloud" ]; then
+    export PATH="$HOME/google-cloud-sdk/bin:$PATH"
+  fi
+fi
+
+if ! command -v gcloud &> /dev/null; then
+  echo "❌ ERRO: gcloud não encontrado!"
+  echo "   Instale o Google Cloud SDK ou adicione ao PATH"
+  exit 1
+fi
+
 # Configurações baseadas no ambiente
 PROJECT_ID="qivo-mining-prod"
 SERVICE_NAME="qivo-mining-${ENV}"
@@ -48,15 +59,15 @@ REGION="southamerica-east1"
 case $ENV in
   dev)
     NODE_ENV="development"
-    echo "🚀 Deploying QIVO Mining Backend to DEV environment..."
+    echo "🚀 Deploying QIVO Mining Backend to DEV environment (build local)..."
     ;;
   staging)
     NODE_ENV="staging"
-    echo "🚀 Deploying QIVO Mining Backend to STAGING environment..."
+    echo "🚀 Deploying QIVO Mining Backend to STAGING environment (build local)..."
     ;;
   prd)
     NODE_ENV="production"
-    echo "🚀 Deploying QIVO Mining Backend to PRODUCTION environment..."
+    echo "🚀 Deploying QIVO Mining Backend to PRODUCTION environment (build local)..."
     ;;
 esac
 
@@ -108,69 +119,99 @@ setup_gcs_permissions() {
 # Gerar timestamp único para forçar rebuild sem cache
 BUILD_TIMESTAMP=$(date -u +%Y%m%d%H%M%S)
 echo "$BUILD_TIMESTAMP" > .build-timestamp
-echo "📅 Build timestamp: $BUILD_TIMESTAMP (forçando rebuild sem cache)"
+echo "📅 Build timestamp: $BUILD_TIMESTAMP"
 
-# Gerar tag única para forçar nova imagem (evita cache do Cloud Run)
+# Gerar tag única
 IMAGE_TAG="${BUILD_TIMESTAMP}"
-IMAGE_NAME_WITH_TAG="gcr.io/${PROJECT_ID}/${SERVICE_NAME}:${IMAGE_TAG}"
-echo "🏷️  Usando tag única: ${IMAGE_TAG} (forçando nova imagem)"
+IMAGE_NAME="gcr.io/${PROJECT_ID}/${SERVICE_NAME}:${IMAGE_TAG}"
+IMAGE_NAME_LATEST="gcr.io/${PROJECT_ID}/${SERVICE_NAME}:latest"
+
+echo "🏷️  Image tag: ${IMAGE_TAG}"
 echo "📦 Service name: ${SERVICE_NAME}"
 echo "🌍 Environment: ${NODE_ENV}"
-
-# Verificar se .gcloudignore não está ignorando arquivos importantes
-echo ""
-echo "🔍 Verificando .gcloudignore:"
-if grep -q "^src/" .gcloudignore 2>/dev/null; then
-  echo "   ⚠️  WARNING: src/ está sendo ignorado pelo .gcloudignore!"
-  echo "   Isso pode causar problemas. Verifique o arquivo .gcloudignore"
-else
-  echo "   ✅ src/ NÃO está sendo ignorado (ok)"
-fi
-
-# Build da imagem Docker (usando código local)
-echo ""
-echo "📦 Building Docker image (usando código local)..."
-echo "   IMPORTANTE: O gcloud builds submit envia o código LOCAL para o Cloud Build"
-echo "   O código que você vê aqui será o código usado no build"
-echo "   Os logs do build serão exibidos em tempo real abaixo:"
-echo "   Este build vai FORÇAR recompilação do código (cache invalidado)"
 echo ""
 
-# Executar build usando cloudbuild.yaml (que tem --no-cache)
-echo "   Iniciando build usando cloudbuild.yaml (--no-cache forçado)..."
-echo "   Isso vai garantir que o código local seja usado SEM cache!"
+# Autenticar Docker no GCP
+echo "🔐 Autenticando Docker no GCP..."
+gcloud auth configure-docker --quiet --project ${PROJECT_ID}
+
+# Build da imagem Docker LOCALMENTE
+echo ""
+echo "📦 Building Docker image localmente..."
+echo "   Dockerfile: Dockerfile.backend"
+echo "   Context: . (diretório atual)"
 echo ""
 
-# IMPORTANTE: gcloud builds submit SEM --source envia o código LOCAL
-# Usar substituições para passar a tag única e o ambiente
-gcloud builds submit \
-  . \
-  --config cloudbuild.yaml \
-  --substitutions=_IMAGE_TAG=${IMAGE_TAG},_SERVICE_NAME=${SERVICE_NAME},_NODE_ENV=${NODE_ENV} \
-  --project ${PROJECT_ID}
+docker build \
+  --no-cache \
+  -f Dockerfile.backend \
+  -t ${IMAGE_NAME} \
+  -t ${IMAGE_NAME_LATEST} \
+  .
 
 BUILD_EXIT_CODE=$?
 
 if [ $BUILD_EXIT_CODE -ne 0 ]; then
   echo ""
-  echo "❌ Build falhou com código de saída: $BUILD_EXIT_CODE"
-  echo "   Verifique os logs acima ou em: https://console.cloud.google.com/cloud-build/builds?project=${PROJECT_ID}"
+  echo "❌ Build Docker falhou com código de saída: $BUILD_EXIT_CODE"
   exit 1
 fi
 
-# Capturar o ID do último build para referência
-BUILD_ID=$(gcloud builds list --project ${PROJECT_ID} --limit=1 --format="value(id)" 2>/dev/null || echo "")
+echo ""
+echo "✅ Docker image built successfully!"
 
-if [ -n "$BUILD_ID" ]; then
+# Push da imagem para Container Registry
+echo ""
+echo "📤 Pushing image to Container Registry..."
+echo "   ${IMAGE_NAME}"
+echo "   ${IMAGE_NAME_LATEST}"
+echo ""
+
+docker push ${IMAGE_NAME}
+docker push ${IMAGE_NAME_LATEST}
+
+PUSH_EXIT_CODE=$?
+
+if [ $PUSH_EXIT_CODE -ne 0 ]; then
   echo ""
-  echo "✅ Build e Deploy concluídos! ID: $BUILD_ID"
-  echo "   O cloudbuild.yaml já fez o deploy automaticamente para o Cloud Run"
-  echo "   Ver detalhes em: https://console.cloud.google.com/cloud-build/builds/${BUILD_ID}?project=${PROJECT_ID}"
-else
+  echo "❌ Push da imagem falhou com código de saída: $PUSH_EXIT_CODE"
+  exit 1
+fi
+
+echo ""
+echo "✅ Image pushed successfully!"
+
+# Deploy no Cloud Run
+echo ""
+echo "🚀 Deploying to Cloud Run..."
+echo "   Service: ${SERVICE_NAME}"
+echo "   Region: ${REGION}"
+echo "   Image: ${IMAGE_NAME}"
+echo ""
+
+gcloud run deploy ${SERVICE_NAME} \
+  --image=${IMAGE_NAME} \
+  --region=${REGION} \
+  --platform=managed \
+  --allow-unauthenticated \
+  --min-instances=1 \
+  --max-instances=10 \
+  --memory=4Gi \
+  --cpu=2 \
+  --timeout=300 \
+  --port=10000 \
+  --vpc-connector=qivo-vpc-connector \
+  --vpc-egress=private-ranges-only \
+  --set-env-vars=NODE_ENV=${NODE_ENV} \
+  --set-secrets=DATABASE_URL=compliancecore-db-url:latest,OPENAI_API_KEY=openai-api-key:latest,SESSION_SECRET=session-secret:latest,JWT_SECRET=jwt-secret:latest,SIGMINE_API_KEY=sigmine-api-key:latest,MAPBIOMAS_API_KEY=mapbiomas-api-key:latest \
+  --project=${PROJECT_ID}
+
+DEPLOY_EXIT_CODE=$?
+
+if [ $DEPLOY_EXIT_CODE -ne 0 ]; then
   echo ""
-  echo "✅ Build e Deploy concluídos!"
-  echo "   O cloudbuild.yaml já fez o deploy automaticamente para o Cloud Run"
-  echo "   Ver builds em: https://console.cloud.google.com/cloud-build/builds?project=${PROJECT_ID}"
+  echo "❌ Deploy falhou com código de saída: $DEPLOY_EXIT_CODE"
+  exit 1
 fi
 
 # Aguardar um pouco para garantir que a revisão foi criada
@@ -204,4 +245,9 @@ echo "✅ Deployment complete!"
 echo "🔗 URL: https://${SERVICE_NAME}-586444405059.${REGION}.run.app"
 echo "📝 Para verificar os logs do Cloud Run:"
 echo "   gcloud run services logs read ${SERVICE_NAME} --region=${REGION} --project=${PROJECT_ID} --limit=50"
+echo ""
+echo "💡 Dica: Para usar este script, adicione ao package.json:"
+echo "   \"deploy:local:dev\": \"bash deploy-local.sh dev\""
+echo "   \"deploy:local:staging\": \"bash deploy-local.sh staging\""
+echo "   \"deploy:local:prd\": \"bash deploy-local.sh prd\""
 

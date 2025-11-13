@@ -15,7 +15,7 @@
  *     }]
  *   });
  */
-import { storagePut } from "server/storage-hybrid";
+import { storagePut } from "../storage-gcs";
 import { ENV } from "./env";
 
 export type GenerateImageOptions = {

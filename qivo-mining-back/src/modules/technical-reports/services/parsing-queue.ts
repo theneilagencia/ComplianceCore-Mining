@@ -148,8 +148,23 @@ class ParsingJobQueue {
       // Stage 1: Parse file (25% progress)
       emitParsingProgress(reportId, 25, 'Lendo arquivo...');
       
+      // Extrair texto do arquivo baseado no tipo
+      let fileText: string;
+      if (mimeType === 'application/pdf') {
+        // Para PDFs, tentar extrair texto básico (melhorar depois com biblioteca)
+        // Por enquanto, usar nome do arquivo como fallback principal
+        fileText = fileBuffer.toString('utf-8', 0, Math.min(10000, fileBuffer.length));
+        // Se o texto extraído for muito pequeno ou parecer binário, usar apenas nome do arquivo
+        if (fileText.length < 100 || !/[a-zA-Z]{10,}/.test(fileText)) {
+          fileText = ''; // Forçar uso do nome do arquivo
+        }
+      } else {
+        // Para outros tipos, converter buffer para string
+        fileText = fileBuffer.toString('utf-8');
+      }
+      
       const parsingResult: any = await Promise.race([
-        parseAndNormalize(fileBuffer.toString(), mimeType, reportId, tenantId),
+        parseAndNormalize(fileText, mimeType, reportId, tenantId, fileName),
         this.timeout(120000, 'Parsing timeout após 2 minutos'), // 2 min timeout
       ]);
 
@@ -173,15 +188,22 @@ class ParsingJobQueue {
       const db = await getDb();
       if (!db) throw new Error('Database not available');
 
+      // Validar standard antes de salvar (garantir que é um valor válido do enum)
+      const validStandards = ['JORC_2012', 'NI_43_101', 'PERC', 'SAMREC', 'CRIRSCO', 'CBRR', 'SEC_SK_1300'] as const;
+      const detectedStandard = validStandards.includes(parsingResult.summary.detectedStandard as any)
+        ? parsingResult.summary.detectedStandard
+        : 'JORC_2012'; // Fallback para JORC_2012 se inválido
+
       await db
         .update(reports)
         .set({
-          detectedStandard: parsingResult.summary.detectedStandard as any,
-          standard: parsingResult.summary.detectedStandard as any,
+          detectedStandard: detectedStandard as any,
+          standard: detectedStandard as any,
           status: (parsingResult.status === 'needs_review' ? 'needs_review' : 'ready_for_audit') as any,
           s3NormalizedUrl: normalizedUrl,
           parsingSummary: {
             ...parsingResult.summary,
+            detectedStandard: detectedStandard, // Garantir que o summary também tenha valor válido
             attemptCount: job.attempts,
             parsedAt: new Date().toISOString(),
           },

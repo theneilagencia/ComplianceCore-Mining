@@ -28,7 +28,7 @@ export default function AuditUploadModal({ isOpen, onClose, onUploadComplete }: 
   const [file, setFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  const uploadMutation = trpc.technicalReports.uploadsV2.upload.useMutation();
+  const uploadMutation = trpc.technicalReports.uploadsV2.uploadAndProcessReport.useMutation();
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
@@ -51,9 +51,40 @@ export default function AuditUploadModal({ isOpen, onClose, onUploadComplete }: 
     try {
       console.log("[AuditUploadModal] Starting upload...");
       
+      // Converter arquivo para base64
+      const fileData = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        
+        reader.onload = () => {
+          try {
+            const result = reader.result as string;
+            if (!result || !result.includes(',')) {
+              reject(new Error("Formato de arquivo inválido"));
+              return;
+            }
+            const base64 = result.split(",")[1];
+            if (!base64) {
+              reject(new Error("Não foi possível converter o arquivo"));
+              return;
+            }
+            resolve(base64);
+          } catch (error) {
+            reject(new Error(`Erro ao processar arquivo: ${error}`));
+          }
+        };
+        
+        reader.onerror = () => {
+          reject(new Error(`Erro ao ler arquivo: ${reader.error?.message || 'desconhecido'}`));
+        };
+        
+        reader.readAsDataURL(file);
+      });
+      
       const result = await uploadMutation.mutateAsync({
-        file: file as any,
         fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type || "application/pdf",
+        fileData,
       });
 
       console.log("[AuditUploadModal] Upload completed:", result.reportId);

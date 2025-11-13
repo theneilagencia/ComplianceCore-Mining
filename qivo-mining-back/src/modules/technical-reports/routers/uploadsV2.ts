@@ -2,7 +2,7 @@ import { z } from "zod";
 import { randomUUID } from "crypto";
 import { router, protectedProcedure } from "../../../_core/trpc";
 import { uploads, reports } from "../../../../drizzle/schema";
-import { storagePut } from "../../../storage-hybrid";
+import { storagePut } from "../../../storage-gcs";
 import { parsingQueue } from "../services/parsing-queue";
 import { emitUploadCompleted } from "../services/event-emitter";
 

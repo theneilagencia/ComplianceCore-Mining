@@ -11,7 +11,7 @@ import { reports, certifications } from '../../../../drizzle/schema';
 import { eq, and, desc } from 'drizzle-orm';
 import { runPreCertification } from '../services/precertification';
 import { generateCompliancePDF } from '../services/compliance-pdf';
-import { storagePut } from '../../../storage';
+import { storagePut } from '../../../storage-gcs';
 
 export const precertificationRouter = router({
   // Submit pre-certification request

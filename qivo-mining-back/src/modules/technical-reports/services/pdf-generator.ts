@@ -5,7 +5,7 @@
  */
 
 import puppeteer from "puppeteer";
-import { storagePut } from "../../../storage.js";
+import { storagePut } from "../../../storage-gcs";
 
 interface AuditData {
   reportId: string;

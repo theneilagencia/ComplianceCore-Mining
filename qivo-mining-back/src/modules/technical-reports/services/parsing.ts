@@ -1,4 +1,4 @@
-import { storagePut, storageGet } from "../../../storage-hybrid";
+import { storagePut, storageGet } from "../../../storage-gcs";
 
 /**
  * ETAPA 2: Serviço de Parsing e Normalização
@@ -123,11 +123,13 @@ function detectDocumentType(text: string): { type: 'technical_report' | 'api_doc
 
 /**
  * Detecta o padrão internacional baseado em palavras-chave
+ * Também usa o nome do arquivo como fallback
  */
-function detectStandard(text: string): { standard: string; confidence: number } {
+function detectStandard(text: string, fileName?: string): { standard: string; confidence: number } {
   const patterns = {
     JORC_2012: [
       /jorc\s*2012/i,
+      /jorc\s*code/i,
       /table\s*1/i,
       /competent\s*person/i,
       /mineral\s*resource/i,
@@ -135,6 +137,7 @@ function detectStandard(text: string): { standard: string; confidence: number } 
     ],
     NI_43_101: [
       /ni\s*43-101/i,
+      /ni\s*43\s*101/i,
       /national\s*instrument/i,
       /qualified\s*person/i,
       /item\s*14/i,
@@ -156,8 +159,31 @@ function detectStandard(text: string): { standard: string; confidence: number } 
     ],
   };
 
-  let bestMatch = { standard: "UNKNOWN", confidence: 0 };
+  // Valores válidos do enum do banco
+  const validStandards = ['JORC_2012', 'NI_43_101', 'PERC', 'SAMREC', 'CRIRSCO', 'CBRR', 'SEC_SK_1300'] as const;
+  const defaultStandard = 'JORC_2012'; // Padrão quando não detectar nada
 
+  let bestMatch = { standard: defaultStandard, confidence: 0 };
+
+  // Primeiro, tentar detectar pelo nome do arquivo (alta confiança se encontrado)
+  if (fileName) {
+    const fileNameLower = fileName.toLowerCase();
+    if (fileNameLower.includes('jorc')) {
+      bestMatch = { standard: 'JORC_2012', confidence: 0.9 };
+    } else if (fileNameLower.includes('ni43') || fileNameLower.includes('ni-43') || fileNameLower.includes('ni_43')) {
+      bestMatch = { standard: 'NI_43_101', confidence: 0.9 };
+    } else if (fileNameLower.includes('perc')) {
+      bestMatch = { standard: 'PERC', confidence: 0.9 };
+    } else if (fileNameLower.includes('samrec')) {
+      bestMatch = { standard: 'SAMREC', confidence: 0.9 };
+    } else if (fileNameLower.includes('crirsco')) {
+      bestMatch = { standard: 'CRIRSCO', confidence: 0.9 };
+    } else if (fileNameLower.includes('cbrr')) {
+      bestMatch = { standard: 'CBRR', confidence: 0.9 };
+    }
+  }
+
+  // Depois, tentar detectar pelo conteúdo do texto
   for (const [standard, regexes] of Object.entries(patterns)) {
     let matches = 0;
     for (const regex of regexes) {
@@ -166,9 +192,16 @@ function detectStandard(text: string): { standard: string; confidence: number } 
       }
     }
     const confidence = matches / regexes.length;
+    // Se a confiança do conteúdo for maior que a do nome do arquivo, usar conteúdo
     if (confidence > bestMatch.confidence) {
       bestMatch = { standard, confidence };
     }
+  }
+
+  // Garantir que o standard retornado seja válido
+  if (!validStandards.includes(bestMatch.standard as any)) {
+    bestMatch.standard = defaultStandard;
+    bestMatch.confidence = 0;
   }
 
   return bestMatch;
@@ -328,13 +361,14 @@ export async function parseAndNormalize(
   fileContent: string,
   fileType: string,
   reportId: string,
-  tenantId: string
+  tenantId: string,
+  fileName?: string
 ): Promise<ParsingResult> {
   // Simular extração de texto (em produção, usar bibliotecas específicas)
   const text = fileContent;
 
-  // Detectar padrão
-  const { standard, confidence } = detectStandard(text);
+  // Detectar padrão (incluindo nome do arquivo como fallback)
+  const { standard, confidence } = detectStandard(text, fileName);
 
   // Extrair componentes
   const sections = extractSections(text, standard);
@@ -434,17 +468,10 @@ export async function loadNormalizedFromS3(
     console.log(`[loadNormalizedFromS3] Loading ${s3Key}...`);
     
     const result = await storageGet(s3Key);
-    console.log(`[loadNormalizedFromS3] Got storage result:`, { key: result.key, hasBuffer: !!result.buffer, url: result.url });
+    console.log(`[loadNormalizedFromS3] Got storage result:`, { key: result.key, url: result.url });
     
-    // Se temos o buffer direto (Render Disk), usar ele
-    if (result.buffer) {
-      console.log(`[loadNormalizedFromS3] Using buffer from Render Disk`);
-      const normalized = JSON.parse(result.buffer.toString('utf-8'));
-      return normalized as NormalizedReport;
-    }
-    
-    // Caso contrário, fazer fetch da URL (CDN)
-    console.log(`[loadNormalizedFromS3] Fetching from URL: ${result.url}`);
+    // Fazer fetch da URL assinada do GCS
+    console.log(`[loadNormalizedFromS3] Fetching from GCS URL: ${result.url}`);
     const response = await fetch(result.url);
     
     if (!response.ok) {

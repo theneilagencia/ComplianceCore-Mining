@@ -1,7 +1,7 @@
 # Cloud Build Configuration for QIVO Mining Backend
 # This file automates the build and deployment process to Cloud Run
 # Supports multiple environments: dev, staging, prd
-# Service name pattern: qivo-mining-${_ENV}
+# Service name is passed via _SERVICE_NAME substitution
 
 steps:
   # Step 1: Build Docker image
@@ -62,7 +62,6 @@ images:
 # Substitutions
 substitutions:
   _IMAGE_TAG: 'latest'  # Default, será sobrescrito pelo script
-  _ENV: 'prd'  # Default environment
   _SERVICE_NAME: 'qivo-mining-prd'  # Default service name
   _NODE_ENV: 'production'  # Default node environment
 

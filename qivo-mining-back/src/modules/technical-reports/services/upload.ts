@@ -1,4 +1,4 @@
-import { storagePut, storageGet } from "../../../storage-hybrid";
+import { storagePut, storageGet } from "../../../storage-gcs";
 
 /**
  * Upload Service para Technical Reports

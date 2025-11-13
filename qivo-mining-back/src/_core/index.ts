@@ -4,7 +4,6 @@ import compression from "compression";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { createServer } from "http";
-import net from "net";
 import { rateLimit } from "express-rate-limit";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
@@ -30,9 +29,8 @@ import { startScheduler } from "../modules/radar/services/scheduler";
 import templatesRouter from "../modules/templates/router";
 import validateRouter from "../modules/validate/router";
 import contactRouter from "../modules/contact/router";
-import storageDownloadRouter from "../routes/storage-download";
 import fixS3UrlRouter from "../routes/fix-s3url";
-import { initStorage } from "../storage-hybrid";
+import { initStorage } from "../storage-gcs";
 import { installS3UrlTrigger } from "../install-s3url-trigger";
 import { passport } from "../modules/auth/google-oauth";
 import devRouter from "../modules/dev/router";
@@ -46,25 +44,6 @@ import { runDevSeeds } from "../modules/dev/seed";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
 import { antiRedirectMiddleware } from "./anti-redirect-middleware";
-
-function isPortAvailable(port: number): Promise<boolean> {
-  return new Promise(resolve => {
-    const server = net.createServer();
-    server.listen(port, () => {
-      server.close(() => resolve(true));
-    });
-    server.on("error", () => resolve(false));
-  });
-}
-
-async function findAvailablePort(startPort: number = 3000): Promise<number> {
-  for (let port = startPort; port < startPort + 20; port++) {
-    if (await isPortAvailable(port)) {
-      return port;
-    }
-  }
-  throw new Error(`No available port found starting from ${startPort}`);
-}
 
 async function startServer() {
   const app = express();
@@ -280,9 +259,8 @@ async function startServer() {
   // Populate database route (temporary, for setup)
   app.use("/api/dev", populateDbRouter);
   
-  // Migrations route (temporary, for setup)
-  const migrationsRouter = (await import("../modules/dev/migrations-router.js")).default;
-  app.use("/api/dev", migrationsRouter);
+  // Migrations route (temporary, for setup) - loaded asynchronously after server starts
+  // Will be registered after server.listen() to avoid blocking startup
   
   // Stripe webhook setup route (temporary, for setup)
   app.use("/api", stripeWebhookSetupRouter);
@@ -327,15 +305,11 @@ async function startServer() {
   // Contact form routes
   app.use("/api/contact", contactRouter);
   
-  // Storage download routes
-  app.use("/api/storage", storageDownloadRouter);
-  
   // Fix s3Url migration route
   app.use("/api", fixS3UrlRouter);
   
   // Server-Sent Events (SSE) for real-time upload pipeline updates
-  const { eventsRouter } = await import("../modules/technical-reports/routers/events");
-  app.use("/api", eventsRouter);
+  // Will be loaded asynchronously after server starts to avoid blocking startup
   
   // tRPC API (com rate limiting para uploads)
   // Note: uploadLimiter será aplicado especificamente no endpoint de upload via tRPC middleware
@@ -350,12 +324,8 @@ async function startServer() {
   // Backend-only mode: No static file serving
   // All routes are API routes under /api/*
 
-  const preferredPort = parseInt(process.env.PORT || "3000");
-  const port = await findAvailablePort(preferredPort);
-
-  if (port !== preferredPort) {
-    console.log(`Port ${preferredPort} is busy, using port ${port} instead`);
-  }
+  // Use PORT from environment (Cloud Run sets this to 10000) or default to 10000
+  const port = parseInt(process.env.PORT || "10000");
 
   // Increase timeout for large file uploads (default is 2 minutes)
   // Base64 encoding increases size by ~33%, so a 50MB file becomes ~66MB
@@ -363,16 +333,53 @@ async function startServer() {
   server.keepAliveTimeout = 65 * 1000; // Slightly higher than ALB idle timeout (60s)
   server.headersTimeout = 66 * 1000; // Slightly higher than keepAliveTimeout
 
-  server.listen(port, async () => {
-    console.log(`Server running on http://localhost:${port}/`);
+  // Start server immediately - Cloud Run requires quick startup
+  // Listen on 0.0.0.0 to accept connections from Cloud Run
+  server.listen(port, '0.0.0.0', () => {
+    console.log(`Server running on http://0.0.0.0:${port}/`);
     console.log(`Server timeout: ${server.timeout}ms (${server.timeout / 1000}s)`);
     
-    // Initialize storage
-    await initStorage();
-    
-    // Install database trigger to auto-fix s3Url
-    await installS3UrlTrigger();
-    
+    // Auto-seed disabled - use POST /api/dev/init to create test users
+    if (process.env.NODE_ENV !== 'production') {
+      console.log('[Dev] Development mode enabled. Use POST /api/dev/init to create test users.');
+    }
+  });
+
+  // Initialize services asynchronously after server starts (non-blocking)
+  // This allows Cloud Run to detect the server is ready immediately
+  (async () => {
+    try {
+      // Load dynamic routes that were deferred to avoid blocking startup
+      const migrationsRouter = (await import("../modules/dev/migrations-router.js")).default;
+      app.use("/api/dev", migrationsRouter);
+      console.log('✅ [Routes] Migrations router loaded');
+      
+      const { eventsRouter } = await import("../modules/technical-reports/routers/events");
+      app.use("/api", eventsRouter);
+      console.log('✅ [Routes] Events router loaded');
+    } catch (error) {
+      console.error('❌ [Routes] Failed to load dynamic routes:', error);
+      // Non-blocking - continue even if route loading fails
+    }
+
+    try {
+      // Initialize storage
+      await initStorage();
+      console.log('✅ [Storage] Initialized successfully');
+    } catch (error) {
+      console.error('❌ [Storage] Failed to initialize:', error);
+      // Non-blocking - continue even if storage init fails
+    }
+
+    try {
+      // Install database trigger to auto-fix s3Url
+      await installS3UrlTrigger();
+      console.log('✅ [Database Trigger] Installed successfully');
+    } catch (error) {
+      console.error('❌ [Database Trigger] Failed to install:', error);
+      // Non-blocking - continue even if trigger installation fails
+    }
+
     // Initialize Radar Scheduler (cron jobs for data aggregation and notifications)
     if (process.env.NODE_ENV !== 'test') {
       try {
@@ -393,11 +400,9 @@ async function startServer() {
       //   // Non-blocking - continue server startup even if scheduler fails
       // }
     }
-    
-    // Auto-seed disabled - use POST /api/dev/init to create test users
-    if (process.env.NODE_ENV !== 'production') {
-      console.log('[Dev] Development mode enabled. Use POST /api/dev/init to create test users.');
-    }
+  })().catch((error) => {
+    console.error('❌ [Initialization] Error during async initialization:', error);
+    // Don't crash the server if initialization fails
   });
 }
 
