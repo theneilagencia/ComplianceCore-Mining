@@ -1,0 +1,60 @@
+{
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "delete": "Supprimer",
+    "edit": "Modifier",
+    "create": "Créer",
+    "back": "Retour",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "export": "Exporter",
+    "import": "Importer"
+  },
+  "nav": {
+    "features": "Fonctionnalités",
+    "pricing": "Tarifs",
+    "login": "Se Connecter",
+    "logout": "Se Déconnecter",
+    "dashboard": "Tableau de Bord",
+    "account": "Compte",
+    "settings": "Paramètres"
+  },
+  "home": {
+    "skipNav": "Aller au contenu principal",
+    "tagline": "Infrastructure Full-Stack pour la Gouvernance Minière",
+    "title": "Transformez la Conformité en",
+    "titleHighlight": "Valeur Stratégique",
+    "description": "QIVO Mining est l'infrastructure numérique qui connecte les données techniques, l'intelligence réglementaire, l'ESG et la valorisation financière — transformant les rapports statiques en actifs auditables, précieux et stratégiques.",
+    "ctaPrimary": "Créer un Compte Gratuit",
+    "ctaSecondary": "Voir les Plans et Tarifs",
+    "feature1": "Auditable en temps réel",
+    "feature2": "Conformité prédictive",
+    "feature3": "ESG opérationnel"
+  },
+  "pricing": {
+    "title": "Plans et Tarifs",
+    "subtitle": "Choisissez le plan idéal pour votre opération minière",
+    "free": "Gratuit",
+    "perMonth": "/mois",
+    "perYear": "/an",
+    "selectPlan": "Sélectionner le Plan",
+    "contactSales": "Contacter les Ventes"
+  },
+  "dashboard": {
+    "welcome": "Bienvenue",
+    "generateReport": "Générer un Rapport",
+    "auditReport": "Auditer un Rapport"
+  },
+  "reports": {
+    "title": "Rapports Techniques",
+    "newReport": "Nouveau Rapport",
+    "generate": "Générer un Rapport Technique"
+  }
+}
+

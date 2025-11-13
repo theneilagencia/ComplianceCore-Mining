@@ -1,0 +1,326 @@
+/**
+ * Authentication Router
+ * Handles login, register, logout, and OAuth routes
+ */
+
+import express, { type Request, type Response } from 'express';
+import * as authService from './service';
+import { passport, configureGoogleOAuth } from './google-oauth';
+
+const router = express.Router();
+
+// Configure Google OAuth
+configureGoogleOAuth();
+
+/**
+ * POST /api/auth/register
+ * Register new user with email/password
+ */
+router.post('/register', async (req: Request, res: Response) => {
+  try {
+    const { email, password, name } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({
+        error: 'Email and password are required',
+      });
+      return;
+    }
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      res.status(400).json({
+        error: 'Invalid email format',
+      });
+      return;
+    }
+
+    // Validate password strength (min 8 chars)
+    if (password.length < 8) {
+      res.status(400).json({
+        error: 'Password must be at least 8 characters long',
+      });
+      return;
+    }
+
+    const authTokens = await authService.registerUser({ email, password, name });
+    
+    // Set JWT in secure HTTP-only cookie
+    res.cookie('accessToken', authTokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000 // 15 minutes
+    });
+    
+    res.cookie('refreshToken', authTokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    // Return only user data - tokens are in HttpOnly cookies
+    res.json({
+      success: true,
+      user: authTokens.user
+    });
+  } catch (error: any) {
+    console.error('[Auth] Register error:', error);
+    res.status(400).json({
+      error: error.message || 'Registration failed',
+    });
+  }
+});
+
+/**
+ * POST /api/auth/login
+ * Login user with email/password
+ */
+router.post('/login', async (req: Request, res: Response) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      res.status(400).json({
+        error: 'Email and password are required',
+      });
+      return;
+    }
+
+    const authTokens = await authService.loginUser({ email, password });
+    
+    // Set JWT in secure HTTP-only cookie (fallback for same-origin)
+    res.cookie('accessToken', authTokens.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000 // 15 minutes
+    });
+    
+    res.cookie('refreshToken', authTokens.refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
+    });
+
+    // Return tokens in body for cross-origin scenarios
+    res.json({
+      success: true,
+      user: authTokens.user,
+      accessToken: authTokens.accessToken,
+      refreshToken: authTokens.refreshToken
+    });
+  } catch (error: any) {
+    console.error('[Auth] Login error:', error);
+    res.status(401).json({
+      error: error.message || 'Login failed',
+    });
+  }
+});
+
+/**
+ * POST /api/auth/refresh
+ * Refresh access token using refresh token from cookie
+ */
+router.post('/refresh', async (req: Request, res: Response) => {
+  try {
+    // Get refresh token from body or cookie
+    const refreshToken = req.body.refreshToken || req.cookies.refreshToken;
+
+    if (!refreshToken) {
+      res.status(401).json({
+        error: 'No refresh token provided',
+      });
+      return;
+    }
+
+    // Generate new access token
+    const result = await authService.refreshAccessToken(refreshToken);
+
+    // Set new access token in cookie (fallback)
+    res.cookie('accessToken', result.accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
+      maxAge: 15 * 60 * 1000 // 15 minutes
+    });
+
+    // Return new access token in body for cross-origin
+    res.json({ 
+      success: true, 
+      message: 'Token refreshed successfully',
+      accessToken: result.accessToken
+    });
+  } catch (error: any) {
+    console.error('[Auth] Refresh error:', error);
+    
+    // Clear cookies if refresh failed
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    
+    res.status(401).json({
+      error: error.message || 'Token refresh failed',
+    });
+  }
+});
+
+/**
+ * POST /api/auth/logout
+ * Logout user (invalidate refresh token)
+ */
+router.post('/logout', async (req: Request, res: Response) => {
+  try {
+    // Try to get token from cookie first, then from header
+    const token = req.cookies.accessToken || 
+      (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.substring(7) : null);
+
+    if (token) {
+      try {
+        const decoded = authService.verifyToken(token);
+        await authService.logoutUser(decoded.userId);
+      } catch (error) {
+        // Token invalid or expired, just clear cookies
+        console.log('[Auth] Token invalid during logout, clearing cookies anyway');
+      }
+    }
+    
+    // Clear cookies
+    res.clearCookie('accessToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
+    
+    res.clearCookie('refreshToken', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    });
+
+    res.json({ success: true });
+  } catch (error: any) {
+    console.error('[Auth] Logout error:', error);
+    res.status(400).json({
+      error: error.message || 'Logout failed',
+    });
+  }
+});
+
+/**
+ * GET /api/auth/session
+ * Check if user is authenticated and return session info
+ */
+router.get('/session', async (req: Request, res: Response) => {
+  try {
+    // Try to get token from cookie first, then from header
+    const token = req.cookies.accessToken || 
+      (req.headers.authorization?.startsWith('Bearer ') ? req.headers.authorization.substring(7) : null);
+
+    if (!token) {
+      res.status(401).json({
+        authenticated: false,
+        error: 'No token provided',
+      });
+      return;
+    }
+    const decoded = authService.verifyToken(token);
+
+    const user = await authService.getUserById(decoded.userId);
+
+    if (!user) {
+      res.status(401).json({
+        authenticated: false,
+        error: 'User not found',
+      });
+      return;
+    }
+
+    // Get user's license/plan
+    const license = await authService.getUserLicenseInfo(user.id);
+
+    res.json({
+      authenticated: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
+      },
+      plan: license?.plan || 'START',
+    });
+  } catch (error: any) {
+    console.error('[Auth] Session check error:', error);
+    res.status(401).json({
+      authenticated: false,
+      error: error.message || 'Authentication failed',
+    });
+  }
+});
+
+/**
+ * GET /api/auth/me
+ * Get current user info
+ */
+router.get('/me', async (req: Request, res: Response) => {
+  try {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      res.status(401).json({
+        error: 'No token provided',
+      });
+      return;
+    }
+
+    const token = authHeader.substring(7);
+    const decoded = authService.verifyToken(token);
+
+    const user = await authService.getUserById(decoded.userId);
+
+    if (!user) {
+      res.status(404).json({
+        error: 'User not found',
+      });
+      return;
+    }
+
+    res.json({
+      id: user.id,
+      email: user.email,
+      name: user.name,
+    });
+  } catch (error: any) {
+    console.error('[Auth] Get user error:', error);
+    res.status(401).json({
+      error: error.message || 'Authentication failed',
+    });
+  }
+});
+
+/**
+ * GET /api/auth/google
+ * Initiate Google OAuth flow
+ * TEMPORARILY DISABLED - Returns 503
+ */
+router.get('/google', (req: Request, res: Response) => {
+  res.status(503).json({
+    error: 'Google login temporariamente desabilitado'
+  });
+});
+
+/**
+ * GET /api/auth/google/callback
+ * Google OAuth callback
+ * TEMPORARILY DISABLED - Returns 503
+ */
+router.get('/google/callback', (req: Request, res: Response) => {
+  res.status(503).json({
+    error: 'Google login temporariamente desabilitado'
+  });
+});
+
+export default router;
+

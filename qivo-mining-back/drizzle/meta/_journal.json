@@ -1,0 +1,34 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1761064354848,
+      "tag": "0000_abnormal_ultimo",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1761065571640,
+      "tag": "0001_gray_daredevil",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1761067007925,
+      "tag": "0002_cuddly_jane_foster",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1761068597390,
+      "tag": "0003_fancy_moondragon",
+      "breakpoints": true
+    }
+  ]
+}

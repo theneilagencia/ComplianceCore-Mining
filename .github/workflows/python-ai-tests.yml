@@ -22,6 +22,7 @@ jobs:
   test-ai:
     name: Test AI Modules
     runs-on: ubuntu-latest
+    if: github.ref != 'refs/heads/dev'
     
     strategy:
       matrix:

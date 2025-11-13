@@ -16,7 +16,7 @@ jobs:
   auto_fix:
     name: "Detect & Fix Deploy Issues"
     runs-on: ubuntu-latest
-    if: github.event.workflow_run.conclusion == 'failure'
+    if: github.ref != 'refs/heads/dev' && github.event.workflow_run.conclusion == 'failure'
     
     steps:
       - name: "🧩 Checkout repository"

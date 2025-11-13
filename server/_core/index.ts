@@ -87,6 +87,8 @@ async function startServer() {
     'https://qivomining.com',
     // Staging
     'https://qivo-mining-staging-586444405059.southamerica-east1.run.app',
+    // Vercel Frontend
+    'https://dev-qivo-mining.vercel.app',
     // Development
     'http://localhost:5173',
     'http://localhost:3000',
@@ -94,7 +96,7 @@ async function startServer() {
     'https://dev-qivo-mining.vercel.app'
 
   ];
-  
+
   const corsOptions = {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
       // Allow requests with no origin (mobile apps, Postman, etc.)
@@ -102,6 +104,11 @@ async function startServer() {
       
       // Check if origin is in allowed list
       if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      
+      // Allow all Vercel preview URLs (for PR previews and deployments)
+      if (origin.includes('.vercel.app')) {
         return callback(null, true);
       }
       
